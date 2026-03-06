@@ -125,12 +125,11 @@ void LogicSystem::LoginHandler(std::shared_ptr<CSession> session,
 
     // Defer 保证任何 return 路径都会把 rtvalue 发回客户端
     // 注意：rtvalue 是栈变量，Defer 析构在同一作用域内，生命周期安全
-    Defer defer([&rtvalue, &session, msg_id]() {
-        session->Send(rtvalue.toStyledString(), msg_id);
+    Defer defer([&rtvalue, &session]() {
+        session->Send(rtvalue.toStyledString(), MSG_CHAT_LOGIN_RSP);
         });
 
     // 2. 向 StatusServer 校验 token
-    // 注意：StatusGrpcClient::Login 是待实现的新接口，
     // 与 GetChatServer 并列，用于验证客户端持有的 token 是否合法
     auto rsp = StatusGrpcClient::getInstance().Login(uid, token);
     rtvalue["error"] = rsp.error();
@@ -167,5 +166,5 @@ void LogicSystem::LoginHandler(std::shared_ptr<CSession> session,
     std::cout << "[LogicSystem] LoginHandler 登录成功，uid: " << uid << "\n";
     rtvalue["uid"] = uid;
     rtvalue["token"] = rsp.token();
-    rtvalue["email"] = user_info->email;
+    rtvalue["name"] = user_info->name;
 }

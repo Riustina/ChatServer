@@ -38,4 +38,5 @@ enum ErrorCodes {
 
 enum MSG_IDS {
 	MSG_CHAT_LOGIN = 1005, //用户登陆
+	MSG_CHAT_LOGIN_RSP = 1006,   // 登录聊天服务器回包
 };
