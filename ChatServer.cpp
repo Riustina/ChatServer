@@ -1,20 +1,49 @@
 ﻿// ChatServer.cpp : 此文件包含 "main" 函数。程序执行将在此处开始并结束。
-//
-
 #include <iostream>
+#include <boost/asio.hpp>
+#include "AsioIOServicePool.h"
+#include "CServer.h"
+#include "ConfigManager.h"
+#include "LogicSystem.h"
+
+#ifdef _WIN32
+#include <windows.h>
+#endif
 
 int main()
 {
-    std::cout << "Hello World!\n";
+    try {
+        auto& cfg = ConfigManager::getInstance();
+        auto& pool = AsioIOServicePool::getInstance();
+
+        boost::asio::io_context io_context;
+        boost::asio::signal_set signals(io_context, SIGINT, SIGTERM);
+
+        signals.async_wait([&io_context, &pool](
+            const boost::system::error_code& ec, int /*signo*/)
+            {
+                if (ec) return; // 信号等待本身出错，不处理
+                std::cout << "[main] 收到退出信号，正在关闭...\n";
+                io_context.stop();
+                pool.Stop();
+            });
+
+        const std::string port_str = cfg["SelfServer"]["Port"];
+        if (port_str.empty()) {
+            throw std::runtime_error("[main] 配置文件中 SelfServer.Port 为空");
+        }
+
+        const int port = std::stoi(port_str); // 比 atoi 更安全，失败时抛异常
+        CServer server(io_context, static_cast<short>(port));
+
+        std::cout << "[main] ChatServer 启动，端口: " << port << "\n";
+        io_context.run();
+        std::cout << "[main] io_context 已退出，程序结束\n";
+    }
+    catch (const std::exception& e) {
+        std::cerr << "[main] 致命错误: " << e.what() << "\n";
+        return EXIT_FAILURE;
+    }
+
+    return EXIT_SUCCESS;
 }
-
-// 运行程序: Ctrl + F5 或调试 >“开始执行(不调试)”菜单
-// 调试程序: F5 或调试 >“开始调试”菜单
-
-// 入门使用技巧: 
-//   1. 使用解决方案资源管理器窗口添加/管理文件
-//   2. 使用团队资源管理器窗口连接到源代码管理
-//   3. 使用输出窗口查看生成输出和其他消息
-//   4. 使用错误列表窗口查看错误
-//   5. 转到“项目”>“添加新项”以创建新的代码文件，或转到“项目”>“添加现有项”以将现有代码文件添加到项目
-//   6. 将来，若要再次打开此项目，请转到“文件”>“打开”>“项目”并选择 .sln 文件
