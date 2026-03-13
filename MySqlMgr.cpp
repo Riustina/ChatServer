@@ -24,13 +24,33 @@ int MySqlMgr::UpdatePwd(const std::string& name, const std::string& pwd) {
     return _dao.UpdatePwd(name, pwd);
 }
 
-int MySqlMgr::CheckLogin(const std::string& email, const std::string& pwd, UserInfo userInfo) {
+int MySqlMgr::CheckLogin(const std::string& email, const std::string& pwd, UserInfo& userInfo) {
     return _dao.CheckLogin(email, pwd, userInfo);
 }
 
 std::shared_ptr<UserInfo> MySqlMgr::GetUser(int uid)
 {
     return _dao.GetUser(uid);
+}
+
+std::vector<UserInfo> MySqlMgr::SearchUsers(const std::string& keyword, std::size_t limit)
+{
+    return _dao.SearchUsers(keyword, limit);
+}
+
+long long MySqlMgr::CreateFriendRequest(int from_uid, int to_uid, const std::string& remark)
+{
+    return _dao.CreateFriendRequest(from_uid, to_uid, remark);
+}
+
+std::vector<FriendRequestInfo> MySqlMgr::GetPendingFriendRequests(int to_uid)
+{
+    return _dao.GetPendingFriendRequests(to_uid);
+}
+
+int MySqlMgr::HandleFriendRequest(long long request_id, int to_uid, bool accept)
+{
+    return _dao.HandleFriendRequest(request_id, to_uid, accept);
 }
 
 MySqlMgr::MySqlMgr() 

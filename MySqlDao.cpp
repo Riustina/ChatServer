@@ -613,3 +613,234 @@ std::shared_ptr<UserInfo> MySqlDao::GetUser(int uid)
         return nullptr;
     }
 }
+
+std::vector<UserInfo> MySqlDao::SearchUsers(const std::string& keyword, std::size_t limit)
+{
+    std::vector<UserInfo> users;
+    auto con = pool_->getConnection();
+    if (con == nullptr) {
+        std::cerr << "[MySqlDao.cpp] 函数 [SearchUsers()] 无法获取数据库连接" << std::endl;
+        return users;
+    }
+
+    Defer defer([this, &con]() {
+        pool_->returnConnection(std::move(con));
+        });
+
+    try {
+        bool all_digits = !keyword.empty();
+        for (char ch : keyword) {
+            if (ch < '0' || ch > '9') {
+                all_digits = false;
+                break;
+            }
+        }
+
+        std::unique_ptr<sql::PreparedStatement> pstmt;
+        if (all_digits) {
+            pstmt.reset(con->_con->prepareStatement(
+                "SELECT uid, name, email, pwd FROM user WHERE uid = ? OR name LIKE ? ORDER BY uid ASC LIMIT ?"));
+            pstmt->setInt(1, std::stoi(keyword));
+            pstmt->setString(2, "%" + keyword + "%");
+            pstmt->setInt(3, static_cast<int>(limit));
+        }
+        else {
+            pstmt.reset(con->_con->prepareStatement(
+                "SELECT uid, name, email, pwd FROM user WHERE name LIKE ? ORDER BY uid ASC LIMIT ?"));
+            pstmt->setString(1, "%" + keyword + "%");
+            pstmt->setInt(2, static_cast<int>(limit));
+        }
+
+        std::unique_ptr<sql::ResultSet> res(pstmt->executeQuery());
+        while (res->next()) {
+            UserInfo user;
+            user.uid = res->getInt("uid");
+            user.name = res->getString("name");
+            user.email = res->getString("email");
+            user.pwd = res->getString("pwd");
+            users.push_back(user);
+        }
+
+        std::cout << "[MySqlDao.cpp] 函数 [SearchUsers()] 搜索完成，keyword: " << keyword
+            << "，结果数: " << users.size() << std::endl;
+        return users;
+    }
+    catch (const sql::SQLException& e) {
+        std::cerr << "[MySqlDao.cpp] 函数 [SearchUsers()] SQLException: " << e.what();
+        std::cerr << " (MySQL error code: " << e.getErrorCode();
+        std::cerr << ", SQLState: " << e.getSQLState() << " )" << std::endl;
+        return users;
+    }
+}
+
+long long MySqlDao::CreateFriendRequest(int from_uid, int to_uid, const std::string& remark)
+{
+    if (from_uid <= 0 || to_uid <= 0 || from_uid == to_uid) {
+        return -1;
+    }
+
+    auto con = pool_->getConnection();
+    if (con == nullptr) {
+        std::cerr << "[MySqlDao.cpp] 函数 [CreateFriendRequest()] 无法获取数据库连接" << std::endl;
+        return -2;
+    }
+
+    Defer defer([this, &con]() {
+        pool_->returnConnection(std::move(con));
+        });
+
+    try {
+        std::unique_ptr<sql::PreparedStatement> check_pstmt(
+            con->_con->prepareStatement(
+                "SELECT request_id FROM friend_request WHERE from_uid = ? AND to_uid = ? AND status = 'pending' LIMIT 1"));
+        check_pstmt->setInt(1, from_uid);
+        check_pstmt->setInt(2, to_uid);
+        std::unique_ptr<sql::ResultSet> check_res(check_pstmt->executeQuery());
+        if (check_res->next()) {
+            return -3;
+        }
+
+        std::unique_ptr<sql::PreparedStatement> pstmt(
+            con->_con->prepareStatement(
+                "INSERT INTO friend_request(from_uid, to_uid, remark, status) VALUES(?, ?, ?, 'pending')"));
+        pstmt->setInt(1, from_uid);
+        pstmt->setInt(2, to_uid);
+        pstmt->setString(3, remark);
+        pstmt->executeUpdate();
+
+        std::unique_ptr<sql::Statement> stmt(con->_con->createStatement());
+        std::unique_ptr<sql::ResultSet> res(stmt->executeQuery("SELECT LAST_INSERT_ID() AS request_id"));
+        if (res->next()) {
+            return res->getInt64("request_id");
+        }
+        return -4;
+    }
+    catch (const sql::SQLException& e) {
+        std::cerr << "[MySqlDao.cpp] 函数 [CreateFriendRequest()] SQLException: " << e.what();
+        std::cerr << " (MySQL error code: " << e.getErrorCode();
+        std::cerr << ", SQLState: " << e.getSQLState() << " )" << std::endl;
+        return -5;
+    }
+}
+
+std::vector<FriendRequestInfo> MySqlDao::GetPendingFriendRequests(int to_uid)
+{
+    std::vector<FriendRequestInfo> requests;
+    auto con = pool_->getConnection();
+    if (con == nullptr) {
+        std::cerr << "[MySqlDao.cpp] 函数 [GetPendingFriendRequests()] 无法获取数据库连接" << std::endl;
+        return requests;
+    }
+
+    Defer defer([this, &con]() {
+        pool_->returnConnection(std::move(con));
+        });
+
+    try {
+        std::unique_ptr<sql::PreparedStatement> pstmt(
+            con->_con->prepareStatement(
+                "SELECT fr.request_id, fr.from_uid, fu.name AS from_name, fr.to_uid, tu.name AS to_name, "
+                "fr.remark, fr.status, fr.created_at, fr.handled_at "
+                "FROM friend_request fr "
+                "JOIN user fu ON fu.uid = fr.from_uid "
+                "JOIN user tu ON tu.uid = fr.to_uid "
+                "WHERE fr.to_uid = ? AND fr.status = 'pending' "
+                "ORDER BY fr.request_id DESC"));
+        pstmt->setInt(1, to_uid);
+        std::unique_ptr<sql::ResultSet> res(pstmt->executeQuery());
+
+        while (res->next()) {
+            FriendRequestInfo item;
+            item.request_id = res->getInt64("request_id");
+            item.from_uid = res->getInt("from_uid");
+            item.from_name = res->getString("from_name");
+            item.to_uid = res->getInt("to_uid");
+            item.to_name = res->getString("to_name");
+            item.remark = res->getString("remark");
+            item.status = res->getString("status");
+            item.created_at = res->getString("created_at");
+            item.handled_at = res->isNull("handled_at") ? "" : res->getString("handled_at");
+            requests.push_back(item);
+        }
+        return requests;
+    }
+    catch (const sql::SQLException& e) {
+        std::cerr << "[MySqlDao.cpp] 函数 [GetPendingFriendRequests()] SQLException: " << e.what();
+        std::cerr << " (MySQL error code: " << e.getErrorCode();
+        std::cerr << ", SQLState: " << e.getSQLState() << " )" << std::endl;
+        return requests;
+    }
+}
+
+int MySqlDao::HandleFriendRequest(long long request_id, int to_uid, bool accept)
+{
+    auto con = pool_->getConnection();
+    if (con == nullptr) {
+        std::cerr << "[MySqlDao.cpp] 函数 [HandleFriendRequest()] 无法获取数据库连接" << std::endl;
+        return -1;
+    }
+
+    Defer defer([this, &con]() {
+        pool_->returnConnection(std::move(con));
+        });
+
+    try {
+        con->_con->setAutoCommit(false);
+
+        std::unique_ptr<sql::PreparedStatement> select_pstmt(
+            con->_con->prepareStatement(
+                "SELECT from_uid, to_uid, status FROM friend_request WHERE request_id = ? AND to_uid = ? FOR UPDATE"));
+        select_pstmt->setInt64(1, request_id);
+        select_pstmt->setInt(2, to_uid);
+        std::unique_ptr<sql::ResultSet> res(select_pstmt->executeQuery());
+        if (!res->next()) {
+            con->_con->rollback();
+            con->_con->setAutoCommit(true);
+            return -2;
+        }
+
+        const int from_uid = res->getInt("from_uid");
+        const std::string status = res->getString("status");
+        if (status != "pending") {
+            con->_con->rollback();
+            con->_con->setAutoCommit(true);
+            return -3;
+        }
+
+        std::unique_ptr<sql::PreparedStatement> update_pstmt(
+            con->_con->prepareStatement(
+                "UPDATE friend_request SET status = ?, handled_at = CURRENT_TIMESTAMP WHERE request_id = ?"));
+        update_pstmt->setString(1, accept ? "accepted" : "rejected");
+        update_pstmt->setInt64(2, request_id);
+        update_pstmt->executeUpdate();
+
+        if (accept) {
+            std::unique_ptr<sql::PreparedStatement> relation_pstmt(
+                con->_con->prepareStatement(
+                    "INSERT INTO friend_relation(user_id, friend_id, status) VALUES(?, ?, 'accepted') "
+                    "ON DUPLICATE KEY UPDATE status = 'accepted', updated_at = CURRENT_TIMESTAMP"));
+            relation_pstmt->setInt(1, from_uid);
+            relation_pstmt->setInt(2, to_uid);
+            relation_pstmt->executeUpdate();
+            relation_pstmt->setInt(1, to_uid);
+            relation_pstmt->setInt(2, from_uid);
+            relation_pstmt->executeUpdate();
+        }
+
+        con->_con->commit();
+        con->_con->setAutoCommit(true);
+        return 0;
+    }
+    catch (const sql::SQLException& e) {
+        try {
+            con->_con->rollback();
+            con->_con->setAutoCommit(true);
+        }
+        catch (...) {
+        }
+        std::cerr << "[MySqlDao.cpp] 函数 [HandleFriendRequest()] SQLException: " << e.what();
+        std::cerr << " (MySQL error code: " << e.getErrorCode();
+        std::cerr << ", SQLState: " << e.getSQLState() << " )" << std::endl;
+        return -4;
+    }
+}
