@@ -206,6 +206,58 @@ MySqlDao::MySqlDao()
     const auto& schema = config["MySQL"]["Schema"];
     const auto& poolSize = std::stoi(config["MySQL"]["PoolSize"]);
 	pool_.reset(new MySqlPool(host + ":" + port, user, pwd, schema, poolSize));
+    EnsureFriendTables();
+}
+
+bool MySqlDao::EnsureFriendTables()
+{
+    auto con = pool_->getConnection();
+    if (con == nullptr) {
+        std::cerr << "[MySqlDao.cpp] 函数 [EnsureFriendTables()] 无法获取数据库连接" << std::endl;
+        return false;
+    }
+
+    try
+    {
+        std::unique_ptr<sql::Statement> stmt(con->_con->createStatement());
+        stmt->execute(
+            "CREATE TABLE IF NOT EXISTS friend_relation ("
+            "id BIGINT PRIMARY KEY AUTO_INCREMENT,"
+            "user_id INT NOT NULL,"
+            "friend_id INT NOT NULL,"
+            "status VARCHAR(16) NOT NULL DEFAULT 'accepted',"
+            "created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,"
+            "updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,"
+            "UNIQUE KEY uniq_user_friend (user_id, friend_id),"
+            "KEY idx_friend_id (friend_id)"
+            ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+
+        stmt->execute(
+            "CREATE TABLE IF NOT EXISTS friend_request ("
+            "request_id BIGINT PRIMARY KEY AUTO_INCREMENT,"
+            "from_uid INT NOT NULL,"
+            "to_uid INT NOT NULL,"
+            "remark VARCHAR(255) NOT NULL DEFAULT '',"
+            "status VARCHAR(16) NOT NULL DEFAULT 'pending',"
+            "created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,"
+            "handled_at TIMESTAMP NULL DEFAULT NULL,"
+            "UNIQUE KEY uniq_from_to (from_uid, to_uid),"
+            "KEY idx_to_uid_status (to_uid, status),"
+            "KEY idx_from_uid_status (from_uid, status)"
+            ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+
+        std::cout << "[MySqlDao.cpp] 函数 [EnsureFriendTables()] 好友相关表检查完成" << std::endl;
+        pool_->returnConnection(std::move(con));
+        return true;
+    }
+    catch (sql::SQLException& e)
+    {
+        std::cerr << "[MySqlDao.cpp] 函数 [EnsureFriendTables()] SQLException: " << e.what();
+        std::cerr << " (MySQL error code: " << e.getErrorCode();
+        std::cerr << ", SQLState: " << e.getSQLState() << " )" << std::endl;
+        pool_->returnConnection(std::move(con));
+        return false;
+    }
 }
 
 MySqlDao::~MySqlDao()

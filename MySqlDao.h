@@ -59,6 +59,7 @@ class MySqlDao
 public:
 	MySqlDao();
 	~MySqlDao();
+	bool EnsureFriendTables();
 	int RegUser(const std::string& name, const std::string& email, const std::string& pwd);
 	int CheckEmail(const std::string& name, const std::string& email);
 	int UpdatePwd(const std::string& name, const std::string& newpwd);

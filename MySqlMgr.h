@@ -9,6 +9,7 @@ class MySqlMgr : public Singleton<MySqlMgr>
     friend class Singleton<MySqlMgr>;
 public:
     ~MySqlMgr();
+    bool EnsureFriendTables();
     int RegUser(const std::string& name, const std::string& email, const std::string& pwd);
     int CheckEmail(const std::string& name, const std::string& email);
     int UpdatePwd(const std::string& name, const std::string& pwd);
