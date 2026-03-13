@@ -119,6 +119,26 @@ void LogicSystem::RegisterCallBacks()
         std::placeholders::_1,
         std::placeholders::_2,
         std::placeholders::_3);
+    _fun_callbacks[MSG_SEARCH_USER_REQ] = std::bind(
+        &LogicSystem::SearchUserHandler, this,
+        std::placeholders::_1,
+        std::placeholders::_2,
+        std::placeholders::_3);
+    _fun_callbacks[MSG_ADD_FRIEND_REQ] = std::bind(
+        &LogicSystem::AddFriendHandler, this,
+        std::placeholders::_1,
+        std::placeholders::_2,
+        std::placeholders::_3);
+    _fun_callbacks[MSG_GET_FRIEND_REQUESTS_REQ] = std::bind(
+        &LogicSystem::GetFriendRequestsHandler, this,
+        std::placeholders::_1,
+        std::placeholders::_2,
+        std::placeholders::_3);
+    _fun_callbacks[MSG_HANDLE_FRIEND_REQUEST_REQ] = std::bind(
+        &LogicSystem::HandleFriendRequestHandler, this,
+        std::placeholders::_1,
+        std::placeholders::_2,
+        std::placeholders::_3);
 }
 
 // ──────────────────────────────────────────────────────────────
@@ -215,4 +235,151 @@ void LogicSystem::RemoveUserSession(int uid)
     std::unique_lock<std::shared_mutex> lock(_online_users_mutex);
     _online_users.erase(uid);
     std::cout << "[LogicSystem] RemoveUserSession 移除本机在线用户，uid: " << uid << "\n";
+}
+
+void LogicSystem::SearchUserHandler(std::shared_ptr<CSession> session,
+    const short msg_id,
+    const std::string& msg_data)
+{
+    Json::Value root;
+    Json::Reader reader;
+    Json::Value reply;
+    Defer defer([&reply, &session]() {
+        session->Send(reply.toStyledString(), MSG_SEARCH_USER_RSP);
+        });
+
+    if (!reader.parse(msg_data, root)) {
+        reply["error"] = ErrorCodes::Error_Json;
+        return;
+    }
+
+    const int uid = session ? session->GetUid() : 0;
+    if (uid <= 0) {
+        reply["error"] = ErrorCodes::UidInvalid;
+        return;
+    }
+
+    const std::string keyword = root["keyword"].asString();
+    const int limit = root.isMember("limit") ? root["limit"].asInt() : 20;
+    const auto users = MySqlMgr::getInstance().SearchUsers(keyword, static_cast<std::size_t>(std::max(1, limit)));
+
+    reply["error"] = ErrorCodes::Success;
+    Json::Value items(Json::arrayValue);
+    for (const auto& user : users) {
+        Json::Value item;
+        item["uid"] = user.uid;
+        item["name"] = user.name;
+        item["email"] = user.email;
+        items.append(item);
+    }
+    reply["users"] = items;
+}
+
+void LogicSystem::AddFriendHandler(std::shared_ptr<CSession> session,
+    const short msg_id,
+    const std::string& msg_data)
+{
+    Json::Value root;
+    Json::Reader reader;
+    Json::Value reply;
+    Defer defer([&reply, &session]() {
+        session->Send(reply.toStyledString(), MSG_ADD_FRIEND_RSP);
+        });
+
+    if (!reader.parse(msg_data, root)) {
+        reply["error"] = ErrorCodes::Error_Json;
+        return;
+    }
+
+    const int from_uid = session ? session->GetUid() : 0;
+    const int to_uid = root["to_uid"].asInt();
+    const std::string remark = root.isMember("remark") ? root["remark"].asString() : "";
+    if (from_uid <= 0 || to_uid <= 0) {
+        reply["error"] = ErrorCodes::UidInvalid;
+        return;
+    }
+
+    const long long request_id = MySqlMgr::getInstance().CreateFriendRequest(from_uid, to_uid, remark);
+    if (request_id <= 0) {
+        reply["error"] = ErrorCodes::MySQLFailed;
+        reply["request_id"] = Json::Int64(request_id);
+        return;
+    }
+
+    reply["error"] = ErrorCodes::Success;
+    reply["request_id"] = Json::Int64(request_id);
+    reply["to_uid"] = to_uid;
+}
+
+void LogicSystem::GetFriendRequestsHandler(std::shared_ptr<CSession> session,
+    const short msg_id,
+    const std::string& msg_data)
+{
+    (void)msg_id;
+    (void)msg_data;
+
+    Json::Value reply;
+    Defer defer([&reply, &session]() {
+        session->Send(reply.toStyledString(), MSG_GET_FRIEND_REQUESTS_RSP);
+        });
+
+    const int to_uid = session ? session->GetUid() : 0;
+    if (to_uid <= 0) {
+        reply["error"] = ErrorCodes::UidInvalid;
+        return;
+    }
+
+    const auto requests = MySqlMgr::getInstance().GetPendingFriendRequests(to_uid);
+    reply["error"] = ErrorCodes::Success;
+    Json::Value items(Json::arrayValue);
+    for (const auto& item : requests) {
+        Json::Value node;
+        node["request_id"] = Json::Int64(item.request_id);
+        node["from_uid"] = item.from_uid;
+        node["from_name"] = item.from_name;
+        node["to_uid"] = item.to_uid;
+        node["to_name"] = item.to_name;
+        node["remark"] = item.remark;
+        node["status"] = item.status;
+        node["created_at"] = item.created_at;
+        node["handled_at"] = item.handled_at;
+        items.append(node);
+    }
+    reply["requests"] = items;
+}
+
+void LogicSystem::HandleFriendRequestHandler(std::shared_ptr<CSession> session,
+    const short msg_id,
+    const std::string& msg_data)
+{
+    Json::Value root;
+    Json::Reader reader;
+    Json::Value reply;
+    Defer defer([&reply, &session]() {
+        session->Send(reply.toStyledString(), MSG_HANDLE_FRIEND_REQUEST_RSP);
+        });
+
+    if (!reader.parse(msg_data, root)) {
+        reply["error"] = ErrorCodes::Error_Json;
+        return;
+    }
+
+    const int to_uid = session ? session->GetUid() : 0;
+    if (to_uid <= 0) {
+        reply["error"] = ErrorCodes::UidInvalid;
+        return;
+    }
+
+    const long long request_id = root["request_id"].asInt64();
+    const bool accept = root["accept"].asBool();
+    const int result = MySqlMgr::getInstance().HandleFriendRequest(request_id, to_uid, accept);
+    if (result != 0) {
+        reply["error"] = ErrorCodes::MySQLFailed;
+        reply["db_result"] = result;
+        return;
+    }
+
+    reply["error"] = ErrorCodes::Success;
+    reply["request_id"] = Json::Int64(request_id);
+    reply["accept"] = accept;
 }

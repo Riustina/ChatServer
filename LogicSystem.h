@@ -40,6 +40,18 @@ private:
     void LoginHandler(std::shared_ptr<CSession> session,
         const short msg_id,
         const std::string& msg_data);
+    void SearchUserHandler(std::shared_ptr<CSession> session,
+        const short msg_id,
+        const std::string& msg_data);
+    void AddFriendHandler(std::shared_ptr<CSession> session,
+        const short msg_id,
+        const std::string& msg_data);
+    void GetFriendRequestsHandler(std::shared_ptr<CSession> session,
+        const short msg_id,
+        const std::string& msg_data);
+    void HandleFriendRequestHandler(std::shared_ptr<CSession> session,
+        const short msg_id,
+        const std::string& msg_data);
     void BindUserSession(int uid, std::shared_ptr<CSession> session);
     void RemoveUserSession(int uid);
 
