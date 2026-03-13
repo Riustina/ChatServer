@@ -257,6 +257,41 @@ class StatusService final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::message::LoginRsp>> PrepareAsyncLogin(::grpc::ClientContext* context, const ::message::LoginReq& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::message::LoginRsp>>(PrepareAsyncLoginRaw(context, request, cq));
     }
+    virtual ::grpc::Status RegisterChatServer(::grpc::ClientContext* context, const ::message::RegisterChatServerReq& request, ::message::RegisterChatServerRsp* response) = 0;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::message::RegisterChatServerRsp>> AsyncRegisterChatServer(::grpc::ClientContext* context, const ::message::RegisterChatServerReq& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::message::RegisterChatServerRsp>>(AsyncRegisterChatServerRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::message::RegisterChatServerRsp>> PrepareAsyncRegisterChatServer(::grpc::ClientContext* context, const ::message::RegisterChatServerReq& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::message::RegisterChatServerRsp>>(PrepareAsyncRegisterChatServerRaw(context, request, cq));
+    }
+    virtual ::grpc::Status Heartbeat(::grpc::ClientContext* context, const ::message::HeartbeatReq& request, ::message::HeartbeatRsp* response) = 0;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::message::HeartbeatRsp>> AsyncHeartbeat(::grpc::ClientContext* context, const ::message::HeartbeatReq& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::message::HeartbeatRsp>>(AsyncHeartbeatRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::message::HeartbeatRsp>> PrepareAsyncHeartbeat(::grpc::ClientContext* context, const ::message::HeartbeatReq& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::message::HeartbeatRsp>>(PrepareAsyncHeartbeatRaw(context, request, cq));
+    }
+    virtual ::grpc::Status ReportUserOnline(::grpc::ClientContext* context, const ::message::ReportUserOnlineReq& request, ::message::ReportUserOnlineRsp* response) = 0;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::message::ReportUserOnlineRsp>> AsyncReportUserOnline(::grpc::ClientContext* context, const ::message::ReportUserOnlineReq& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::message::ReportUserOnlineRsp>>(AsyncReportUserOnlineRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::message::ReportUserOnlineRsp>> PrepareAsyncReportUserOnline(::grpc::ClientContext* context, const ::message::ReportUserOnlineReq& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::message::ReportUserOnlineRsp>>(PrepareAsyncReportUserOnlineRaw(context, request, cq));
+    }
+    virtual ::grpc::Status ReportUserOffline(::grpc::ClientContext* context, const ::message::ReportUserOfflineReq& request, ::message::ReportUserOfflineRsp* response) = 0;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::message::ReportUserOfflineRsp>> AsyncReportUserOffline(::grpc::ClientContext* context, const ::message::ReportUserOfflineReq& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::message::ReportUserOfflineRsp>>(AsyncReportUserOfflineRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::message::ReportUserOfflineRsp>> PrepareAsyncReportUserOffline(::grpc::ClientContext* context, const ::message::ReportUserOfflineReq& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::message::ReportUserOfflineRsp>>(PrepareAsyncReportUserOfflineRaw(context, request, cq));
+    }
+    virtual ::grpc::Status QueryUserRoute(::grpc::ClientContext* context, const ::message::QueryUserRouteReq& request, ::message::QueryUserRouteRsp* response) = 0;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::message::QueryUserRouteRsp>> AsyncQueryUserRoute(::grpc::ClientContext* context, const ::message::QueryUserRouteReq& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::message::QueryUserRouteRsp>>(AsyncQueryUserRouteRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::message::QueryUserRouteRsp>> PrepareAsyncQueryUserRoute(::grpc::ClientContext* context, const ::message::QueryUserRouteReq& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::message::QueryUserRouteRsp>>(PrepareAsyncQueryUserRouteRaw(context, request, cq));
+    }
     class async_interface {
      public:
       virtual ~async_interface() {}
@@ -264,6 +299,16 @@ class StatusService final {
       virtual void GetChatServer(::grpc::ClientContext* context, const ::message::GetChatServerReq* request, ::message::GetChatServerRsp* response, ::grpc::ClientUnaryReactor* reactor) = 0;
       virtual void Login(::grpc::ClientContext* context, const ::message::LoginReq* request, ::message::LoginRsp* response, std::function<void(::grpc::Status)>) = 0;
       virtual void Login(::grpc::ClientContext* context, const ::message::LoginReq* request, ::message::LoginRsp* response, ::grpc::ClientUnaryReactor* reactor) = 0;
+      virtual void RegisterChatServer(::grpc::ClientContext* context, const ::message::RegisterChatServerReq* request, ::message::RegisterChatServerRsp* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void RegisterChatServer(::grpc::ClientContext* context, const ::message::RegisterChatServerReq* request, ::message::RegisterChatServerRsp* response, ::grpc::ClientUnaryReactor* reactor) = 0;
+      virtual void Heartbeat(::grpc::ClientContext* context, const ::message::HeartbeatReq* request, ::message::HeartbeatRsp* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void Heartbeat(::grpc::ClientContext* context, const ::message::HeartbeatReq* request, ::message::HeartbeatRsp* response, ::grpc::ClientUnaryReactor* reactor) = 0;
+      virtual void ReportUserOnline(::grpc::ClientContext* context, const ::message::ReportUserOnlineReq* request, ::message::ReportUserOnlineRsp* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void ReportUserOnline(::grpc::ClientContext* context, const ::message::ReportUserOnlineReq* request, ::message::ReportUserOnlineRsp* response, ::grpc::ClientUnaryReactor* reactor) = 0;
+      virtual void ReportUserOffline(::grpc::ClientContext* context, const ::message::ReportUserOfflineReq* request, ::message::ReportUserOfflineRsp* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void ReportUserOffline(::grpc::ClientContext* context, const ::message::ReportUserOfflineReq* request, ::message::ReportUserOfflineRsp* response, ::grpc::ClientUnaryReactor* reactor) = 0;
+      virtual void QueryUserRoute(::grpc::ClientContext* context, const ::message::QueryUserRouteReq* request, ::message::QueryUserRouteRsp* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void QueryUserRoute(::grpc::ClientContext* context, const ::message::QueryUserRouteReq* request, ::message::QueryUserRouteRsp* response, ::grpc::ClientUnaryReactor* reactor) = 0;
     };
     typedef class async_interface experimental_async_interface;
     virtual class async_interface* async() { return nullptr; }
@@ -273,6 +318,16 @@ class StatusService final {
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::message::GetChatServerRsp>* PrepareAsyncGetChatServerRaw(::grpc::ClientContext* context, const ::message::GetChatServerReq& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::message::LoginRsp>* AsyncLoginRaw(::grpc::ClientContext* context, const ::message::LoginReq& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::message::LoginRsp>* PrepareAsyncLoginRaw(::grpc::ClientContext* context, const ::message::LoginReq& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::message::RegisterChatServerRsp>* AsyncRegisterChatServerRaw(::grpc::ClientContext* context, const ::message::RegisterChatServerReq& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::message::RegisterChatServerRsp>* PrepareAsyncRegisterChatServerRaw(::grpc::ClientContext* context, const ::message::RegisterChatServerReq& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::message::HeartbeatRsp>* AsyncHeartbeatRaw(::grpc::ClientContext* context, const ::message::HeartbeatReq& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::message::HeartbeatRsp>* PrepareAsyncHeartbeatRaw(::grpc::ClientContext* context, const ::message::HeartbeatReq& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::message::ReportUserOnlineRsp>* AsyncReportUserOnlineRaw(::grpc::ClientContext* context, const ::message::ReportUserOnlineReq& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::message::ReportUserOnlineRsp>* PrepareAsyncReportUserOnlineRaw(::grpc::ClientContext* context, const ::message::ReportUserOnlineReq& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::message::ReportUserOfflineRsp>* AsyncReportUserOfflineRaw(::grpc::ClientContext* context, const ::message::ReportUserOfflineReq& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::message::ReportUserOfflineRsp>* PrepareAsyncReportUserOfflineRaw(::grpc::ClientContext* context, const ::message::ReportUserOfflineReq& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::message::QueryUserRouteRsp>* AsyncQueryUserRouteRaw(::grpc::ClientContext* context, const ::message::QueryUserRouteReq& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::message::QueryUserRouteRsp>* PrepareAsyncQueryUserRouteRaw(::grpc::ClientContext* context, const ::message::QueryUserRouteReq& request, ::grpc::CompletionQueue* cq) = 0;
   };
   class Stub final : public StubInterface {
    public:
@@ -291,6 +346,41 @@ class StatusService final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::message::LoginRsp>> PrepareAsyncLogin(::grpc::ClientContext* context, const ::message::LoginReq& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::message::LoginRsp>>(PrepareAsyncLoginRaw(context, request, cq));
     }
+    ::grpc::Status RegisterChatServer(::grpc::ClientContext* context, const ::message::RegisterChatServerReq& request, ::message::RegisterChatServerRsp* response) override;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::message::RegisterChatServerRsp>> AsyncRegisterChatServer(::grpc::ClientContext* context, const ::message::RegisterChatServerReq& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::message::RegisterChatServerRsp>>(AsyncRegisterChatServerRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::message::RegisterChatServerRsp>> PrepareAsyncRegisterChatServer(::grpc::ClientContext* context, const ::message::RegisterChatServerReq& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::message::RegisterChatServerRsp>>(PrepareAsyncRegisterChatServerRaw(context, request, cq));
+    }
+    ::grpc::Status Heartbeat(::grpc::ClientContext* context, const ::message::HeartbeatReq& request, ::message::HeartbeatRsp* response) override;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::message::HeartbeatRsp>> AsyncHeartbeat(::grpc::ClientContext* context, const ::message::HeartbeatReq& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::message::HeartbeatRsp>>(AsyncHeartbeatRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::message::HeartbeatRsp>> PrepareAsyncHeartbeat(::grpc::ClientContext* context, const ::message::HeartbeatReq& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::message::HeartbeatRsp>>(PrepareAsyncHeartbeatRaw(context, request, cq));
+    }
+    ::grpc::Status ReportUserOnline(::grpc::ClientContext* context, const ::message::ReportUserOnlineReq& request, ::message::ReportUserOnlineRsp* response) override;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::message::ReportUserOnlineRsp>> AsyncReportUserOnline(::grpc::ClientContext* context, const ::message::ReportUserOnlineReq& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::message::ReportUserOnlineRsp>>(AsyncReportUserOnlineRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::message::ReportUserOnlineRsp>> PrepareAsyncReportUserOnline(::grpc::ClientContext* context, const ::message::ReportUserOnlineReq& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::message::ReportUserOnlineRsp>>(PrepareAsyncReportUserOnlineRaw(context, request, cq));
+    }
+    ::grpc::Status ReportUserOffline(::grpc::ClientContext* context, const ::message::ReportUserOfflineReq& request, ::message::ReportUserOfflineRsp* response) override;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::message::ReportUserOfflineRsp>> AsyncReportUserOffline(::grpc::ClientContext* context, const ::message::ReportUserOfflineReq& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::message::ReportUserOfflineRsp>>(AsyncReportUserOfflineRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::message::ReportUserOfflineRsp>> PrepareAsyncReportUserOffline(::grpc::ClientContext* context, const ::message::ReportUserOfflineReq& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::message::ReportUserOfflineRsp>>(PrepareAsyncReportUserOfflineRaw(context, request, cq));
+    }
+    ::grpc::Status QueryUserRoute(::grpc::ClientContext* context, const ::message::QueryUserRouteReq& request, ::message::QueryUserRouteRsp* response) override;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::message::QueryUserRouteRsp>> AsyncQueryUserRoute(::grpc::ClientContext* context, const ::message::QueryUserRouteReq& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::message::QueryUserRouteRsp>>(AsyncQueryUserRouteRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::message::QueryUserRouteRsp>> PrepareAsyncQueryUserRoute(::grpc::ClientContext* context, const ::message::QueryUserRouteReq& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::message::QueryUserRouteRsp>>(PrepareAsyncQueryUserRouteRaw(context, request, cq));
+    }
     class async final :
       public StubInterface::async_interface {
      public:
@@ -298,6 +388,16 @@ class StatusService final {
       void GetChatServer(::grpc::ClientContext* context, const ::message::GetChatServerReq* request, ::message::GetChatServerRsp* response, ::grpc::ClientUnaryReactor* reactor) override;
       void Login(::grpc::ClientContext* context, const ::message::LoginReq* request, ::message::LoginRsp* response, std::function<void(::grpc::Status)>) override;
       void Login(::grpc::ClientContext* context, const ::message::LoginReq* request, ::message::LoginRsp* response, ::grpc::ClientUnaryReactor* reactor) override;
+      void RegisterChatServer(::grpc::ClientContext* context, const ::message::RegisterChatServerReq* request, ::message::RegisterChatServerRsp* response, std::function<void(::grpc::Status)>) override;
+      void RegisterChatServer(::grpc::ClientContext* context, const ::message::RegisterChatServerReq* request, ::message::RegisterChatServerRsp* response, ::grpc::ClientUnaryReactor* reactor) override;
+      void Heartbeat(::grpc::ClientContext* context, const ::message::HeartbeatReq* request, ::message::HeartbeatRsp* response, std::function<void(::grpc::Status)>) override;
+      void Heartbeat(::grpc::ClientContext* context, const ::message::HeartbeatReq* request, ::message::HeartbeatRsp* response, ::grpc::ClientUnaryReactor* reactor) override;
+      void ReportUserOnline(::grpc::ClientContext* context, const ::message::ReportUserOnlineReq* request, ::message::ReportUserOnlineRsp* response, std::function<void(::grpc::Status)>) override;
+      void ReportUserOnline(::grpc::ClientContext* context, const ::message::ReportUserOnlineReq* request, ::message::ReportUserOnlineRsp* response, ::grpc::ClientUnaryReactor* reactor) override;
+      void ReportUserOffline(::grpc::ClientContext* context, const ::message::ReportUserOfflineReq* request, ::message::ReportUserOfflineRsp* response, std::function<void(::grpc::Status)>) override;
+      void ReportUserOffline(::grpc::ClientContext* context, const ::message::ReportUserOfflineReq* request, ::message::ReportUserOfflineRsp* response, ::grpc::ClientUnaryReactor* reactor) override;
+      void QueryUserRoute(::grpc::ClientContext* context, const ::message::QueryUserRouteReq* request, ::message::QueryUserRouteRsp* response, std::function<void(::grpc::Status)>) override;
+      void QueryUserRoute(::grpc::ClientContext* context, const ::message::QueryUserRouteReq* request, ::message::QueryUserRouteRsp* response, ::grpc::ClientUnaryReactor* reactor) override;
      private:
       friend class Stub;
       explicit async(Stub* stub): stub_(stub) { }
@@ -313,8 +413,23 @@ class StatusService final {
     ::grpc::ClientAsyncResponseReader< ::message::GetChatServerRsp>* PrepareAsyncGetChatServerRaw(::grpc::ClientContext* context, const ::message::GetChatServerReq& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::message::LoginRsp>* AsyncLoginRaw(::grpc::ClientContext* context, const ::message::LoginReq& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::message::LoginRsp>* PrepareAsyncLoginRaw(::grpc::ClientContext* context, const ::message::LoginReq& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::message::RegisterChatServerRsp>* AsyncRegisterChatServerRaw(::grpc::ClientContext* context, const ::message::RegisterChatServerReq& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::message::RegisterChatServerRsp>* PrepareAsyncRegisterChatServerRaw(::grpc::ClientContext* context, const ::message::RegisterChatServerReq& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::message::HeartbeatRsp>* AsyncHeartbeatRaw(::grpc::ClientContext* context, const ::message::HeartbeatReq& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::message::HeartbeatRsp>* PrepareAsyncHeartbeatRaw(::grpc::ClientContext* context, const ::message::HeartbeatReq& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::message::ReportUserOnlineRsp>* AsyncReportUserOnlineRaw(::grpc::ClientContext* context, const ::message::ReportUserOnlineReq& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::message::ReportUserOnlineRsp>* PrepareAsyncReportUserOnlineRaw(::grpc::ClientContext* context, const ::message::ReportUserOnlineReq& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::message::ReportUserOfflineRsp>* AsyncReportUserOfflineRaw(::grpc::ClientContext* context, const ::message::ReportUserOfflineReq& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::message::ReportUserOfflineRsp>* PrepareAsyncReportUserOfflineRaw(::grpc::ClientContext* context, const ::message::ReportUserOfflineReq& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::message::QueryUserRouteRsp>* AsyncQueryUserRouteRaw(::grpc::ClientContext* context, const ::message::QueryUserRouteReq& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::message::QueryUserRouteRsp>* PrepareAsyncQueryUserRouteRaw(::grpc::ClientContext* context, const ::message::QueryUserRouteReq& request, ::grpc::CompletionQueue* cq) override;
     const ::grpc::internal::RpcMethod rpcmethod_GetChatServer_;
     const ::grpc::internal::RpcMethod rpcmethod_Login_;
+    const ::grpc::internal::RpcMethod rpcmethod_RegisterChatServer_;
+    const ::grpc::internal::RpcMethod rpcmethod_Heartbeat_;
+    const ::grpc::internal::RpcMethod rpcmethod_ReportUserOnline_;
+    const ::grpc::internal::RpcMethod rpcmethod_ReportUserOffline_;
+    const ::grpc::internal::RpcMethod rpcmethod_QueryUserRoute_;
   };
   static std::unique_ptr<Stub> NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options = ::grpc::StubOptions());
 
@@ -324,6 +439,11 @@ class StatusService final {
     virtual ~Service();
     virtual ::grpc::Status GetChatServer(::grpc::ServerContext* context, const ::message::GetChatServerReq* request, ::message::GetChatServerRsp* response);
     virtual ::grpc::Status Login(::grpc::ServerContext* context, const ::message::LoginReq* request, ::message::LoginRsp* response);
+    virtual ::grpc::Status RegisterChatServer(::grpc::ServerContext* context, const ::message::RegisterChatServerReq* request, ::message::RegisterChatServerRsp* response);
+    virtual ::grpc::Status Heartbeat(::grpc::ServerContext* context, const ::message::HeartbeatReq* request, ::message::HeartbeatRsp* response);
+    virtual ::grpc::Status ReportUserOnline(::grpc::ServerContext* context, const ::message::ReportUserOnlineReq* request, ::message::ReportUserOnlineRsp* response);
+    virtual ::grpc::Status ReportUserOffline(::grpc::ServerContext* context, const ::message::ReportUserOfflineReq* request, ::message::ReportUserOfflineRsp* response);
+    virtual ::grpc::Status QueryUserRoute(::grpc::ServerContext* context, const ::message::QueryUserRouteReq* request, ::message::QueryUserRouteRsp* response);
   };
   template <class BaseClass>
   class WithAsyncMethod_GetChatServer : public BaseClass {
@@ -365,7 +485,107 @@ class StatusService final {
       ::grpc::Service::RequestAsyncUnary(1, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
-  typedef WithAsyncMethod_GetChatServer<WithAsyncMethod_Login<Service > > AsyncService;
+  template <class BaseClass>
+  class WithAsyncMethod_RegisterChatServer : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithAsyncMethod_RegisterChatServer() {
+      ::grpc::Service::MarkMethodAsync(2);
+    }
+    ~WithAsyncMethod_RegisterChatServer() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status RegisterChatServer(::grpc::ServerContext* /*context*/, const ::message::RegisterChatServerReq* /*request*/, ::message::RegisterChatServerRsp* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestRegisterChatServer(::grpc::ServerContext* context, ::message::RegisterChatServerReq* request, ::grpc::ServerAsyncResponseWriter< ::message::RegisterChatServerRsp>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(2, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
+  class WithAsyncMethod_Heartbeat : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithAsyncMethod_Heartbeat() {
+      ::grpc::Service::MarkMethodAsync(3);
+    }
+    ~WithAsyncMethod_Heartbeat() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status Heartbeat(::grpc::ServerContext* /*context*/, const ::message::HeartbeatReq* /*request*/, ::message::HeartbeatRsp* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestHeartbeat(::grpc::ServerContext* context, ::message::HeartbeatReq* request, ::grpc::ServerAsyncResponseWriter< ::message::HeartbeatRsp>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(3, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
+  class WithAsyncMethod_ReportUserOnline : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithAsyncMethod_ReportUserOnline() {
+      ::grpc::Service::MarkMethodAsync(4);
+    }
+    ~WithAsyncMethod_ReportUserOnline() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status ReportUserOnline(::grpc::ServerContext* /*context*/, const ::message::ReportUserOnlineReq* /*request*/, ::message::ReportUserOnlineRsp* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestReportUserOnline(::grpc::ServerContext* context, ::message::ReportUserOnlineReq* request, ::grpc::ServerAsyncResponseWriter< ::message::ReportUserOnlineRsp>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(4, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
+  class WithAsyncMethod_ReportUserOffline : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithAsyncMethod_ReportUserOffline() {
+      ::grpc::Service::MarkMethodAsync(5);
+    }
+    ~WithAsyncMethod_ReportUserOffline() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status ReportUserOffline(::grpc::ServerContext* /*context*/, const ::message::ReportUserOfflineReq* /*request*/, ::message::ReportUserOfflineRsp* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestReportUserOffline(::grpc::ServerContext* context, ::message::ReportUserOfflineReq* request, ::grpc::ServerAsyncResponseWriter< ::message::ReportUserOfflineRsp>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(5, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
+  class WithAsyncMethod_QueryUserRoute : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithAsyncMethod_QueryUserRoute() {
+      ::grpc::Service::MarkMethodAsync(6);
+    }
+    ~WithAsyncMethod_QueryUserRoute() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status QueryUserRoute(::grpc::ServerContext* /*context*/, const ::message::QueryUserRouteReq* /*request*/, ::message::QueryUserRouteRsp* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestQueryUserRoute(::grpc::ServerContext* context, ::message::QueryUserRouteReq* request, ::grpc::ServerAsyncResponseWriter< ::message::QueryUserRouteRsp>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(6, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  typedef WithAsyncMethod_GetChatServer<WithAsyncMethod_Login<WithAsyncMethod_RegisterChatServer<WithAsyncMethod_Heartbeat<WithAsyncMethod_ReportUserOnline<WithAsyncMethod_ReportUserOffline<WithAsyncMethod_QueryUserRoute<Service > > > > > > > AsyncService;
   template <class BaseClass>
   class WithCallbackMethod_GetChatServer : public BaseClass {
    private:
@@ -420,7 +640,142 @@ class StatusService final {
     virtual ::grpc::ServerUnaryReactor* Login(
       ::grpc::CallbackServerContext* /*context*/, const ::message::LoginReq* /*request*/, ::message::LoginRsp* /*response*/)  { return nullptr; }
   };
-  typedef WithCallbackMethod_GetChatServer<WithCallbackMethod_Login<Service > > CallbackService;
+  template <class BaseClass>
+  class WithCallbackMethod_RegisterChatServer : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithCallbackMethod_RegisterChatServer() {
+      ::grpc::Service::MarkMethodCallback(2,
+          new ::grpc::internal::CallbackUnaryHandler< ::message::RegisterChatServerReq, ::message::RegisterChatServerRsp>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::message::RegisterChatServerReq* request, ::message::RegisterChatServerRsp* response) { return this->RegisterChatServer(context, request, response); }));}
+    void SetMessageAllocatorFor_RegisterChatServer(
+        ::grpc::MessageAllocator< ::message::RegisterChatServerReq, ::message::RegisterChatServerRsp>* allocator) {
+      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(2);
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::message::RegisterChatServerReq, ::message::RegisterChatServerRsp>*>(handler)
+              ->SetMessageAllocator(allocator);
+    }
+    ~WithCallbackMethod_RegisterChatServer() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status RegisterChatServer(::grpc::ServerContext* /*context*/, const ::message::RegisterChatServerReq* /*request*/, ::message::RegisterChatServerRsp* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* RegisterChatServer(
+      ::grpc::CallbackServerContext* /*context*/, const ::message::RegisterChatServerReq* /*request*/, ::message::RegisterChatServerRsp* /*response*/)  { return nullptr; }
+  };
+  template <class BaseClass>
+  class WithCallbackMethod_Heartbeat : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithCallbackMethod_Heartbeat() {
+      ::grpc::Service::MarkMethodCallback(3,
+          new ::grpc::internal::CallbackUnaryHandler< ::message::HeartbeatReq, ::message::HeartbeatRsp>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::message::HeartbeatReq* request, ::message::HeartbeatRsp* response) { return this->Heartbeat(context, request, response); }));}
+    void SetMessageAllocatorFor_Heartbeat(
+        ::grpc::MessageAllocator< ::message::HeartbeatReq, ::message::HeartbeatRsp>* allocator) {
+      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(3);
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::message::HeartbeatReq, ::message::HeartbeatRsp>*>(handler)
+              ->SetMessageAllocator(allocator);
+    }
+    ~WithCallbackMethod_Heartbeat() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status Heartbeat(::grpc::ServerContext* /*context*/, const ::message::HeartbeatReq* /*request*/, ::message::HeartbeatRsp* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* Heartbeat(
+      ::grpc::CallbackServerContext* /*context*/, const ::message::HeartbeatReq* /*request*/, ::message::HeartbeatRsp* /*response*/)  { return nullptr; }
+  };
+  template <class BaseClass>
+  class WithCallbackMethod_ReportUserOnline : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithCallbackMethod_ReportUserOnline() {
+      ::grpc::Service::MarkMethodCallback(4,
+          new ::grpc::internal::CallbackUnaryHandler< ::message::ReportUserOnlineReq, ::message::ReportUserOnlineRsp>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::message::ReportUserOnlineReq* request, ::message::ReportUserOnlineRsp* response) { return this->ReportUserOnline(context, request, response); }));}
+    void SetMessageAllocatorFor_ReportUserOnline(
+        ::grpc::MessageAllocator< ::message::ReportUserOnlineReq, ::message::ReportUserOnlineRsp>* allocator) {
+      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(4);
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::message::ReportUserOnlineReq, ::message::ReportUserOnlineRsp>*>(handler)
+              ->SetMessageAllocator(allocator);
+    }
+    ~WithCallbackMethod_ReportUserOnline() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status ReportUserOnline(::grpc::ServerContext* /*context*/, const ::message::ReportUserOnlineReq* /*request*/, ::message::ReportUserOnlineRsp* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* ReportUserOnline(
+      ::grpc::CallbackServerContext* /*context*/, const ::message::ReportUserOnlineReq* /*request*/, ::message::ReportUserOnlineRsp* /*response*/)  { return nullptr; }
+  };
+  template <class BaseClass>
+  class WithCallbackMethod_ReportUserOffline : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithCallbackMethod_ReportUserOffline() {
+      ::grpc::Service::MarkMethodCallback(5,
+          new ::grpc::internal::CallbackUnaryHandler< ::message::ReportUserOfflineReq, ::message::ReportUserOfflineRsp>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::message::ReportUserOfflineReq* request, ::message::ReportUserOfflineRsp* response) { return this->ReportUserOffline(context, request, response); }));}
+    void SetMessageAllocatorFor_ReportUserOffline(
+        ::grpc::MessageAllocator< ::message::ReportUserOfflineReq, ::message::ReportUserOfflineRsp>* allocator) {
+      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(5);
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::message::ReportUserOfflineReq, ::message::ReportUserOfflineRsp>*>(handler)
+              ->SetMessageAllocator(allocator);
+    }
+    ~WithCallbackMethod_ReportUserOffline() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status ReportUserOffline(::grpc::ServerContext* /*context*/, const ::message::ReportUserOfflineReq* /*request*/, ::message::ReportUserOfflineRsp* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* ReportUserOffline(
+      ::grpc::CallbackServerContext* /*context*/, const ::message::ReportUserOfflineReq* /*request*/, ::message::ReportUserOfflineRsp* /*response*/)  { return nullptr; }
+  };
+  template <class BaseClass>
+  class WithCallbackMethod_QueryUserRoute : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithCallbackMethod_QueryUserRoute() {
+      ::grpc::Service::MarkMethodCallback(6,
+          new ::grpc::internal::CallbackUnaryHandler< ::message::QueryUserRouteReq, ::message::QueryUserRouteRsp>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::message::QueryUserRouteReq* request, ::message::QueryUserRouteRsp* response) { return this->QueryUserRoute(context, request, response); }));}
+    void SetMessageAllocatorFor_QueryUserRoute(
+        ::grpc::MessageAllocator< ::message::QueryUserRouteReq, ::message::QueryUserRouteRsp>* allocator) {
+      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(6);
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::message::QueryUserRouteReq, ::message::QueryUserRouteRsp>*>(handler)
+              ->SetMessageAllocator(allocator);
+    }
+    ~WithCallbackMethod_QueryUserRoute() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status QueryUserRoute(::grpc::ServerContext* /*context*/, const ::message::QueryUserRouteReq* /*request*/, ::message::QueryUserRouteRsp* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* QueryUserRoute(
+      ::grpc::CallbackServerContext* /*context*/, const ::message::QueryUserRouteReq* /*request*/, ::message::QueryUserRouteRsp* /*response*/)  { return nullptr; }
+  };
+  typedef WithCallbackMethod_GetChatServer<WithCallbackMethod_Login<WithCallbackMethod_RegisterChatServer<WithCallbackMethod_Heartbeat<WithCallbackMethod_ReportUserOnline<WithCallbackMethod_ReportUserOffline<WithCallbackMethod_QueryUserRoute<Service > > > > > > > CallbackService;
   typedef CallbackService ExperimentalCallbackService;
   template <class BaseClass>
   class WithGenericMethod_GetChatServer : public BaseClass {
@@ -452,6 +807,91 @@ class StatusService final {
     }
     // disable synchronous version of this method
     ::grpc::Status Login(::grpc::ServerContext* /*context*/, const ::message::LoginReq* /*request*/, ::message::LoginRsp* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+  };
+  template <class BaseClass>
+  class WithGenericMethod_RegisterChatServer : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithGenericMethod_RegisterChatServer() {
+      ::grpc::Service::MarkMethodGeneric(2);
+    }
+    ~WithGenericMethod_RegisterChatServer() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status RegisterChatServer(::grpc::ServerContext* /*context*/, const ::message::RegisterChatServerReq* /*request*/, ::message::RegisterChatServerRsp* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+  };
+  template <class BaseClass>
+  class WithGenericMethod_Heartbeat : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithGenericMethod_Heartbeat() {
+      ::grpc::Service::MarkMethodGeneric(3);
+    }
+    ~WithGenericMethod_Heartbeat() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status Heartbeat(::grpc::ServerContext* /*context*/, const ::message::HeartbeatReq* /*request*/, ::message::HeartbeatRsp* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+  };
+  template <class BaseClass>
+  class WithGenericMethod_ReportUserOnline : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithGenericMethod_ReportUserOnline() {
+      ::grpc::Service::MarkMethodGeneric(4);
+    }
+    ~WithGenericMethod_ReportUserOnline() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status ReportUserOnline(::grpc::ServerContext* /*context*/, const ::message::ReportUserOnlineReq* /*request*/, ::message::ReportUserOnlineRsp* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+  };
+  template <class BaseClass>
+  class WithGenericMethod_ReportUserOffline : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithGenericMethod_ReportUserOffline() {
+      ::grpc::Service::MarkMethodGeneric(5);
+    }
+    ~WithGenericMethod_ReportUserOffline() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status ReportUserOffline(::grpc::ServerContext* /*context*/, const ::message::ReportUserOfflineReq* /*request*/, ::message::ReportUserOfflineRsp* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+  };
+  template <class BaseClass>
+  class WithGenericMethod_QueryUserRoute : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithGenericMethod_QueryUserRoute() {
+      ::grpc::Service::MarkMethodGeneric(6);
+    }
+    ~WithGenericMethod_QueryUserRoute() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status QueryUserRoute(::grpc::ServerContext* /*context*/, const ::message::QueryUserRouteReq* /*request*/, ::message::QueryUserRouteRsp* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -497,6 +937,106 @@ class StatusService final {
     }
   };
   template <class BaseClass>
+  class WithRawMethod_RegisterChatServer : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithRawMethod_RegisterChatServer() {
+      ::grpc::Service::MarkMethodRaw(2);
+    }
+    ~WithRawMethod_RegisterChatServer() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status RegisterChatServer(::grpc::ServerContext* /*context*/, const ::message::RegisterChatServerReq* /*request*/, ::message::RegisterChatServerRsp* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestRegisterChatServer(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(2, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
+  class WithRawMethod_Heartbeat : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithRawMethod_Heartbeat() {
+      ::grpc::Service::MarkMethodRaw(3);
+    }
+    ~WithRawMethod_Heartbeat() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status Heartbeat(::grpc::ServerContext* /*context*/, const ::message::HeartbeatReq* /*request*/, ::message::HeartbeatRsp* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestHeartbeat(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(3, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
+  class WithRawMethod_ReportUserOnline : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithRawMethod_ReportUserOnline() {
+      ::grpc::Service::MarkMethodRaw(4);
+    }
+    ~WithRawMethod_ReportUserOnline() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status ReportUserOnline(::grpc::ServerContext* /*context*/, const ::message::ReportUserOnlineReq* /*request*/, ::message::ReportUserOnlineRsp* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestReportUserOnline(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(4, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
+  class WithRawMethod_ReportUserOffline : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithRawMethod_ReportUserOffline() {
+      ::grpc::Service::MarkMethodRaw(5);
+    }
+    ~WithRawMethod_ReportUserOffline() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status ReportUserOffline(::grpc::ServerContext* /*context*/, const ::message::ReportUserOfflineReq* /*request*/, ::message::ReportUserOfflineRsp* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestReportUserOffline(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(5, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
+  class WithRawMethod_QueryUserRoute : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithRawMethod_QueryUserRoute() {
+      ::grpc::Service::MarkMethodRaw(6);
+    }
+    ~WithRawMethod_QueryUserRoute() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status QueryUserRoute(::grpc::ServerContext* /*context*/, const ::message::QueryUserRouteReq* /*request*/, ::message::QueryUserRouteRsp* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestQueryUserRoute(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(6, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
   class WithRawCallbackMethod_GetChatServer : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
@@ -538,6 +1078,116 @@ class StatusService final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     virtual ::grpc::ServerUnaryReactor* Login(
+      ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)  { return nullptr; }
+  };
+  template <class BaseClass>
+  class WithRawCallbackMethod_RegisterChatServer : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithRawCallbackMethod_RegisterChatServer() {
+      ::grpc::Service::MarkMethodRawCallback(2,
+          new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->RegisterChatServer(context, request, response); }));
+    }
+    ~WithRawCallbackMethod_RegisterChatServer() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status RegisterChatServer(::grpc::ServerContext* /*context*/, const ::message::RegisterChatServerReq* /*request*/, ::message::RegisterChatServerRsp* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* RegisterChatServer(
+      ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)  { return nullptr; }
+  };
+  template <class BaseClass>
+  class WithRawCallbackMethod_Heartbeat : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithRawCallbackMethod_Heartbeat() {
+      ::grpc::Service::MarkMethodRawCallback(3,
+          new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->Heartbeat(context, request, response); }));
+    }
+    ~WithRawCallbackMethod_Heartbeat() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status Heartbeat(::grpc::ServerContext* /*context*/, const ::message::HeartbeatReq* /*request*/, ::message::HeartbeatRsp* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* Heartbeat(
+      ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)  { return nullptr; }
+  };
+  template <class BaseClass>
+  class WithRawCallbackMethod_ReportUserOnline : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithRawCallbackMethod_ReportUserOnline() {
+      ::grpc::Service::MarkMethodRawCallback(4,
+          new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->ReportUserOnline(context, request, response); }));
+    }
+    ~WithRawCallbackMethod_ReportUserOnline() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status ReportUserOnline(::grpc::ServerContext* /*context*/, const ::message::ReportUserOnlineReq* /*request*/, ::message::ReportUserOnlineRsp* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* ReportUserOnline(
+      ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)  { return nullptr; }
+  };
+  template <class BaseClass>
+  class WithRawCallbackMethod_ReportUserOffline : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithRawCallbackMethod_ReportUserOffline() {
+      ::grpc::Service::MarkMethodRawCallback(5,
+          new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->ReportUserOffline(context, request, response); }));
+    }
+    ~WithRawCallbackMethod_ReportUserOffline() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status ReportUserOffline(::grpc::ServerContext* /*context*/, const ::message::ReportUserOfflineReq* /*request*/, ::message::ReportUserOfflineRsp* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* ReportUserOffline(
+      ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)  { return nullptr; }
+  };
+  template <class BaseClass>
+  class WithRawCallbackMethod_QueryUserRoute : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithRawCallbackMethod_QueryUserRoute() {
+      ::grpc::Service::MarkMethodRawCallback(6,
+          new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->QueryUserRoute(context, request, response); }));
+    }
+    ~WithRawCallbackMethod_QueryUserRoute() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status QueryUserRoute(::grpc::ServerContext* /*context*/, const ::message::QueryUserRouteReq* /*request*/, ::message::QueryUserRouteRsp* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* QueryUserRoute(
       ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)  { return nullptr; }
   };
   template <class BaseClass>
@@ -594,9 +1244,144 @@ class StatusService final {
     // replace default version of method with streamed unary
     virtual ::grpc::Status StreamedLogin(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::message::LoginReq,::message::LoginRsp>* server_unary_streamer) = 0;
   };
-  typedef WithStreamedUnaryMethod_GetChatServer<WithStreamedUnaryMethod_Login<Service > > StreamedUnaryService;
+  template <class BaseClass>
+  class WithStreamedUnaryMethod_RegisterChatServer : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithStreamedUnaryMethod_RegisterChatServer() {
+      ::grpc::Service::MarkMethodStreamed(2,
+        new ::grpc::internal::StreamedUnaryHandler<
+          ::message::RegisterChatServerReq, ::message::RegisterChatServerRsp>(
+            [this](::grpc::ServerContext* context,
+                   ::grpc::ServerUnaryStreamer<
+                     ::message::RegisterChatServerReq, ::message::RegisterChatServerRsp>* streamer) {
+                       return this->StreamedRegisterChatServer(context,
+                         streamer);
+                  }));
+    }
+    ~WithStreamedUnaryMethod_RegisterChatServer() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable regular version of this method
+    ::grpc::Status RegisterChatServer(::grpc::ServerContext* /*context*/, const ::message::RegisterChatServerReq* /*request*/, ::message::RegisterChatServerRsp* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    // replace default version of method with streamed unary
+    virtual ::grpc::Status StreamedRegisterChatServer(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::message::RegisterChatServerReq,::message::RegisterChatServerRsp>* server_unary_streamer) = 0;
+  };
+  template <class BaseClass>
+  class WithStreamedUnaryMethod_Heartbeat : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithStreamedUnaryMethod_Heartbeat() {
+      ::grpc::Service::MarkMethodStreamed(3,
+        new ::grpc::internal::StreamedUnaryHandler<
+          ::message::HeartbeatReq, ::message::HeartbeatRsp>(
+            [this](::grpc::ServerContext* context,
+                   ::grpc::ServerUnaryStreamer<
+                     ::message::HeartbeatReq, ::message::HeartbeatRsp>* streamer) {
+                       return this->StreamedHeartbeat(context,
+                         streamer);
+                  }));
+    }
+    ~WithStreamedUnaryMethod_Heartbeat() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable regular version of this method
+    ::grpc::Status Heartbeat(::grpc::ServerContext* /*context*/, const ::message::HeartbeatReq* /*request*/, ::message::HeartbeatRsp* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    // replace default version of method with streamed unary
+    virtual ::grpc::Status StreamedHeartbeat(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::message::HeartbeatReq,::message::HeartbeatRsp>* server_unary_streamer) = 0;
+  };
+  template <class BaseClass>
+  class WithStreamedUnaryMethod_ReportUserOnline : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithStreamedUnaryMethod_ReportUserOnline() {
+      ::grpc::Service::MarkMethodStreamed(4,
+        new ::grpc::internal::StreamedUnaryHandler<
+          ::message::ReportUserOnlineReq, ::message::ReportUserOnlineRsp>(
+            [this](::grpc::ServerContext* context,
+                   ::grpc::ServerUnaryStreamer<
+                     ::message::ReportUserOnlineReq, ::message::ReportUserOnlineRsp>* streamer) {
+                       return this->StreamedReportUserOnline(context,
+                         streamer);
+                  }));
+    }
+    ~WithStreamedUnaryMethod_ReportUserOnline() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable regular version of this method
+    ::grpc::Status ReportUserOnline(::grpc::ServerContext* /*context*/, const ::message::ReportUserOnlineReq* /*request*/, ::message::ReportUserOnlineRsp* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    // replace default version of method with streamed unary
+    virtual ::grpc::Status StreamedReportUserOnline(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::message::ReportUserOnlineReq,::message::ReportUserOnlineRsp>* server_unary_streamer) = 0;
+  };
+  template <class BaseClass>
+  class WithStreamedUnaryMethod_ReportUserOffline : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithStreamedUnaryMethod_ReportUserOffline() {
+      ::grpc::Service::MarkMethodStreamed(5,
+        new ::grpc::internal::StreamedUnaryHandler<
+          ::message::ReportUserOfflineReq, ::message::ReportUserOfflineRsp>(
+            [this](::grpc::ServerContext* context,
+                   ::grpc::ServerUnaryStreamer<
+                     ::message::ReportUserOfflineReq, ::message::ReportUserOfflineRsp>* streamer) {
+                       return this->StreamedReportUserOffline(context,
+                         streamer);
+                  }));
+    }
+    ~WithStreamedUnaryMethod_ReportUserOffline() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable regular version of this method
+    ::grpc::Status ReportUserOffline(::grpc::ServerContext* /*context*/, const ::message::ReportUserOfflineReq* /*request*/, ::message::ReportUserOfflineRsp* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    // replace default version of method with streamed unary
+    virtual ::grpc::Status StreamedReportUserOffline(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::message::ReportUserOfflineReq,::message::ReportUserOfflineRsp>* server_unary_streamer) = 0;
+  };
+  template <class BaseClass>
+  class WithStreamedUnaryMethod_QueryUserRoute : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithStreamedUnaryMethod_QueryUserRoute() {
+      ::grpc::Service::MarkMethodStreamed(6,
+        new ::grpc::internal::StreamedUnaryHandler<
+          ::message::QueryUserRouteReq, ::message::QueryUserRouteRsp>(
+            [this](::grpc::ServerContext* context,
+                   ::grpc::ServerUnaryStreamer<
+                     ::message::QueryUserRouteReq, ::message::QueryUserRouteRsp>* streamer) {
+                       return this->StreamedQueryUserRoute(context,
+                         streamer);
+                  }));
+    }
+    ~WithStreamedUnaryMethod_QueryUserRoute() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable regular version of this method
+    ::grpc::Status QueryUserRoute(::grpc::ServerContext* /*context*/, const ::message::QueryUserRouteReq* /*request*/, ::message::QueryUserRouteRsp* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    // replace default version of method with streamed unary
+    virtual ::grpc::Status StreamedQueryUserRoute(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::message::QueryUserRouteReq,::message::QueryUserRouteRsp>* server_unary_streamer) = 0;
+  };
+  typedef WithStreamedUnaryMethod_GetChatServer<WithStreamedUnaryMethod_Login<WithStreamedUnaryMethod_RegisterChatServer<WithStreamedUnaryMethod_Heartbeat<WithStreamedUnaryMethod_ReportUserOnline<WithStreamedUnaryMethod_ReportUserOffline<WithStreamedUnaryMethod_QueryUserRoute<Service > > > > > > > StreamedUnaryService;
   typedef Service SplitStreamedService;
-  typedef WithStreamedUnaryMethod_GetChatServer<WithStreamedUnaryMethod_Login<Service > > StreamedService;
+  typedef WithStreamedUnaryMethod_GetChatServer<WithStreamedUnaryMethod_Login<WithStreamedUnaryMethod_RegisterChatServer<WithStreamedUnaryMethod_Heartbeat<WithStreamedUnaryMethod_ReportUserOnline<WithStreamedUnaryMethod_ReportUserOffline<WithStreamedUnaryMethod_QueryUserRoute<Service > > > > > > > StreamedService;
 };
 
 }  // namespace message

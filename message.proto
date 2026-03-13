@@ -13,10 +13,8 @@ message GetVerifyRsp {
 }
 
 service VerifyService {
-  rpc GetVerifyCode (GetVerifyReq) returns (GetVerifyRsp) {}
+  rpc GetVerifyCode(GetVerifyReq) returns (GetVerifyRsp) {}
 }
-
-
 
 message GetChatServerReq {
   int32 uid = 1;
@@ -27,20 +25,81 @@ message GetChatServerRsp {
   string host = 2;
   string port = 3;
   string token = 4;
+  string server_id = 5;
 }
 
-message LoginReq{
-    int32 uid = 1;
-    string token= 2;
+message LoginReq {
+  int32 uid = 1;
+  string token = 2;
 }
 
 message LoginRsp {
-    int32 error = 1;
-    int32 uid = 2;
-    string token = 3;
+  int32 error = 1;
+  int32 uid = 2;
+  string token = 3;
+}
+
+message RegisterChatServerReq {
+  string server_id = 1;
+  string host = 2;
+  string port = 3;
+}
+
+message RegisterChatServerRsp {
+  int32 error = 1;
+}
+
+message HeartbeatReq {
+  string server_id = 1;
+  string host = 2;
+  string port = 3;
+  int64 timestamp = 4;
+}
+
+message HeartbeatRsp {
+  int32 error = 1;
+  bool online = 2;
+}
+
+message ReportUserOnlineReq {
+  int32 uid = 1;
+  string token = 2;
+  string server_id = 3;
+  string host = 4;
+  string port = 5;
+}
+
+message ReportUserOnlineRsp {
+  int32 error = 1;
+}
+
+message ReportUserOfflineReq {
+  int32 uid = 1;
+  string server_id = 2;
+}
+
+message ReportUserOfflineRsp {
+  int32 error = 1;
+}
+
+message QueryUserRouteReq {
+  int32 uid = 1;
+}
+
+message QueryUserRouteRsp {
+  int32 error = 1;
+  bool online = 2;
+  string server_id = 3;
+  string host = 4;
+  string port = 5;
 }
 
 service StatusService {
-    rpc GetChatServer (GetChatServerReq) returns (GetChatServerRsp) {}
-	rpc Login(LoginReq) returns (LoginRsp);
+  rpc GetChatServer(GetChatServerReq) returns (GetChatServerRsp) {}
+  rpc Login(LoginReq) returns (LoginRsp) {}
+  rpc RegisterChatServer(RegisterChatServerReq) returns (RegisterChatServerRsp) {}
+  rpc Heartbeat(HeartbeatReq) returns (HeartbeatRsp) {}
+  rpc ReportUserOnline(ReportUserOnlineReq) returns (ReportUserOnlineRsp) {}
+  rpc ReportUserOffline(ReportUserOfflineReq) returns (ReportUserOfflineRsp) {}
+  rpc QueryUserRoute(QueryUserRouteReq) returns (QueryUserRouteRsp) {}
 }

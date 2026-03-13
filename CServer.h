@@ -3,6 +3,7 @@
 #pragma once
 #include <boost/asio.hpp>
 #include "CSession.h"
+#include <atomic>
 #include <memory>
 #include <unordered_map>  // O(1) 查找，替换 map 的 O(log n)
 #include <shared_mutex>
@@ -16,6 +17,7 @@ public:
     ~CServer();
 
     void ClearSession(const std::string& uuid); // const 引用，避免不必要的拷贝
+    void Shutdown();
 
 private:
     void HandleAccept(std::shared_ptr<CSession> session,
@@ -28,4 +30,5 @@ private:
 
     std::unordered_map<std::string, std::shared_ptr<CSession>> _sessions;
     std::shared_mutex _sessions_mutex; // 读多写少时比 mutex 更高效
+    std::atomic<bool> _is_shutting_down;
 };

@@ -85,6 +85,11 @@ VerifyService::Service::~Service() {
 static const char* StatusService_method_names[] = {
   "/message.StatusService/GetChatServer",
   "/message.StatusService/Login",
+  "/message.StatusService/RegisterChatServer",
+  "/message.StatusService/Heartbeat",
+  "/message.StatusService/ReportUserOnline",
+  "/message.StatusService/ReportUserOffline",
+  "/message.StatusService/QueryUserRoute",
 };
 
 std::unique_ptr< StatusService::Stub> StatusService::NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options) {
@@ -96,6 +101,11 @@ std::unique_ptr< StatusService::Stub> StatusService::NewStub(const std::shared_p
 StatusService::Stub::Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options)
   : channel_(channel), rpcmethod_GetChatServer_(StatusService_method_names[0], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   , rpcmethod_Login_(StatusService_method_names[1], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_RegisterChatServer_(StatusService_method_names[2], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_Heartbeat_(StatusService_method_names[3], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_ReportUserOnline_(StatusService_method_names[4], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_ReportUserOffline_(StatusService_method_names[5], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_QueryUserRoute_(StatusService_method_names[6], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   {}
 
 ::grpc::Status StatusService::Stub::GetChatServer(::grpc::ClientContext* context, const ::message::GetChatServerReq& request, ::message::GetChatServerRsp* response) {
@@ -144,6 +154,121 @@ void StatusService::Stub::async::Login(::grpc::ClientContext* context, const ::m
   return result;
 }
 
+::grpc::Status StatusService::Stub::RegisterChatServer(::grpc::ClientContext* context, const ::message::RegisterChatServerReq& request, ::message::RegisterChatServerRsp* response) {
+  return ::grpc::internal::BlockingUnaryCall< ::message::RegisterChatServerReq, ::message::RegisterChatServerRsp, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_RegisterChatServer_, context, request, response);
+}
+
+void StatusService::Stub::async::RegisterChatServer(::grpc::ClientContext* context, const ::message::RegisterChatServerReq* request, ::message::RegisterChatServerRsp* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall< ::message::RegisterChatServerReq, ::message::RegisterChatServerRsp, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_RegisterChatServer_, context, request, response, std::move(f));
+}
+
+void StatusService::Stub::async::RegisterChatServer(::grpc::ClientContext* context, const ::message::RegisterChatServerReq* request, ::message::RegisterChatServerRsp* response, ::grpc::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_RegisterChatServer_, context, request, response, reactor);
+}
+
+::grpc::ClientAsyncResponseReader< ::message::RegisterChatServerRsp>* StatusService::Stub::PrepareAsyncRegisterChatServerRaw(::grpc::ClientContext* context, const ::message::RegisterChatServerReq& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::message::RegisterChatServerRsp, ::message::RegisterChatServerReq, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_RegisterChatServer_, context, request);
+}
+
+::grpc::ClientAsyncResponseReader< ::message::RegisterChatServerRsp>* StatusService::Stub::AsyncRegisterChatServerRaw(::grpc::ClientContext* context, const ::message::RegisterChatServerReq& request, ::grpc::CompletionQueue* cq) {
+  auto* result =
+    this->PrepareAsyncRegisterChatServerRaw(context, request, cq);
+  result->StartCall();
+  return result;
+}
+
+::grpc::Status StatusService::Stub::Heartbeat(::grpc::ClientContext* context, const ::message::HeartbeatReq& request, ::message::HeartbeatRsp* response) {
+  return ::grpc::internal::BlockingUnaryCall< ::message::HeartbeatReq, ::message::HeartbeatRsp, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_Heartbeat_, context, request, response);
+}
+
+void StatusService::Stub::async::Heartbeat(::grpc::ClientContext* context, const ::message::HeartbeatReq* request, ::message::HeartbeatRsp* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall< ::message::HeartbeatReq, ::message::HeartbeatRsp, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_Heartbeat_, context, request, response, std::move(f));
+}
+
+void StatusService::Stub::async::Heartbeat(::grpc::ClientContext* context, const ::message::HeartbeatReq* request, ::message::HeartbeatRsp* response, ::grpc::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_Heartbeat_, context, request, response, reactor);
+}
+
+::grpc::ClientAsyncResponseReader< ::message::HeartbeatRsp>* StatusService::Stub::PrepareAsyncHeartbeatRaw(::grpc::ClientContext* context, const ::message::HeartbeatReq& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::message::HeartbeatRsp, ::message::HeartbeatReq, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_Heartbeat_, context, request);
+}
+
+::grpc::ClientAsyncResponseReader< ::message::HeartbeatRsp>* StatusService::Stub::AsyncHeartbeatRaw(::grpc::ClientContext* context, const ::message::HeartbeatReq& request, ::grpc::CompletionQueue* cq) {
+  auto* result =
+    this->PrepareAsyncHeartbeatRaw(context, request, cq);
+  result->StartCall();
+  return result;
+}
+
+::grpc::Status StatusService::Stub::ReportUserOnline(::grpc::ClientContext* context, const ::message::ReportUserOnlineReq& request, ::message::ReportUserOnlineRsp* response) {
+  return ::grpc::internal::BlockingUnaryCall< ::message::ReportUserOnlineReq, ::message::ReportUserOnlineRsp, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_ReportUserOnline_, context, request, response);
+}
+
+void StatusService::Stub::async::ReportUserOnline(::grpc::ClientContext* context, const ::message::ReportUserOnlineReq* request, ::message::ReportUserOnlineRsp* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall< ::message::ReportUserOnlineReq, ::message::ReportUserOnlineRsp, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_ReportUserOnline_, context, request, response, std::move(f));
+}
+
+void StatusService::Stub::async::ReportUserOnline(::grpc::ClientContext* context, const ::message::ReportUserOnlineReq* request, ::message::ReportUserOnlineRsp* response, ::grpc::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_ReportUserOnline_, context, request, response, reactor);
+}
+
+::grpc::ClientAsyncResponseReader< ::message::ReportUserOnlineRsp>* StatusService::Stub::PrepareAsyncReportUserOnlineRaw(::grpc::ClientContext* context, const ::message::ReportUserOnlineReq& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::message::ReportUserOnlineRsp, ::message::ReportUserOnlineReq, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_ReportUserOnline_, context, request);
+}
+
+::grpc::ClientAsyncResponseReader< ::message::ReportUserOnlineRsp>* StatusService::Stub::AsyncReportUserOnlineRaw(::grpc::ClientContext* context, const ::message::ReportUserOnlineReq& request, ::grpc::CompletionQueue* cq) {
+  auto* result =
+    this->PrepareAsyncReportUserOnlineRaw(context, request, cq);
+  result->StartCall();
+  return result;
+}
+
+::grpc::Status StatusService::Stub::ReportUserOffline(::grpc::ClientContext* context, const ::message::ReportUserOfflineReq& request, ::message::ReportUserOfflineRsp* response) {
+  return ::grpc::internal::BlockingUnaryCall< ::message::ReportUserOfflineReq, ::message::ReportUserOfflineRsp, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_ReportUserOffline_, context, request, response);
+}
+
+void StatusService::Stub::async::ReportUserOffline(::grpc::ClientContext* context, const ::message::ReportUserOfflineReq* request, ::message::ReportUserOfflineRsp* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall< ::message::ReportUserOfflineReq, ::message::ReportUserOfflineRsp, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_ReportUserOffline_, context, request, response, std::move(f));
+}
+
+void StatusService::Stub::async::ReportUserOffline(::grpc::ClientContext* context, const ::message::ReportUserOfflineReq* request, ::message::ReportUserOfflineRsp* response, ::grpc::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_ReportUserOffline_, context, request, response, reactor);
+}
+
+::grpc::ClientAsyncResponseReader< ::message::ReportUserOfflineRsp>* StatusService::Stub::PrepareAsyncReportUserOfflineRaw(::grpc::ClientContext* context, const ::message::ReportUserOfflineReq& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::message::ReportUserOfflineRsp, ::message::ReportUserOfflineReq, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_ReportUserOffline_, context, request);
+}
+
+::grpc::ClientAsyncResponseReader< ::message::ReportUserOfflineRsp>* StatusService::Stub::AsyncReportUserOfflineRaw(::grpc::ClientContext* context, const ::message::ReportUserOfflineReq& request, ::grpc::CompletionQueue* cq) {
+  auto* result =
+    this->PrepareAsyncReportUserOfflineRaw(context, request, cq);
+  result->StartCall();
+  return result;
+}
+
+::grpc::Status StatusService::Stub::QueryUserRoute(::grpc::ClientContext* context, const ::message::QueryUserRouteReq& request, ::message::QueryUserRouteRsp* response) {
+  return ::grpc::internal::BlockingUnaryCall< ::message::QueryUserRouteReq, ::message::QueryUserRouteRsp, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_QueryUserRoute_, context, request, response);
+}
+
+void StatusService::Stub::async::QueryUserRoute(::grpc::ClientContext* context, const ::message::QueryUserRouteReq* request, ::message::QueryUserRouteRsp* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall< ::message::QueryUserRouteReq, ::message::QueryUserRouteRsp, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_QueryUserRoute_, context, request, response, std::move(f));
+}
+
+void StatusService::Stub::async::QueryUserRoute(::grpc::ClientContext* context, const ::message::QueryUserRouteReq* request, ::message::QueryUserRouteRsp* response, ::grpc::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_QueryUserRoute_, context, request, response, reactor);
+}
+
+::grpc::ClientAsyncResponseReader< ::message::QueryUserRouteRsp>* StatusService::Stub::PrepareAsyncQueryUserRouteRaw(::grpc::ClientContext* context, const ::message::QueryUserRouteReq& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::message::QueryUserRouteRsp, ::message::QueryUserRouteReq, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_QueryUserRoute_, context, request);
+}
+
+::grpc::ClientAsyncResponseReader< ::message::QueryUserRouteRsp>* StatusService::Stub::AsyncQueryUserRouteRaw(::grpc::ClientContext* context, const ::message::QueryUserRouteReq& request, ::grpc::CompletionQueue* cq) {
+  auto* result =
+    this->PrepareAsyncQueryUserRouteRaw(context, request, cq);
+  result->StartCall();
+  return result;
+}
+
 StatusService::Service::Service() {
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       StatusService_method_names[0],
@@ -165,6 +290,56 @@ StatusService::Service::Service() {
              ::message::LoginRsp* resp) {
                return service->Login(ctx, req, resp);
              }, this)));
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
+      StatusService_method_names[2],
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< StatusService::Service, ::message::RegisterChatServerReq, ::message::RegisterChatServerRsp, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
+          [](StatusService::Service* service,
+             ::grpc::ServerContext* ctx,
+             const ::message::RegisterChatServerReq* req,
+             ::message::RegisterChatServerRsp* resp) {
+               return service->RegisterChatServer(ctx, req, resp);
+             }, this)));
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
+      StatusService_method_names[3],
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< StatusService::Service, ::message::HeartbeatReq, ::message::HeartbeatRsp, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
+          [](StatusService::Service* service,
+             ::grpc::ServerContext* ctx,
+             const ::message::HeartbeatReq* req,
+             ::message::HeartbeatRsp* resp) {
+               return service->Heartbeat(ctx, req, resp);
+             }, this)));
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
+      StatusService_method_names[4],
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< StatusService::Service, ::message::ReportUserOnlineReq, ::message::ReportUserOnlineRsp, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
+          [](StatusService::Service* service,
+             ::grpc::ServerContext* ctx,
+             const ::message::ReportUserOnlineReq* req,
+             ::message::ReportUserOnlineRsp* resp) {
+               return service->ReportUserOnline(ctx, req, resp);
+             }, this)));
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
+      StatusService_method_names[5],
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< StatusService::Service, ::message::ReportUserOfflineReq, ::message::ReportUserOfflineRsp, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
+          [](StatusService::Service* service,
+             ::grpc::ServerContext* ctx,
+             const ::message::ReportUserOfflineReq* req,
+             ::message::ReportUserOfflineRsp* resp) {
+               return service->ReportUserOffline(ctx, req, resp);
+             }, this)));
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
+      StatusService_method_names[6],
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< StatusService::Service, ::message::QueryUserRouteReq, ::message::QueryUserRouteRsp, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
+          [](StatusService::Service* service,
+             ::grpc::ServerContext* ctx,
+             const ::message::QueryUserRouteReq* req,
+             ::message::QueryUserRouteRsp* resp) {
+               return service->QueryUserRoute(ctx, req, resp);
+             }, this)));
 }
 
 StatusService::Service::~Service() {
@@ -178,6 +353,41 @@ StatusService::Service::~Service() {
 }
 
 ::grpc::Status StatusService::Service::Login(::grpc::ServerContext* context, const ::message::LoginReq* request, ::message::LoginRsp* response) {
+  (void) context;
+  (void) request;
+  (void) response;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+}
+
+::grpc::Status StatusService::Service::RegisterChatServer(::grpc::ServerContext* context, const ::message::RegisterChatServerReq* request, ::message::RegisterChatServerRsp* response) {
+  (void) context;
+  (void) request;
+  (void) response;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+}
+
+::grpc::Status StatusService::Service::Heartbeat(::grpc::ServerContext* context, const ::message::HeartbeatReq* request, ::message::HeartbeatRsp* response) {
+  (void) context;
+  (void) request;
+  (void) response;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+}
+
+::grpc::Status StatusService::Service::ReportUserOnline(::grpc::ServerContext* context, const ::message::ReportUserOnlineReq* request, ::message::ReportUserOnlineRsp* response) {
+  (void) context;
+  (void) request;
+  (void) response;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+}
+
+::grpc::Status StatusService::Service::ReportUserOffline(::grpc::ServerContext* context, const ::message::ReportUserOfflineReq* request, ::message::ReportUserOfflineRsp* response) {
+  (void) context;
+  (void) request;
+  (void) response;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+}
+
+::grpc::Status StatusService::Service::QueryUserRoute(::grpc::ServerContext* context, const ::message::QueryUserRouteReq* request, ::message::QueryUserRouteRsp* response) {
   (void) context;
   (void) request;
   (void) response;

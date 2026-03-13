@@ -1,4 +1,4 @@
-// ConfigManager.cpp
+ï»¿// ConfigManager.cpp
 
 #include "ConfigManager.h"
 #include <boost/filesystem.hpp>
@@ -6,7 +6,9 @@
 #include <boost/property_tree/ini_parser.hpp>
 #include <iostream>
 
-// --- SectionInfo ÊµÏÖ ---
+std::string ConfigManager::_config_path;
+
+// --- SectionInfo å®žçŽ° ---
 
 SectionInfo::SectionInfo() {}
 
@@ -17,7 +19,7 @@ SectionInfo::~SectionInfo() {
 const std::string& SectionInfo::operator[](const std::string& key) const {
     auto it = _section_datas.find(key);
     if (it == _section_datas.end()) {
-        std::cerr << "[ConfigManager.h] º¯Êý [SectionInfo::operator[]] key ["
+        std::cerr << "[ConfigManager.h] å‡½æ•° [SectionInfo::operator[]] key ["
             << key << "] not found" << std::endl;
         static const std::string empty_str = "";
         return empty_str;
@@ -25,24 +27,40 @@ const std::string& SectionInfo::operator[](const std::string& key) const {
     return it->second;
 }
 
-// --- ConfigManager ÊµÏÖ ---
+// --- ConfigManager å®žçŽ° ---
+
+void ConfigManager::SetConfigPath(const std::string& config_path)
+{
+    _config_path = config_path;
+}
+
+const std::string& ConfigManager::GetConfigPath()
+{
+    return _config_path;
+}
 
 ConfigManager::ConfigManager() {
     try {
-        // »ñÈ¡µ±Ç°Â·¾¶²¢Æ´½ÓÅäÖÃÎÄ¼þÂ·¾¶
-        boost::filesystem::path config_path = boost::filesystem::current_path() / "config.ini";
-        std::cout << "[ConfigManager.cpp] º¯Êý [ConfigManager()] config path: " << config_path.string() << std::endl;
+        boost::filesystem::path config_path;
+        if (_config_path.empty()) {
+            config_path = boost::filesystem::current_path() / "config.ini";
+        }
+        else {
+            config_path = boost::filesystem::path(_config_path);
+        }
+
+        std::cout << "[ConfigManager.cpp] å‡½æ•° [ConfigManager()] config path: "
+            << config_path.string() << std::endl;
 
         if (!boost::filesystem::exists(config_path)) {
-            std::cerr << "[ConfigManager.cpp] º¯Êý [ConfigManager()] " << config_path.string() << " ÎÄ¼þ²»´æÔÚ!" << std::endl;
+            std::cerr << "[ConfigManager.cpp] å‡½æ•° [ConfigManager()] "
+                << config_path.string() << " æ–‡ä»¶ä¸å­˜åœ¨!" << std::endl;
             return;
         }
 
-        // ¶ÁÈ¡ÅäÖÃÎÄ¼þ
         boost::property_tree::ptree pt;
         boost::property_tree::ini_parser::read_ini(config_path.string(), pt);
 
-        // Ìî³ä _config_map
         for (const auto& sectionPair : pt) {
             const std::string& sectionName = sectionPair.first;
             const boost::property_tree::ptree& sectionTree = sectionPair.second;
@@ -54,8 +72,7 @@ ConfigManager::ConfigManager() {
             this->_config_map[sectionName] = sectionInfo;
         }
 
-        // µ÷ÊÔ´òÓ¡
-        /*std::cout << "[ConfigManager.cpp] º¯Êý [ConfigManager()] ±éÀúÅäÖÃÏî:" << std::endl;
+        /*std::cout << "[ConfigManager.cpp] å‡½æ•° [ConfigManager()] éåŽ†é…ç½®é¡¹:" << std::endl;
         for (const auto& section : _config_map) {
             std::cout << "section: " << section.first << std::endl;
             for (const auto& keyValue : section.second._section_datas) {
@@ -64,7 +81,7 @@ ConfigManager::ConfigManager() {
         }*/
     }
     catch (const std::exception& e) {
-        std::cout << "[ConfigManager.cpp] º¯Êý [ConfigManager()] Exception: " << e.what() << std::endl;
+        std::cout << "[ConfigManager.cpp] å‡½æ•° [ConfigManager()] Exception: " << e.what() << std::endl;
     }
 }
 
@@ -75,7 +92,7 @@ ConfigManager::~ConfigManager() {
 const SectionInfo& ConfigManager::operator[](const std::string& section) const {
     auto it = _config_map.find(section);
     if (it == _config_map.end()) {
-        std::cerr << "[ConfigManager.h] º¯Êý [ConfigManager::operator[]] section ["
+        std::cerr << "[ConfigManager.h] å‡½æ•° [ConfigManager::operator[]] section ["
             << section << "] not found" << std::endl;
         static const SectionInfo empty_section;
         return empty_section;

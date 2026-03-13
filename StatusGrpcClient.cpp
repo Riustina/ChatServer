@@ -1,8 +1,18 @@
 // StatusGrpcClient.cpp
 
 #include "StatusGrpcClient.h"
+#include <chrono>
 #include <iostream>
 #include "Defer.h"
+
+namespace {
+std::string buildServerId(const std::string& host, const std::string& port)
+{
+    return host + ":" + port;
+}
+
+constexpr auto kHeartbeatInterval = std::chrono::seconds(3);
+}
 
 // ══════════════════════════════════════════════
 // StatusConPool
@@ -50,7 +60,6 @@ void StatusConPool::returnConnection(std::unique_ptr<StatusService::Stub> stub)
     std::lock_guard<std::mutex> lock(mutex_);
 
     if (b_stop_.load()) {
-        // 池已关闭，stub 随 unique_ptr 析构自动释放
         std::cerr << "[StatusGrpcClient.cpp] returnConnection [归还连接] 连接池已关闭，丢弃连接\n";
         return;
     }
@@ -63,10 +72,9 @@ void StatusConPool::Close()
 {
     {
         std::lock_guard<std::mutex> lock(mutex_);
-        if (b_stop_.load()) return; // 防止重复关闭
+        if (b_stop_.load()) return;
         b_stop_.store(true);
 
-        // 清空队列，unique_ptr 析构时自动释放 stub
         while (!connections_.empty()) {
             connections_.pop();
         }
@@ -80,18 +88,30 @@ void StatusConPool::Close()
 // ══════════════════════════════════════════════
 
 StatusGrpcClient::StatusGrpcClient()
+    : heartbeat_stop_(false)
+    , heartbeat_started_(false)
 {
     auto& cfg = ConfigManager::getInstance();
     const std::string host = cfg["StatusServer"]["host"];
     const std::string port = cfg["StatusServer"]["port"];
+    self_host_ = cfg["SelfServer"]["Host"];
+    self_port_ = cfg["SelfServer"]["Port"];
+    self_server_id_ = buildServerId(self_host_, self_port_);
     pool_ = std::make_unique<StatusConPool>(5, host, port);
+}
+
+StatusGrpcClient::~StatusGrpcClient()
+{
+    StopHeartbeat();
+    if (pool_) {
+        pool_->Close();
+    }
 }
 
 GetChatServerRsp StatusGrpcClient::GetChatServer(int uid)
 {
     GetChatServerRsp reply;
 
-    // 1. 取出连接，取不到说明池已关闭
     auto stub = pool_->getConnection();
     if (stub == nullptr) {
         std::cerr << "[StatusGrpcClient.cpp] GetChatServer [GetChatServer] "
@@ -100,12 +120,10 @@ GetChatServerRsp StatusGrpcClient::GetChatServer(int uid)
         return reply;
     }
 
-    // 2. 取到连接后立即注册归还，确保任何路径下都能归还
     Defer defer([&stub, this]() {
         pool_->returnConnection(std::move(stub));
         });
 
-    // 3. 发起 RPC 调用
     GetChatServerReq request;
     request.set_uid(uid);
     ClientContext context;
@@ -114,7 +132,7 @@ GetChatServerRsp StatusGrpcClient::GetChatServer(int uid)
     if (status.ok()) {
         std::cout << "[StatusGrpcClient.cpp] GetChatServer [GetChatServer] "
             << "分配 ChatServer 成功，uid: " << uid
-            << "，host: " << reply.host() << "\n";
+            << "，host: " << reply.host() << "，server_id: " << reply.server_id() << "\n";
         return reply;
     }
 
@@ -129,7 +147,6 @@ LoginRsp StatusGrpcClient::Login(int uid, const std::string& token)
 {
     LoginRsp reply;
 
-    // 1. 先取连接，取不到直接返回错误
     auto stub = pool_->getConnection();
     if (stub == nullptr) {
         std::cerr << "[StatusGrpcClient.cpp] Login [Login] 获取 gRPC 连接失败，uid: " << uid << "\n";
@@ -137,12 +154,10 @@ LoginRsp StatusGrpcClient::Login(int uid, const std::string& token)
         return reply;
     }
 
-    // 2. 取到后立即注册归还，保证任何路径都能归还连接
     Defer defer([&stub, this]() {
         pool_->returnConnection(std::move(stub));
         });
 
-    // 3. 发起 RPC
     LoginReq request;
     request.set_uid(uid);
     request.set_token(token);
@@ -158,4 +173,227 @@ LoginRsp StatusGrpcClient::Login(int uid, const std::string& token)
         << "，错误: " << status.error_message() << "\n";
     reply.set_error(ErrorCodes::RPC_Failed);
     return reply;
+}
+
+RegisterChatServerRsp StatusGrpcClient::RegisterChatServer()
+{
+    RegisterChatServerRsp reply;
+
+    auto stub = pool_->getConnection();
+    if (stub == nullptr) {
+        std::cerr << "[StatusGrpcClient.cpp] RegisterChatServer [RegisterChatServer] 获取 gRPC 连接失败\n";
+        reply.set_error(ErrorCodes::RPC_Failed);
+        return reply;
+    }
+
+    Defer defer([&stub, this]() {
+        pool_->returnConnection(std::move(stub));
+        });
+
+    message::RegisterChatServerReq request;
+    request.set_server_id(self_server_id_);
+    request.set_host(self_host_);
+    request.set_port(self_port_);
+    ClientContext context;
+
+    Status status = stub->RegisterChatServer(&context, request, &reply);
+    if (status.ok()) {
+        std::cout << "[StatusGrpcClient.cpp] RegisterChatServer [RegisterChatServer] "
+            << "注册成功，server_id: " << self_server_id_ << "\n";
+        return reply;
+    }
+
+    std::cerr << "[StatusGrpcClient.cpp] RegisterChatServer [RegisterChatServer] "
+        << "gRPC 调用失败，server_id: " << self_server_id_
+        << "，错误: " << status.error_message() << "\n";
+    reply.set_error(ErrorCodes::RPC_Failed);
+    return reply;
+}
+
+HeartbeatRsp StatusGrpcClient::Heartbeat()
+{
+    HeartbeatRsp reply;
+
+    auto stub = pool_->getConnection();
+    if (stub == nullptr) {
+        std::cerr << "[StatusGrpcClient.cpp] Heartbeat [Heartbeat] 获取 gRPC 连接失败\n";
+        reply.set_error(ErrorCodes::RPC_Failed);
+        return reply;
+    }
+
+    Defer defer([&stub, this]() {
+        pool_->returnConnection(std::move(stub));
+        });
+
+    message::HeartbeatReq request;
+    request.set_server_id(self_server_id_);
+    request.set_host(self_host_);
+    request.set_port(self_port_);
+    request.set_timestamp(static_cast<long long>(std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::system_clock::now().time_since_epoch()).count()));
+    ClientContext context;
+
+    Status status = stub->Heartbeat(&context, request, &reply);
+    if (status.ok()) {
+        // std::cout << "[StatusGrpcClient.cpp] Heartbeat [Heartbeat] "
+        //     << "心跳成功，server_id: " << self_server_id_ << "，online: " << reply.online() << "\n";
+        return reply;
+    }
+
+    std::cerr << "[StatusGrpcClient.cpp] Heartbeat [Heartbeat] "
+        << "gRPC 调用失败，server_id: " << self_server_id_
+        << "，错误: " << status.error_message() << "\n";
+    reply.set_error(ErrorCodes::RPC_Failed);
+    return reply;
+}
+
+ReportUserOnlineRsp StatusGrpcClient::ReportUserOnline(int uid, const std::string& token)
+{
+    ReportUserOnlineRsp reply;
+    auto stub = pool_->getConnection();
+    if (stub == nullptr) {
+        std::cerr << "[StatusGrpcClient.cpp] ReportUserOnline [ReportUserOnline] "
+            << "获取 gRPC 连接失败，uid: " << uid << "\n";
+        reply.set_error(ErrorCodes::RPC_Failed);
+        return reply;
+    }
+
+    Defer defer([&stub, this]() {
+        pool_->returnConnection(std::move(stub));
+        });
+
+    message::ReportUserOnlineReq request;
+    request.set_uid(uid);
+    request.set_token(token);
+    request.set_server_id(self_server_id_);
+    request.set_host(self_host_);
+    request.set_port(self_port_);
+    ClientContext context;
+
+    Status status = stub->ReportUserOnline(&context, request, &reply);
+    if (status.ok()) {
+        std::cout << "[StatusGrpcClient.cpp] ReportUserOnline [ReportUserOnline] "
+            << "uid: " << uid << " 上报在线成功，server_id: " << self_server_id_ << "\n";
+        return reply;
+    }
+
+    std::cerr << "[StatusGrpcClient.cpp] ReportUserOnline [ReportUserOnline] "
+        << "gRPC 调用失败，uid: " << uid
+        << "，错误: " << status.error_message() << "\n";
+    reply.set_error(ErrorCodes::RPC_Failed);
+    return reply;
+}
+
+ReportUserOfflineRsp StatusGrpcClient::ReportUserOffline(int uid)
+{
+    ReportUserOfflineRsp reply;
+    auto stub = pool_->getConnection();
+    if (stub == nullptr) {
+        std::cerr << "[StatusGrpcClient.cpp] ReportUserOffline [ReportUserOffline] "
+            << "获取 gRPC 连接失败，uid: " << uid << "\n";
+        reply.set_error(ErrorCodes::RPC_Failed);
+        return reply;
+    }
+
+    Defer defer([&stub, this]() {
+        pool_->returnConnection(std::move(stub));
+        });
+
+    message::ReportUserOfflineReq request;
+    request.set_uid(uid);
+    request.set_server_id(self_server_id_);
+    ClientContext context;
+
+    Status status = stub->ReportUserOffline(&context, request, &reply);
+    if (status.ok()) {
+        std::cout << "[StatusGrpcClient.cpp] ReportUserOffline [ReportUserOffline] "
+            << "uid: " << uid << " 上报下线成功，server_id: " << self_server_id_ << "\n";
+        return reply;
+    }
+
+    std::cerr << "[StatusGrpcClient.cpp] ReportUserOffline [ReportUserOffline] "
+        << "gRPC 调用失败，uid: " << uid
+        << "，错误: " << status.error_message() << "\n";
+    reply.set_error(ErrorCodes::RPC_Failed);
+    return reply;
+}
+
+QueryUserRouteRsp StatusGrpcClient::QueryUserRoute(int uid)
+{
+    QueryUserRouteRsp reply;
+    auto stub = pool_->getConnection();
+    if (stub == nullptr) {
+        std::cerr << "[StatusGrpcClient.cpp] QueryUserRoute [QueryUserRoute] "
+            << "获取 gRPC 连接失败，uid: " << uid << "\n";
+        reply.set_error(ErrorCodes::RPC_Failed);
+        return reply;
+    }
+
+    Defer defer([&stub, this]() {
+        pool_->returnConnection(std::move(stub));
+        });
+
+    message::QueryUserRouteReq request;
+    request.set_uid(uid);
+    ClientContext context;
+
+    Status status = stub->QueryUserRoute(&context, request, &reply);
+    if (status.ok()) {
+        std::cout << "[StatusGrpcClient.cpp] QueryUserRoute [QueryUserRoute] "
+            << "uid: " << uid << " 查询完成，online: " << reply.online() << "\n";
+        return reply;
+    }
+
+    std::cerr << "[StatusGrpcClient.cpp] QueryUserRoute [QueryUserRoute] "
+        << "gRPC 调用失败，uid: " << uid
+        << "，错误: " << status.error_message() << "\n";
+    reply.set_error(ErrorCodes::RPC_Failed);
+    return reply;
+}
+
+void StatusGrpcClient::StartHeartbeat()
+{
+    bool expected = false;
+    if (!heartbeat_started_.compare_exchange_strong(expected, true)) {
+        return;
+    }
+
+    heartbeat_stop_.store(false);
+    heartbeat_thread_ = std::thread(&StatusGrpcClient::HeartbeatLoop, this);
+    std::cout << "[StatusGrpcClient.cpp] StartHeartbeat [StartHeartbeat] 心跳线程已启动\n";
+}
+
+void StatusGrpcClient::StopHeartbeat()
+{
+    heartbeat_stop_.store(true);
+    if (heartbeat_thread_.joinable()) {
+        heartbeat_thread_.join();
+    }
+    heartbeat_started_.store(false);
+    std::cout << "[StatusGrpcClient.cpp] StopHeartbeat [StopHeartbeat] 心跳线程已停止\n";
+}
+
+void StatusGrpcClient::HeartbeatLoop()
+{
+    while (!heartbeat_stop_.load()) {
+        auto rsp = Heartbeat();
+        if (rsp.error() != ErrorCodes::Success) {
+            std::cerr << "[StatusGrpcClient.cpp] HeartbeatLoop [HeartbeatLoop] 心跳失败，server_id: "
+                << self_server_id_ << "，error: " << rsp.error() << "\n";
+        }
+
+        for (int i = 0; i < static_cast<int>(kHeartbeatInterval.count()); ++i) {
+            if (heartbeat_stop_.load()) {
+                break;
+            }
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+        }
+    }
+
+    std::cout << "[StatusGrpcClient.cpp] HeartbeatLoop [HeartbeatLoop] 心跳线程退出\n";
+}
+
+const std::string& StatusGrpcClient::ServerId() const
+{
+    return self_server_id_;
 }
