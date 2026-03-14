@@ -299,6 +299,21 @@ void LogicSystem::AddFriendHandler(std::shared_ptr<CSession> session,
         return;
     }
 
+    const auto existingRequests = MySqlMgr::getInstance().GetPendingFriendRequests(from_uid);
+    for (const auto &item : existingRequests) {
+        const bool sameTarget = (item.from_uid == from_uid && item.to_uid == to_uid)
+            || (item.from_uid == to_uid && item.to_uid == from_uid);
+        if (!sameTarget) {
+            continue;
+        }
+
+        if (item.status == "pending" || item.status == "accepted") {
+            reply["error"] = ErrorCodes::MySQLFailed;
+            reply["request_id"] = Json::Int64(-3);
+            return;
+        }
+    }
+
     const long long request_id = MySqlMgr::getInstance().CreateFriendRequest(from_uid, to_uid, remark);
     if (request_id <= 0) {
         reply["error"] = ErrorCodes::MySQLFailed;
