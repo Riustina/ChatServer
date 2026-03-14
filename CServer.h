@@ -1,11 +1,11 @@
-// CServer.h
+ï»¿// CServer.h
 
 #pragma once
 #include <boost/asio.hpp>
 #include "CSession.h"
 #include <atomic>
 #include <memory>
-#include <unordered_map>  // O(1) ²éÕÒ£¬Ìæ»» map µÄ O(log n)
+#include <unordered_map>  // O(1) æŸ¥æ‰¾ï¼Œæ›¿æ¢ map çš„ O(log n)
 #include <shared_mutex>
 
 using boost::asio::ip::tcp;
@@ -16,7 +16,7 @@ public:
     CServer(boost::asio::io_context& io_context, short port);
     ~CServer();
 
-    void ClearSession(const std::string& uuid); // const ÒıÓÃ£¬±ÜÃâ²»±ØÒªµÄ¿½±´
+    void ClearSession(const std::string& uuid); // const å¼•ç”¨ï¼Œé¿å…ä¸å¿…è¦çš„æ‹·è´
     void Shutdown();
 
 private:
@@ -29,6 +29,6 @@ private:
     tcp::acceptor            _acceptor;
 
     std::unordered_map<std::string, std::shared_ptr<CSession>> _sessions;
-    std::shared_mutex _sessions_mutex; // ¶Á¶àĞ´ÉÙÊ±±È mutex ¸ü¸ßĞ§
+    std::shared_mutex _sessions_mutex; // è¯»å¤šå†™å°‘æ—¶æ¯” mutex æ›´é«˜æ•ˆ
     std::atomic<bool> _is_shutting_down;
 };

@@ -508,6 +508,9 @@ inline constexpr GetChatServerRsp::Impl_::Impl_(
         server_id_(
             &::google::protobuf::internal::fixed_address_empty_string,
             ::_pbi::ConstantInitialized()),
+        grpc_port_(
+            &::google::protobuf::internal::fixed_address_empty_string,
+            ::_pbi::ConstantInitialized()),
         error_{0},
         _cached_size_{0} {}
 
@@ -605,6 +608,7 @@ const ::uint32_t
         PROTOBUF_FIELD_OFFSET(::message::GetChatServerRsp, _impl_.port_),
         PROTOBUF_FIELD_OFFSET(::message::GetChatServerRsp, _impl_.token_),
         PROTOBUF_FIELD_OFFSET(::message::GetChatServerRsp, _impl_.server_id_),
+        PROTOBUF_FIELD_OFFSET(::message::GetChatServerRsp, _impl_.grpc_port_),
         ~0u,  // no _has_bits_
         PROTOBUF_FIELD_OFFSET(::message::LoginReq, _internal_metadata_),
         ~0u,  // no _extensions_
@@ -761,20 +765,20 @@ static const ::_pbi::MigrationSchema
         {9, -1, -1, sizeof(::message::GetVerifyRsp)},
         {20, -1, -1, sizeof(::message::GetChatServerReq)},
         {29, -1, -1, sizeof(::message::GetChatServerRsp)},
-        {42, -1, -1, sizeof(::message::LoginReq)},
-        {52, -1, -1, sizeof(::message::LoginRsp)},
-        {63, -1, -1, sizeof(::message::RegisterChatServerReq)},
-        {75, -1, -1, sizeof(::message::RegisterChatServerRsp)},
-        {84, -1, -1, sizeof(::message::HeartbeatReq)},
-        {97, -1, -1, sizeof(::message::HeartbeatRsp)},
-        {107, -1, -1, sizeof(::message::ReportUserOnlineReq)},
-        {120, -1, -1, sizeof(::message::ReportUserOnlineRsp)},
-        {129, -1, -1, sizeof(::message::ReportUserOfflineReq)},
-        {139, -1, -1, sizeof(::message::ReportUserOfflineRsp)},
-        {148, -1, -1, sizeof(::message::QueryUserRouteReq)},
-        {157, -1, -1, sizeof(::message::QueryUserRouteRsp)},
-        {171, -1, -1, sizeof(::message::PushFriendRequestsReq)},
-        {180, -1, -1, sizeof(::message::PushFriendRequestsRsp)},
+        {43, -1, -1, sizeof(::message::LoginReq)},
+        {53, -1, -1, sizeof(::message::LoginRsp)},
+        {64, -1, -1, sizeof(::message::RegisterChatServerReq)},
+        {76, -1, -1, sizeof(::message::RegisterChatServerRsp)},
+        {85, -1, -1, sizeof(::message::HeartbeatReq)},
+        {98, -1, -1, sizeof(::message::HeartbeatRsp)},
+        {108, -1, -1, sizeof(::message::ReportUserOnlineReq)},
+        {121, -1, -1, sizeof(::message::ReportUserOnlineRsp)},
+        {130, -1, -1, sizeof(::message::ReportUserOfflineReq)},
+        {140, -1, -1, sizeof(::message::ReportUserOfflineRsp)},
+        {149, -1, -1, sizeof(::message::QueryUserRouteReq)},
+        {158, -1, -1, sizeof(::message::QueryUserRouteRsp)},
+        {172, -1, -1, sizeof(::message::PushFriendRequestsReq)},
+        {181, -1, -1, sizeof(::message::PushFriendRequestsRsp)},
 };
 static const ::_pb::Message* const file_default_instances[] = {
     &::message::_GetVerifyReq_default_instance_._instance,
@@ -801,55 +805,56 @@ const char descriptor_table_protodef_message_2eproto[] ABSL_ATTRIBUTE_SECTION_VA
     "\n\rmessage.proto\022\007message\"\035\n\014GetVerifyReq"
     "\022\r\n\005email\030\001 \001(\t\":\n\014GetVerifyRsp\022\r\n\005error"
     "\030\001 \001(\005\022\r\n\005email\030\002 \001(\t\022\014\n\004code\030\003 \001(\t\"\037\n\020G"
-    "etChatServerReq\022\013\n\003uid\030\001 \001(\005\"_\n\020GetChatS"
+    "etChatServerReq\022\013\n\003uid\030\001 \001(\005\"r\n\020GetChatS"
     "erverRsp\022\r\n\005error\030\001 \001(\005\022\014\n\004host\030\002 \001(\t\022\014\n"
     "\004port\030\003 \001(\t\022\r\n\005token\030\004 \001(\t\022\021\n\tserver_id\030"
-    "\005 \001(\t\"&\n\010LoginReq\022\013\n\003uid\030\001 \001(\005\022\r\n\005token\030"
-    "\002 \001(\t\"5\n\010LoginRsp\022\r\n\005error\030\001 \001(\005\022\013\n\003uid\030"
-    "\002 \001(\005\022\r\n\005token\030\003 \001(\t\"Y\n\025RegisterChatServ"
-    "erReq\022\021\n\tserver_id\030\001 \001(\t\022\014\n\004host\030\002 \001(\t\022\014"
-    "\n\004port\030\003 \001(\t\022\021\n\tgrpc_port\030\004 \001(\t\"&\n\025Regis"
-    "terChatServerRsp\022\r\n\005error\030\001 \001(\005\"c\n\014Heart"
-    "beatReq\022\021\n\tserver_id\030\001 \001(\t\022\014\n\004host\030\002 \001(\t"
-    "\022\014\n\004port\030\003 \001(\t\022\021\n\ttimestamp\030\004 \001(\003\022\021\n\tgrp"
-    "c_port\030\005 \001(\t\"-\n\014HeartbeatRsp\022\r\n\005error\030\001 "
-    "\001(\005\022\016\n\006online\030\002 \001(\010\"`\n\023ReportUserOnlineR"
-    "eq\022\013\n\003uid\030\001 \001(\005\022\r\n\005token\030\002 \001(\t\022\021\n\tserver"
-    "_id\030\003 \001(\t\022\014\n\004host\030\004 \001(\t\022\014\n\004port\030\005 \001(\t\"$\n"
-    "\023ReportUserOnlineRsp\022\r\n\005error\030\001 \001(\005\"6\n\024R"
-    "eportUserOfflineReq\022\013\n\003uid\030\001 \001(\005\022\021\n\tserv"
-    "er_id\030\002 \001(\t\"%\n\024ReportUserOfflineRsp\022\r\n\005e"
-    "rror\030\001 \001(\005\" \n\021QueryUserRouteReq\022\013\n\003uid\030\001"
-    " \001(\005\"t\n\021QueryUserRouteRsp\022\r\n\005error\030\001 \001(\005"
-    "\022\016\n\006online\030\002 \001(\010\022\021\n\tserver_id\030\003 \001(\t\022\014\n\004h"
-    "ost\030\004 \001(\t\022\014\n\004port\030\005 \001(\t\022\021\n\tgrpc_port\030\006 \001"
-    "(\t\"$\n\025PushFriendRequestsReq\022\013\n\003uid\030\001 \001(\005"
-    "\"9\n\025PushFriendRequestsRsp\022\r\n\005error\030\001 \001(\005"
-    "\022\021\n\tdelivered\030\002 \001(\0102P\n\rVerifyService\022\?\n\r"
-    "GetVerifyCode\022\025.message.GetVerifyReq\032\025.m"
-    "essage.GetVerifyRsp\"\0002\221\004\n\rStatusService\022"
-    "G\n\rGetChatServer\022\031.message.GetChatServer"
-    "Req\032\031.message.GetChatServerRsp\"\000\022/\n\005Logi"
-    "n\022\021.message.LoginReq\032\021.message.LoginRsp\""
-    "\000\022V\n\022RegisterChatServer\022\036.message.Regist"
-    "erChatServerReq\032\036.message.RegisterChatSe"
-    "rverRsp\"\000\022;\n\tHeartbeat\022\025.message.Heartbe"
-    "atReq\032\025.message.HeartbeatRsp\"\000\022P\n\020Report"
-    "UserOnline\022\034.message.ReportUserOnlineReq"
-    "\032\034.message.ReportUserOnlineRsp\"\000\022S\n\021Repo"
-    "rtUserOffline\022\035.message.ReportUserOfflin"
-    "eReq\032\035.message.ReportUserOfflineRsp\"\000\022J\n"
-    "\016QueryUserRoute\022\032.message.QueryUserRoute"
-    "Req\032\032.message.QueryUserRouteRsp\"\0002e\n\013Cha"
-    "tService\022V\n\022PushFriendRequests\022\036.message"
-    ".PushFriendRequestsReq\032\036.message.PushFri"
-    "endRequestsRsp\"\000b\006proto3"
+    "\005 \001(\t\022\021\n\tgrpc_port\030\006 \001(\t\"&\n\010LoginReq\022\013\n\003"
+    "uid\030\001 \001(\005\022\r\n\005token\030\002 \001(\t\"5\n\010LoginRsp\022\r\n\005"
+    "error\030\001 \001(\005\022\013\n\003uid\030\002 \001(\005\022\r\n\005token\030\003 \001(\t\""
+    "Y\n\025RegisterChatServerReq\022\021\n\tserver_id\030\001 "
+    "\001(\t\022\014\n\004host\030\002 \001(\t\022\014\n\004port\030\003 \001(\t\022\021\n\tgrpc_"
+    "port\030\004 \001(\t\"&\n\025RegisterChatServerRsp\022\r\n\005e"
+    "rror\030\001 \001(\005\"c\n\014HeartbeatReq\022\021\n\tserver_id\030"
+    "\001 \001(\t\022\014\n\004host\030\002 \001(\t\022\014\n\004port\030\003 \001(\t\022\021\n\ttim"
+    "estamp\030\004 \001(\003\022\021\n\tgrpc_port\030\005 \001(\t\"-\n\014Heart"
+    "beatRsp\022\r\n\005error\030\001 \001(\005\022\016\n\006online\030\002 \001(\010\"`"
+    "\n\023ReportUserOnlineReq\022\013\n\003uid\030\001 \001(\005\022\r\n\005to"
+    "ken\030\002 \001(\t\022\021\n\tserver_id\030\003 \001(\t\022\014\n\004host\030\004 \001"
+    "(\t\022\014\n\004port\030\005 \001(\t\"$\n\023ReportUserOnlineRsp\022"
+    "\r\n\005error\030\001 \001(\005\"6\n\024ReportUserOfflineReq\022\013"
+    "\n\003uid\030\001 \001(\005\022\021\n\tserver_id\030\002 \001(\t\"%\n\024Report"
+    "UserOfflineRsp\022\r\n\005error\030\001 \001(\005\" \n\021QueryUs"
+    "erRouteReq\022\013\n\003uid\030\001 \001(\005\"t\n\021QueryUserRout"
+    "eRsp\022\r\n\005error\030\001 \001(\005\022\016\n\006online\030\002 \001(\010\022\021\n\ts"
+    "erver_id\030\003 \001(\t\022\014\n\004host\030\004 \001(\t\022\014\n\004port\030\005 \001"
+    "(\t\022\021\n\tgrpc_port\030\006 \001(\t\"$\n\025PushFriendReque"
+    "stsReq\022\013\n\003uid\030\001 \001(\005\"9\n\025PushFriendRequest"
+    "sRsp\022\r\n\005error\030\001 \001(\005\022\021\n\tdelivered\030\002 \001(\0102P"
+    "\n\rVerifyService\022\?\n\rGetVerifyCode\022\025.messa"
+    "ge.GetVerifyReq\032\025.message.GetVerifyRsp\"\000"
+    "2\221\004\n\rStatusService\022G\n\rGetChatServer\022\031.me"
+    "ssage.GetChatServerReq\032\031.message.GetChat"
+    "ServerRsp\"\000\022/\n\005Login\022\021.message.LoginReq\032"
+    "\021.message.LoginRsp\"\000\022V\n\022RegisterChatServ"
+    "er\022\036.message.RegisterChatServerReq\032\036.mes"
+    "sage.RegisterChatServerRsp\"\000\022;\n\tHeartbea"
+    "t\022\025.message.HeartbeatReq\032\025.message.Heart"
+    "beatRsp\"\000\022P\n\020ReportUserOnline\022\034.message."
+    "ReportUserOnlineReq\032\034.message.ReportUser"
+    "OnlineRsp\"\000\022S\n\021ReportUserOffline\022\035.messa"
+    "ge.ReportUserOfflineReq\032\035.message.Report"
+    "UserOfflineRsp\"\000\022J\n\016QueryUserRoute\022\032.mes"
+    "sage.QueryUserRouteReq\032\032.message.QueryUs"
+    "erRouteRsp\"\0002e\n\013ChatService\022V\n\022PushFrien"
+    "dRequests\022\036.message.PushFriendRequestsRe"
+    "q\032\036.message.PushFriendRequestsRsp\"\000b\006pro"
+    "to3"
 };
 static ::absl::once_flag descriptor_table_message_2eproto_once;
 PROTOBUF_CONSTINIT const ::_pbi::DescriptorTable descriptor_table_message_2eproto = {
     false,
     false,
-    1824,
+    1843,
     descriptor_table_protodef_message_2eproto,
     "message.proto",
     &descriptor_table_message_2eproto_once,
@@ -1609,6 +1614,7 @@ inline PROTOBUF_NDEBUG_INLINE GetChatServerRsp::Impl_::Impl_(
         port_(arena, from.port_),
         token_(arena, from.token_),
         server_id_(arena, from.server_id_),
+        grpc_port_(arena, from.grpc_port_),
         _cached_size_{0} {}
 
 GetChatServerRsp::GetChatServerRsp(
@@ -1635,6 +1641,7 @@ inline PROTOBUF_NDEBUG_INLINE GetChatServerRsp::Impl_::Impl_(
         port_(arena),
         token_(arena),
         server_id_(arena),
+        grpc_port_(arena),
         _cached_size_{0} {}
 
 inline void GetChatServerRsp::SharedCtor(::_pb::Arena* arena) {
@@ -1653,6 +1660,7 @@ inline void GetChatServerRsp::SharedDtor(MessageLite& self) {
   this_._impl_.port_.Destroy();
   this_._impl_.token_.Destroy();
   this_._impl_.server_id_.Destroy();
+  this_._impl_.grpc_port_.Destroy();
   this_._impl_.~Impl_();
 }
 
@@ -1692,15 +1700,15 @@ const ::google::protobuf::internal::ClassData* GetChatServerRsp::GetClassData() 
   return _class_data_.base();
 }
 PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
-const ::_pbi::TcParseTable<3, 5, 0, 55, 2> GetChatServerRsp::_table_ = {
+const ::_pbi::TcParseTable<3, 6, 0, 64, 2> GetChatServerRsp::_table_ = {
   {
     0,  // no _has_bits_
     0, // no _extensions_
-    5, 56,  // max_field_number, fast_idx_mask
+    6, 56,  // max_field_number, fast_idx_mask
     offsetof(decltype(_table_), field_lookup_table),
-    4294967264,  // skipmap
+    4294967232,  // skipmap
     offsetof(decltype(_table_), field_entries),
-    5,  // num_field_entries
+    6,  // num_field_entries
     0,  // num_aux_entries
     offsetof(decltype(_table_), field_names),  // no aux_entries
     _class_data_.base(),
@@ -1726,7 +1734,9 @@ const ::_pbi::TcParseTable<3, 5, 0, 55, 2> GetChatServerRsp::_table_ = {
     // string server_id = 5;
     {::_pbi::TcParser::FastUS1,
      {42, 63, 0, PROTOBUF_FIELD_OFFSET(GetChatServerRsp, _impl_.server_id_)}},
-    {::_pbi::TcParser::MiniParse, {}},
+    // string grpc_port = 6;
+    {::_pbi::TcParser::FastUS1,
+     {50, 63, 0, PROTOBUF_FIELD_OFFSET(GetChatServerRsp, _impl_.grpc_port_)}},
     {::_pbi::TcParser::MiniParse, {}},
   }}, {{
     65535, 65535
@@ -1746,15 +1756,19 @@ const ::_pbi::TcParseTable<3, 5, 0, 55, 2> GetChatServerRsp::_table_ = {
     // string server_id = 5;
     {PROTOBUF_FIELD_OFFSET(GetChatServerRsp, _impl_.server_id_), 0, 0,
     (0 | ::_fl::kFcSingular | ::_fl::kUtf8String | ::_fl::kRepAString)},
+    // string grpc_port = 6;
+    {PROTOBUF_FIELD_OFFSET(GetChatServerRsp, _impl_.grpc_port_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kUtf8String | ::_fl::kRepAString)},
   }},
   // no aux_entries
   {{
-    "\30\0\4\4\5\11\0\0"
+    "\30\0\4\4\5\11\11\0"
     "message.GetChatServerRsp"
     "host"
     "port"
     "token"
     "server_id"
+    "grpc_port"
   }},
 };
 
@@ -1769,6 +1783,7 @@ PROTOBUF_NOINLINE void GetChatServerRsp::Clear() {
   _impl_.port_.ClearToEmpty();
   _impl_.token_.ClearToEmpty();
   _impl_.server_id_.ClearToEmpty();
+  _impl_.grpc_port_.ClearToEmpty();
   _impl_.error_ = 0;
   _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
 }
@@ -1827,6 +1842,14 @@ PROTOBUF_NOINLINE void GetChatServerRsp::Clear() {
             target = stream->WriteStringMaybeAliased(5, _s, target);
           }
 
+          // string grpc_port = 6;
+          if (!this_._internal_grpc_port().empty()) {
+            const std::string& _s = this_._internal_grpc_port();
+            ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+                _s.data(), static_cast<int>(_s.length()), ::google::protobuf::internal::WireFormatLite::SERIALIZE, "message.GetChatServerRsp.grpc_port");
+            target = stream->WriteStringMaybeAliased(6, _s, target);
+          }
+
           if (PROTOBUF_PREDICT_FALSE(this_._internal_metadata_.have_unknown_fields())) {
             target =
                 ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
@@ -1872,6 +1895,11 @@ PROTOBUF_NOINLINE void GetChatServerRsp::Clear() {
               total_size += 1 + ::google::protobuf::internal::WireFormatLite::StringSize(
                                               this_._internal_server_id());
             }
+            // string grpc_port = 6;
+            if (!this_._internal_grpc_port().empty()) {
+              total_size += 1 + ::google::protobuf::internal::WireFormatLite::StringSize(
+                                              this_._internal_grpc_port());
+            }
             // int32 error = 1;
             if (this_._internal_error() != 0) {
               total_size += ::_pbi::WireFormatLite::Int32SizePlusOne(
@@ -1902,6 +1930,9 @@ void GetChatServerRsp::MergeImpl(::google::protobuf::MessageLite& to_msg, const 
   if (!from._internal_server_id().empty()) {
     _this->_internal_set_server_id(from._internal_server_id());
   }
+  if (!from._internal_grpc_port().empty()) {
+    _this->_internal_set_grpc_port(from._internal_grpc_port());
+  }
   if (from._internal_error() != 0) {
     _this->_impl_.error_ = from._impl_.error_;
   }
@@ -1925,6 +1956,7 @@ void GetChatServerRsp::InternalSwap(GetChatServerRsp* PROTOBUF_RESTRICT other) {
   ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.port_, &other->_impl_.port_, arena);
   ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.token_, &other->_impl_.token_, arena);
   ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.server_id_, &other->_impl_.server_id_, arena);
+  ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.grpc_port_, &other->_impl_.grpc_port_, arena);
         swap(_impl_.error_, other->_impl_.error_);
 }
 

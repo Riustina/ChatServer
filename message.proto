@@ -26,6 +26,7 @@ message GetChatServerRsp {
   string port = 3;
   string token = 4;
   string server_id = 5;
+  string grpc_port = 6;
 }
 
 message LoginReq {

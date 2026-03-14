@@ -3729,6 +3729,7 @@ class GetChatServerRsp final : public ::google::protobuf::Message
     kPortFieldNumber = 3,
     kTokenFieldNumber = 4,
     kServerIdFieldNumber = 5,
+    kGrpcPortFieldNumber = 6,
     kErrorFieldNumber = 1,
   };
   // string host = 2;
@@ -3795,6 +3796,22 @@ class GetChatServerRsp final : public ::google::protobuf::Message
   std::string* _internal_mutable_server_id();
 
   public:
+  // string grpc_port = 6;
+  void clear_grpc_port() ;
+  const std::string& grpc_port() const;
+  template <typename Arg_ = const std::string&, typename... Args_>
+  void set_grpc_port(Arg_&& arg, Args_... args);
+  std::string* mutable_grpc_port();
+  PROTOBUF_NODISCARD std::string* release_grpc_port();
+  void set_allocated_grpc_port(std::string* value);
+
+  private:
+  const std::string& _internal_grpc_port() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_grpc_port(
+      const std::string& value);
+  std::string* _internal_mutable_grpc_port();
+
+  public:
   // int32 error = 1;
   void clear_error() ;
   ::int32_t error() const;
@@ -3810,8 +3827,8 @@ class GetChatServerRsp final : public ::google::protobuf::Message
   class _Internal;
   friend class ::google::protobuf::internal::TcParser;
   static const ::google::protobuf::internal::TcParseTable<
-      3, 5, 0,
-      55, 2>
+      3, 6, 0,
+      64, 2>
       _table_;
 
   friend class ::google::protobuf::MessageLite;
@@ -3832,6 +3849,7 @@ class GetChatServerRsp final : public ::google::protobuf::Message
     ::google::protobuf::internal::ArenaStringPtr port_;
     ::google::protobuf::internal::ArenaStringPtr token_;
     ::google::protobuf::internal::ArenaStringPtr server_id_;
+    ::google::protobuf::internal::ArenaStringPtr grpc_port_;
     ::int32_t error_;
     ::google::protobuf::internal::CachedSize _cached_size_;
     PROTOBUF_TSAN_DECLARE_MEMBER
@@ -4458,6 +4476,54 @@ inline void GetChatServerRsp::set_allocated_server_id(std::string* value) {
     _impl_.server_id_.Set("", GetArena());
   }
   // @@protoc_insertion_point(field_set_allocated:message.GetChatServerRsp.server_id)
+}
+
+// string grpc_port = 6;
+inline void GetChatServerRsp::clear_grpc_port() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.grpc_port_.ClearToEmpty();
+}
+inline const std::string& GetChatServerRsp::grpc_port() const
+    ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  // @@protoc_insertion_point(field_get:message.GetChatServerRsp.grpc_port)
+  return _internal_grpc_port();
+}
+template <typename Arg_, typename... Args_>
+inline PROTOBUF_ALWAYS_INLINE void GetChatServerRsp::set_grpc_port(Arg_&& arg,
+                                                     Args_... args) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.grpc_port_.Set(static_cast<Arg_&&>(arg), args..., GetArena());
+  // @@protoc_insertion_point(field_set:message.GetChatServerRsp.grpc_port)
+}
+inline std::string* GetChatServerRsp::mutable_grpc_port() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  std::string* _s = _internal_mutable_grpc_port();
+  // @@protoc_insertion_point(field_mutable:message.GetChatServerRsp.grpc_port)
+  return _s;
+}
+inline const std::string& GetChatServerRsp::_internal_grpc_port() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.grpc_port_.Get();
+}
+inline void GetChatServerRsp::_internal_set_grpc_port(const std::string& value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.grpc_port_.Set(value, GetArena());
+}
+inline std::string* GetChatServerRsp::_internal_mutable_grpc_port() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  return _impl_.grpc_port_.Mutable( GetArena());
+}
+inline std::string* GetChatServerRsp::release_grpc_port() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  // @@protoc_insertion_point(field_release:message.GetChatServerRsp.grpc_port)
+  return _impl_.grpc_port_.Release();
+}
+inline void GetChatServerRsp::set_allocated_grpc_port(std::string* value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.grpc_port_.SetAllocated(value, GetArena());
+  if (::google::protobuf::internal::DebugHardenForceCopyDefaultString() && _impl_.grpc_port_.IsDefault()) {
+    _impl_.grpc_port_.Set("", GetArena());
+  }
+  // @@protoc_insertion_point(field_set_allocated:message.GetChatServerRsp.grpc_port)
 }
 
 // -------------------------------------------------------------------

@@ -1,4 +1,4 @@
-// Singleton.h
+﻿// Singleton.h
 
 #pragma once
 template<typename T>
@@ -8,7 +8,7 @@ public:
     Singleton& operator=(const Singleton&) = delete;
 
     static T& getInstance() {
-        static T instance;  // C++11 ��֤�̰߳�ȫ
+        static T instance;  // C++11 保证线程安全
         return instance;
     }
 
