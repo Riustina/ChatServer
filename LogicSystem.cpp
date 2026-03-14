@@ -2,12 +2,20 @@
 #include "StatusGrpcClient.h"
 #include "MySqlMgr.h"
 #include "global.h"
+#include "message.grpc.pb.h"
 #include <iostream>
 #include "Defer.h"
 
 // ──────────────────────────────────────────────────────────────
 // 构造 / 析构
 // ──────────────────────────────────────────────────────────────
+
+namespace {
+std::string BuildChatGrpcAddress(const std::string& host, const std::string& grpc_port)
+{
+    return host + ":" + grpc_port;
+}
+}
 
 LogicSystem::LogicSystem() : _b_stop(false)
 {
@@ -167,9 +175,6 @@ void LogicSystem::LoginHandler(std::shared_ptr<CSession> session,
     std::cout << "[LogicSystem] LoginHandler uid: " << uid << "\n";
 
     Json::Value rtvalue;
-    Defer defer([&rtvalue, &session]() {
-        session->Send(rtvalue.toStyledString(), MSG_CHAT_LOGIN_RSP);
-        });
 
     // 2. 先向 StatusServer 校验 token
     auto rsp = StatusGrpcClient::getInstance().Login(uid, token);
@@ -218,9 +223,12 @@ void LogicSystem::LoginHandler(std::shared_ptr<CSession> session,
 
     // 7. 组装成功回包
     std::cout << "[LogicSystem] LoginHandler 登录成功，uid: " << uid << "\n";
+    rtvalue["error"] = ErrorCodes::Success;
     rtvalue["uid"] = uid;
     rtvalue["token"] = rsp.token();
     rtvalue["name"] = user_info->name;
+    session->Send(rtvalue.toStyledString(), MSG_CHAT_LOGIN_RSP);
+    PushFriendRequestsToUser(uid);
 }
 
 void LogicSystem::BindUserSession(int uid, std::shared_ptr<CSession> session)
@@ -235,6 +243,94 @@ void LogicSystem::RemoveUserSession(int uid)
     std::unique_lock<std::shared_mutex> lock(_online_users_mutex);
     _online_users.erase(uid);
     std::cout << "[LogicSystem] RemoveUserSession 移除本机在线用户，uid: " << uid << "\n";
+}
+
+Json::Value LogicSystem::BuildFriendRequestsPayload(int uid)
+{
+    Json::Value reply;
+    if (uid <= 0) {
+        reply["error"] = ErrorCodes::UidInvalid;
+        return reply;
+    }
+
+    const auto requests = MySqlMgr::getInstance().GetPendingFriendRequests(uid);
+    reply["error"] = ErrorCodes::Success;
+    Json::Value items(Json::arrayValue);
+    for (const auto& item : requests) {
+        Json::Value node;
+        node["request_id"] = Json::Int64(item.request_id);
+        node["from_uid"] = item.from_uid;
+        node["from_name"] = item.from_name;
+        node["to_uid"] = item.to_uid;
+        node["to_name"] = item.to_name;
+        node["remark"] = item.remark;
+        node["status"] = item.status;
+        node["created_at"] = item.created_at;
+        node["handled_at"] = item.handled_at;
+        items.append(node);
+    }
+    reply["requests"] = items;
+    return reply;
+}
+
+bool LogicSystem::PushFriendRequestsToLocalUser(int uid)
+{
+    if (uid <= 0) {
+        return false;
+    }
+
+    std::shared_ptr<CSession> session;
+    {
+        std::shared_lock<std::shared_mutex> lock(_online_users_mutex);
+        auto it = _online_users.find(uid);
+        if (it == _online_users.end()) {
+            return false;
+        }
+        session = it->second.lock();
+    }
+
+    if (!session) {
+        return false;
+    }
+
+    const Json::Value payload = BuildFriendRequestsPayload(uid);
+    session->Send(payload.toStyledString(), MSG_FRIEND_REQUESTS_PUSH);
+    return true;
+}
+
+void LogicSystem::PushFriendRequestsToUser(int uid)
+{
+    if (uid <= 0) {
+        return;
+    }
+
+    if (PushFriendRequestsToLocalUser(uid)) {
+        return;
+    }
+
+    const auto routeRsp = StatusGrpcClient::getInstance().QueryUserRoute(uid);
+    if (routeRsp.error() != ErrorCodes::Success || !routeRsp.online()) {
+        return;
+    }
+
+    if (routeRsp.server_id() == StatusGrpcClient::getInstance().ServerId()) {
+        PushFriendRequestsToLocalUser(uid);
+        return;
+    }
+
+    const std::string address = BuildChatGrpcAddress(routeRsp.host(), routeRsp.grpc_port());
+    auto channel = grpc::CreateChannel(address, grpc::InsecureChannelCredentials());
+    auto stub = message::ChatService::NewStub(channel);
+    message::PushFriendRequestsReq request;
+    message::PushFriendRequestsRsp response;
+    request.set_uid(uid);
+    grpc::ClientContext context;
+    grpc::Status status = stub->PushFriendRequests(&context, request, &response);
+    if (!status.ok() || response.error() != ErrorCodes::Success) {
+        std::cerr << "[LogicSystem] PushFriendRequestsToUser 跨服推送失败，uid: " << uid
+            << "，server_id: " << routeRsp.server_id()
+            << "，error: " << (status.ok() ? response.error() : ErrorCodes::RPC_Failed) << "\n";
+    }
 }
 
 void LogicSystem::SearchUserHandler(std::shared_ptr<CSession> session,
@@ -345,7 +441,9 @@ void LogicSystem::AddFriendHandler(std::shared_ptr<CSession> session,
       reply["message"] = "好友申请发送成功";
       std::cout << "[LogicSystem] AddFriendHandler 用户 " << from_uid
           << " 向用户 " << to_uid << " 发送了好友申请，request_id: " << request_id << "\n";
-  }
+      PushFriendRequestsToUser(from_uid);
+      PushFriendRequestsToUser(to_uid);
+}
 
 void LogicSystem::GetFriendRequestsHandler(std::shared_ptr<CSession> session,
     const short msg_id,
@@ -365,23 +463,7 @@ void LogicSystem::GetFriendRequestsHandler(std::shared_ptr<CSession> session,
         return;
     }
 
-    const auto requests = MySqlMgr::getInstance().GetPendingFriendRequests(to_uid);
-    reply["error"] = ErrorCodes::Success;
-    Json::Value items(Json::arrayValue);
-    for (const auto& item : requests) {
-        Json::Value node;
-        node["request_id"] = Json::Int64(item.request_id);
-        node["from_uid"] = item.from_uid;
-        node["from_name"] = item.from_name;
-        node["to_uid"] = item.to_uid;
-        node["to_name"] = item.to_name;
-        node["remark"] = item.remark;
-        node["status"] = item.status;
-        node["created_at"] = item.created_at;
-        node["handled_at"] = item.handled_at;
-        items.append(node);
-    }
-    reply["requests"] = items;
+    reply = BuildFriendRequestsPayload(to_uid);
 }
 
 void LogicSystem::HandleFriendRequestHandler(std::shared_ptr<CSession> session,
@@ -430,4 +512,6 @@ void LogicSystem::HandleFriendRequestHandler(std::shared_ptr<CSession> session,
       std::cout << "[LogicSystem] HandleFriendRequestHandler 用户 " << to_uid
           << (accept ? " 同意了 " : " 拒绝了 ")
           << "用户 " << from_uid << " 的好友申请，request_id: " << request_id << "\n";
-  }
+      PushFriendRequestsToUser(to_uid);
+      PushFriendRequestsToUser(from_uid);
+}

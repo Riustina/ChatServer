@@ -1,4 +1,4 @@
-syntax = "proto3";
+﻿syntax = "proto3";
 
 package message;
 
@@ -43,6 +43,7 @@ message RegisterChatServerReq {
   string server_id = 1;
   string host = 2;
   string port = 3;
+  string grpc_port = 4;
 }
 
 message RegisterChatServerRsp {
@@ -54,6 +55,7 @@ message HeartbeatReq {
   string host = 2;
   string port = 3;
   int64 timestamp = 4;
+  string grpc_port = 5;
 }
 
 message HeartbeatRsp {
@@ -92,6 +94,16 @@ message QueryUserRouteRsp {
   string server_id = 3;
   string host = 4;
   string port = 5;
+  string grpc_port = 6;
+}
+
+message PushFriendRequestsReq {
+  int32 uid = 1;
+}
+
+message PushFriendRequestsRsp {
+  int32 error = 1;
+  bool delivered = 2;
 }
 
 service StatusService {
@@ -102,4 +114,8 @@ service StatusService {
   rpc ReportUserOnline(ReportUserOnlineReq) returns (ReportUserOnlineRsp) {}
   rpc ReportUserOffline(ReportUserOfflineReq) returns (ReportUserOfflineRsp) {}
   rpc QueryUserRoute(QueryUserRouteReq) returns (QueryUserRouteRsp) {}
+}
+
+service ChatService {
+  rpc PushFriendRequests(PushFriendRequestsReq) returns (PushFriendRequestsRsp) {}
 }

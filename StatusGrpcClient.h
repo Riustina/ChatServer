@@ -1,4 +1,4 @@
-// StatusGrpcClient.h
+ï»¿// StatusGrpcClient.h
 
 #pragma once
 #include "global.h"
@@ -28,9 +28,6 @@ using message::ReportUserOfflineRsp;
 using message::ReportUserOnlineRsp;
 using message::StatusService;
 
-// ©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤
-// gRPC Stub Á¬½Ó³Ø
-// ©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤
 class StatusConPool {
 public:
     StatusConPool(size_t poolSize,
@@ -50,9 +47,6 @@ private:
     std::condition_variable cond_;
 };
 
-// ©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤
-// StatusGrpcClient µ¥Àý
-// ©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤
 class StatusGrpcClient : public Singleton<StatusGrpcClient>
 {
     friend class Singleton<StatusGrpcClient>;
@@ -78,6 +72,7 @@ private:
     std::unique_ptr<StatusConPool> pool_;
     std::string self_host_;
     std::string self_port_;
+    std::string self_grpc_port_;
     std::string self_server_id_;
     std::atomic<bool> heartbeat_stop_;
     std::atomic<bool> heartbeat_started_;
