@@ -343,6 +343,8 @@ void LogicSystem::AddFriendHandler(std::shared_ptr<CSession> session,
       reply["request_id"] = Json::Int64(request_id);
       reply["to_uid"] = to_uid;
       reply["message"] = "好友申请发送成功";
+      std::cout << "[LogicSystem] AddFriendHandler 用户 " << from_uid
+          << " 向用户 " << to_uid << " 发送了好友申请，request_id: " << request_id << "\n";
   }
 
 void LogicSystem::GetFriendRequestsHandler(std::shared_ptr<CSession> session,
@@ -398,22 +400,34 @@ void LogicSystem::HandleFriendRequestHandler(std::shared_ptr<CSession> session,
         return;
     }
 
-    const int to_uid = session ? session->GetUid() : 0;
-    if (to_uid <= 0) {
-        reply["error"] = ErrorCodes::UidInvalid;
-        return;
+      const int to_uid = session ? session->GetUid() : 0;
+      if (to_uid <= 0) {
+          reply["error"] = ErrorCodes::UidInvalid;
+          return;
+      }
+
+      const long long request_id = root["request_id"].asInt64();
+      const bool accept = root["accept"].asBool();
+      int from_uid = 0;
+      const auto requests = MySqlMgr::getInstance().GetPendingFriendRequests(to_uid);
+      for (const auto &item : requests) {
+          if (item.request_id == request_id) {
+              from_uid = item.from_uid;
+              break;
+          }
+      }
+
+      const int result = MySqlMgr::getInstance().HandleFriendRequest(request_id, to_uid, accept);
+      if (result != 0) {
+          reply["error"] = ErrorCodes::MySQLFailed;
+          reply["db_result"] = result;
+          return;
     }
 
-    const long long request_id = root["request_id"].asInt64();
-    const bool accept = root["accept"].asBool();
-    const int result = MySqlMgr::getInstance().HandleFriendRequest(request_id, to_uid, accept);
-    if (result != 0) {
-        reply["error"] = ErrorCodes::MySQLFailed;
-        reply["db_result"] = result;
-        return;
-    }
-
-    reply["error"] = ErrorCodes::Success;
-    reply["request_id"] = Json::Int64(request_id);
-    reply["accept"] = accept;
-}
+      reply["error"] = ErrorCodes::Success;
+      reply["request_id"] = Json::Int64(request_id);
+      reply["accept"] = accept;
+      std::cout << "[LogicSystem] HandleFriendRequestHandler 用户 " << to_uid
+          << (accept ? " 同意了 " : " 拒绝了 ")
+          << "用户 " << from_uid << " 的好友申请，request_id: " << request_id << "\n";
+  }
