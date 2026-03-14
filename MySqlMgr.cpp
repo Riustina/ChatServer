@@ -1,4 +1,4 @@
-// MySqlMgr.cpp
+﻿// MySqlMgr.cpp
 
 #include "MySqlMgr.h"
 

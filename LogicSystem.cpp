@@ -299,32 +299,51 @@ void LogicSystem::AddFriendHandler(std::shared_ptr<CSession> session,
         return;
     }
 
-    const auto existingRequests = MySqlMgr::getInstance().GetPendingFriendRequests(from_uid);
-    for (const auto &item : existingRequests) {
-        const bool sameTarget = (item.from_uid == from_uid && item.to_uid == to_uid)
-            || (item.from_uid == to_uid && item.to_uid == from_uid);
+      const auto existingRequests = MySqlMgr::getInstance().GetPendingFriendRequests(from_uid);
+      for (const auto &item : existingRequests) {
+          const bool sameTarget = (item.from_uid == from_uid && item.to_uid == to_uid)
+              || (item.from_uid == to_uid && item.to_uid == from_uid);
         if (!sameTarget) {
             continue;
         }
 
-        if (item.status == "pending" || item.status == "accepted") {
-            reply["error"] = ErrorCodes::MySQLFailed;
-            reply["request_id"] = Json::Int64(-3);
-            return;
-        }
-    }
+          if (item.status == "pending" || item.status == "accepted") {
+              reply["error"] = ErrorCodes::MySQLFailed;
+              reply["db_result"] = (item.status == "accepted") ? -3 : -4;
+              reply["message"] = (item.status == "accepted")
+                  ? "你们已经是好友了"
+                  : "已存在待处理的好友申请";
+              return;
+          }
+      }
 
-    const long long request_id = MySqlMgr::getInstance().CreateFriendRequest(from_uid, to_uid, remark);
-    if (request_id <= 0) {
-        reply["error"] = ErrorCodes::MySQLFailed;
-        reply["request_id"] = Json::Int64(request_id);
-        return;
-    }
+      const long long request_id = MySqlMgr::getInstance().CreateFriendRequest(from_uid, to_uid, remark);
+      if (request_id <= 0) {
+          reply["error"] = ErrorCodes::MySQLFailed;
+          reply["db_result"] = Json::Int64(request_id);
+          switch (request_id) {
+          case -1:
+          case -2:
+              reply["message"] = "好友申请参数无效";
+              break;
+          case -3:
+              reply["message"] = "你们已经是好友了";
+              break;
+          case -4:
+              reply["message"] = "已存在待处理的好友申请";
+              break;
+          default:
+              reply["message"] = "好友申请发送失败，请稍后再试";
+              break;
+          }
+          return;
+      }
 
-    reply["error"] = ErrorCodes::Success;
-    reply["request_id"] = Json::Int64(request_id);
-    reply["to_uid"] = to_uid;
-}
+      reply["error"] = ErrorCodes::Success;
+      reply["request_id"] = Json::Int64(request_id);
+      reply["to_uid"] = to_uid;
+      reply["message"] = "好友申请发送成功";
+  }
 
 void LogicSystem::GetFriendRequestsHandler(std::shared_ptr<CSession> session,
     const short msg_id,

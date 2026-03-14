@@ -1,4 +1,4 @@
-// MySqlMgr.h
+﻿// MySqlMgr.h
 
 #pragma once
 #include "MysqlDao.h"
