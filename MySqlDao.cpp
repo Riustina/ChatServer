@@ -744,9 +744,10 @@ std::vector<FriendRequestInfo> MySqlDao::GetPendingFriendRequests(int to_uid)
                 "FROM friend_request fr "
                 "JOIN user fu ON fu.uid = fr.from_uid "
                 "JOIN user tu ON tu.uid = fr.to_uid "
-                "WHERE fr.to_uid = ? AND fr.status = 'pending' "
+                "WHERE fr.to_uid = ? OR fr.from_uid = ? "
                 "ORDER BY fr.request_id DESC"));
         pstmt->setInt(1, to_uid);
+        pstmt->setInt(2, to_uid);
         std::unique_ptr<sql::ResultSet> res(pstmt->executeQuery());
 
         while (res->next()) {
