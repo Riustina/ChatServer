@@ -16,6 +16,7 @@ public:
     int CheckLogin(const std::string& email, const std::string& pwd, UserInfo& userInfo);
     std::shared_ptr<UserInfo> GetUser(int uid);
     std::vector<UserInfo> SearchUsers(const std::string& keyword, std::size_t limit = 20);
+    std::vector<FriendInfo> GetFriendList(int uid);
     long long CreateFriendRequest(int from_uid, int to_uid, const std::string& remark);
     std::vector<FriendRequestInfo> GetPendingFriendRequests(int to_uid);
     int HandleFriendRequest(long long request_id, int to_uid, bool accept);

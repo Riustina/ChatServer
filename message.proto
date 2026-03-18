@@ -107,6 +107,15 @@ message PushFriendRequestsRsp {
   bool delivered = 2;
 }
 
+message PushFriendListReq {
+  int32 uid = 1;
+}
+
+message PushFriendListRsp {
+  int32 error = 1;
+  bool delivered = 2;
+}
+
 service StatusService {
   rpc GetChatServer(GetChatServerReq) returns (GetChatServerRsp) {}
   rpc Login(LoginReq) returns (LoginRsp) {}
@@ -119,4 +128,5 @@ service StatusService {
 
 service ChatService {
   rpc PushFriendRequests(PushFriendRequestsReq) returns (PushFriendRequestsRsp) {}
+  rpc PushFriendList(PushFriendListReq) returns (PushFriendListRsp) {}
 }

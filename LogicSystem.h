@@ -31,6 +31,7 @@ public:
     void PostMsgToQue(std::shared_ptr<LogicNode> msg);
     void OnSessionClosed(std::shared_ptr<CSession> session);
     bool PushFriendRequestsToLocalUser(int uid);
+    bool PushFriendListToLocalUser(int uid);
 
 private:
     LogicSystem();
@@ -54,7 +55,9 @@ private:
         const short msg_id,
         const std::string& msg_data);
     Json::Value BuildFriendRequestsPayload(int uid);
+    Json::Value BuildFriendListPayload(int uid);
     void PushFriendRequestsToUser(int uid);
+    void PushFriendListToUser(int uid);
     void BindUserSession(int uid, std::shared_ptr<CSession> session);
     void RemoveUserSession(int uid);
 

@@ -1399,11 +1399,20 @@ class ChatService final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::message::PushFriendRequestsRsp>> PrepareAsyncPushFriendRequests(::grpc::ClientContext* context, const ::message::PushFriendRequestsReq& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::message::PushFriendRequestsRsp>>(PrepareAsyncPushFriendRequestsRaw(context, request, cq));
     }
+    virtual ::grpc::Status PushFriendList(::grpc::ClientContext* context, const ::message::PushFriendListReq& request, ::message::PushFriendListRsp* response) = 0;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::message::PushFriendListRsp>> AsyncPushFriendList(::grpc::ClientContext* context, const ::message::PushFriendListReq& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::message::PushFriendListRsp>>(AsyncPushFriendListRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::message::PushFriendListRsp>> PrepareAsyncPushFriendList(::grpc::ClientContext* context, const ::message::PushFriendListReq& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::message::PushFriendListRsp>>(PrepareAsyncPushFriendListRaw(context, request, cq));
+    }
     class async_interface {
      public:
       virtual ~async_interface() {}
       virtual void PushFriendRequests(::grpc::ClientContext* context, const ::message::PushFriendRequestsReq* request, ::message::PushFriendRequestsRsp* response, std::function<void(::grpc::Status)>) = 0;
       virtual void PushFriendRequests(::grpc::ClientContext* context, const ::message::PushFriendRequestsReq* request, ::message::PushFriendRequestsRsp* response, ::grpc::ClientUnaryReactor* reactor) = 0;
+      virtual void PushFriendList(::grpc::ClientContext* context, const ::message::PushFriendListReq* request, ::message::PushFriendListRsp* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void PushFriendList(::grpc::ClientContext* context, const ::message::PushFriendListReq* request, ::message::PushFriendListRsp* response, ::grpc::ClientUnaryReactor* reactor) = 0;
     };
     typedef class async_interface experimental_async_interface;
     virtual class async_interface* async() { return nullptr; }
@@ -1411,6 +1420,8 @@ class ChatService final {
    private:
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::message::PushFriendRequestsRsp>* AsyncPushFriendRequestsRaw(::grpc::ClientContext* context, const ::message::PushFriendRequestsReq& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::message::PushFriendRequestsRsp>* PrepareAsyncPushFriendRequestsRaw(::grpc::ClientContext* context, const ::message::PushFriendRequestsReq& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::message::PushFriendListRsp>* AsyncPushFriendListRaw(::grpc::ClientContext* context, const ::message::PushFriendListReq& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::message::PushFriendListRsp>* PrepareAsyncPushFriendListRaw(::grpc::ClientContext* context, const ::message::PushFriendListReq& request, ::grpc::CompletionQueue* cq) = 0;
   };
   class Stub final : public StubInterface {
    public:
@@ -1422,11 +1433,20 @@ class ChatService final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::message::PushFriendRequestsRsp>> PrepareAsyncPushFriendRequests(::grpc::ClientContext* context, const ::message::PushFriendRequestsReq& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::message::PushFriendRequestsRsp>>(PrepareAsyncPushFriendRequestsRaw(context, request, cq));
     }
+    ::grpc::Status PushFriendList(::grpc::ClientContext* context, const ::message::PushFriendListReq& request, ::message::PushFriendListRsp* response) override;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::message::PushFriendListRsp>> AsyncPushFriendList(::grpc::ClientContext* context, const ::message::PushFriendListReq& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::message::PushFriendListRsp>>(AsyncPushFriendListRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::message::PushFriendListRsp>> PrepareAsyncPushFriendList(::grpc::ClientContext* context, const ::message::PushFriendListReq& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::message::PushFriendListRsp>>(PrepareAsyncPushFriendListRaw(context, request, cq));
+    }
     class async final :
       public StubInterface::async_interface {
      public:
       void PushFriendRequests(::grpc::ClientContext* context, const ::message::PushFriendRequestsReq* request, ::message::PushFriendRequestsRsp* response, std::function<void(::grpc::Status)>) override;
       void PushFriendRequests(::grpc::ClientContext* context, const ::message::PushFriendRequestsReq* request, ::message::PushFriendRequestsRsp* response, ::grpc::ClientUnaryReactor* reactor) override;
+      void PushFriendList(::grpc::ClientContext* context, const ::message::PushFriendListReq* request, ::message::PushFriendListRsp* response, std::function<void(::grpc::Status)>) override;
+      void PushFriendList(::grpc::ClientContext* context, const ::message::PushFriendListReq* request, ::message::PushFriendListRsp* response, ::grpc::ClientUnaryReactor* reactor) override;
      private:
       friend class Stub;
       explicit async(Stub* stub): stub_(stub) { }
@@ -1440,7 +1460,10 @@ class ChatService final {
     class async async_stub_{this};
     ::grpc::ClientAsyncResponseReader< ::message::PushFriendRequestsRsp>* AsyncPushFriendRequestsRaw(::grpc::ClientContext* context, const ::message::PushFriendRequestsReq& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::message::PushFriendRequestsRsp>* PrepareAsyncPushFriendRequestsRaw(::grpc::ClientContext* context, const ::message::PushFriendRequestsReq& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::message::PushFriendListRsp>* AsyncPushFriendListRaw(::grpc::ClientContext* context, const ::message::PushFriendListReq& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::message::PushFriendListRsp>* PrepareAsyncPushFriendListRaw(::grpc::ClientContext* context, const ::message::PushFriendListReq& request, ::grpc::CompletionQueue* cq) override;
     const ::grpc::internal::RpcMethod rpcmethod_PushFriendRequests_;
+    const ::grpc::internal::RpcMethod rpcmethod_PushFriendList_;
   };
   static std::unique_ptr<Stub> NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options = ::grpc::StubOptions());
 
@@ -1449,6 +1472,7 @@ class ChatService final {
     Service();
     virtual ~Service();
     virtual ::grpc::Status PushFriendRequests(::grpc::ServerContext* context, const ::message::PushFriendRequestsReq* request, ::message::PushFriendRequestsRsp* response);
+    virtual ::grpc::Status PushFriendList(::grpc::ServerContext* context, const ::message::PushFriendListReq* request, ::message::PushFriendListRsp* response);
   };
   template <class BaseClass>
   class WithAsyncMethod_PushFriendRequests : public BaseClass {
@@ -1470,7 +1494,27 @@ class ChatService final {
       ::grpc::Service::RequestAsyncUnary(0, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
-  typedef WithAsyncMethod_PushFriendRequests<Service > AsyncService;
+  template <class BaseClass>
+  class WithAsyncMethod_PushFriendList : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithAsyncMethod_PushFriendList() {
+      ::grpc::Service::MarkMethodAsync(1);
+    }
+    ~WithAsyncMethod_PushFriendList() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status PushFriendList(::grpc::ServerContext* /*context*/, const ::message::PushFriendListReq* /*request*/, ::message::PushFriendListRsp* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestPushFriendList(::grpc::ServerContext* context, ::message::PushFriendListReq* request, ::grpc::ServerAsyncResponseWriter< ::message::PushFriendListRsp>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(1, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  typedef WithAsyncMethod_PushFriendRequests<WithAsyncMethod_PushFriendList<Service > > AsyncService;
   template <class BaseClass>
   class WithCallbackMethod_PushFriendRequests : public BaseClass {
    private:
@@ -1498,7 +1542,34 @@ class ChatService final {
     virtual ::grpc::ServerUnaryReactor* PushFriendRequests(
       ::grpc::CallbackServerContext* /*context*/, const ::message::PushFriendRequestsReq* /*request*/, ::message::PushFriendRequestsRsp* /*response*/)  { return nullptr; }
   };
-  typedef WithCallbackMethod_PushFriendRequests<Service > CallbackService;
+  template <class BaseClass>
+  class WithCallbackMethod_PushFriendList : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithCallbackMethod_PushFriendList() {
+      ::grpc::Service::MarkMethodCallback(1,
+          new ::grpc::internal::CallbackUnaryHandler< ::message::PushFriendListReq, ::message::PushFriendListRsp>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::message::PushFriendListReq* request, ::message::PushFriendListRsp* response) { return this->PushFriendList(context, request, response); }));}
+    void SetMessageAllocatorFor_PushFriendList(
+        ::grpc::MessageAllocator< ::message::PushFriendListReq, ::message::PushFriendListRsp>* allocator) {
+      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(1);
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::message::PushFriendListReq, ::message::PushFriendListRsp>*>(handler)
+              ->SetMessageAllocator(allocator);
+    }
+    ~WithCallbackMethod_PushFriendList() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status PushFriendList(::grpc::ServerContext* /*context*/, const ::message::PushFriendListReq* /*request*/, ::message::PushFriendListRsp* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* PushFriendList(
+      ::grpc::CallbackServerContext* /*context*/, const ::message::PushFriendListReq* /*request*/, ::message::PushFriendListRsp* /*response*/)  { return nullptr; }
+  };
+  typedef WithCallbackMethod_PushFriendRequests<WithCallbackMethod_PushFriendList<Service > > CallbackService;
   typedef CallbackService ExperimentalCallbackService;
   template <class BaseClass>
   class WithGenericMethod_PushFriendRequests : public BaseClass {
@@ -1513,6 +1584,23 @@ class ChatService final {
     }
     // disable synchronous version of this method
     ::grpc::Status PushFriendRequests(::grpc::ServerContext* /*context*/, const ::message::PushFriendRequestsReq* /*request*/, ::message::PushFriendRequestsRsp* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+  };
+  template <class BaseClass>
+  class WithGenericMethod_PushFriendList : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithGenericMethod_PushFriendList() {
+      ::grpc::Service::MarkMethodGeneric(1);
+    }
+    ~WithGenericMethod_PushFriendList() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status PushFriendList(::grpc::ServerContext* /*context*/, const ::message::PushFriendListReq* /*request*/, ::message::PushFriendListRsp* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -1538,6 +1626,26 @@ class ChatService final {
     }
   };
   template <class BaseClass>
+  class WithRawMethod_PushFriendList : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithRawMethod_PushFriendList() {
+      ::grpc::Service::MarkMethodRaw(1);
+    }
+    ~WithRawMethod_PushFriendList() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status PushFriendList(::grpc::ServerContext* /*context*/, const ::message::PushFriendListReq* /*request*/, ::message::PushFriendListRsp* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestPushFriendList(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(1, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
   class WithRawCallbackMethod_PushFriendRequests : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
@@ -1557,6 +1665,28 @@ class ChatService final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     virtual ::grpc::ServerUnaryReactor* PushFriendRequests(
+      ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)  { return nullptr; }
+  };
+  template <class BaseClass>
+  class WithRawCallbackMethod_PushFriendList : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithRawCallbackMethod_PushFriendList() {
+      ::grpc::Service::MarkMethodRawCallback(1,
+          new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->PushFriendList(context, request, response); }));
+    }
+    ~WithRawCallbackMethod_PushFriendList() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status PushFriendList(::grpc::ServerContext* /*context*/, const ::message::PushFriendListReq* /*request*/, ::message::PushFriendListRsp* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* PushFriendList(
       ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)  { return nullptr; }
   };
   template <class BaseClass>
@@ -1586,9 +1716,36 @@ class ChatService final {
     // replace default version of method with streamed unary
     virtual ::grpc::Status StreamedPushFriendRequests(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::message::PushFriendRequestsReq,::message::PushFriendRequestsRsp>* server_unary_streamer) = 0;
   };
-  typedef WithStreamedUnaryMethod_PushFriendRequests<Service > StreamedUnaryService;
+  template <class BaseClass>
+  class WithStreamedUnaryMethod_PushFriendList : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithStreamedUnaryMethod_PushFriendList() {
+      ::grpc::Service::MarkMethodStreamed(1,
+        new ::grpc::internal::StreamedUnaryHandler<
+          ::message::PushFriendListReq, ::message::PushFriendListRsp>(
+            [this](::grpc::ServerContext* context,
+                   ::grpc::ServerUnaryStreamer<
+                     ::message::PushFriendListReq, ::message::PushFriendListRsp>* streamer) {
+                       return this->StreamedPushFriendList(context,
+                         streamer);
+                  }));
+    }
+    ~WithStreamedUnaryMethod_PushFriendList() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable regular version of this method
+    ::grpc::Status PushFriendList(::grpc::ServerContext* /*context*/, const ::message::PushFriendListReq* /*request*/, ::message::PushFriendListRsp* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    // replace default version of method with streamed unary
+    virtual ::grpc::Status StreamedPushFriendList(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::message::PushFriendListReq,::message::PushFriendListRsp>* server_unary_streamer) = 0;
+  };
+  typedef WithStreamedUnaryMethod_PushFriendRequests<WithStreamedUnaryMethod_PushFriendList<Service > > StreamedUnaryService;
   typedef Service SplitStreamedService;
-  typedef WithStreamedUnaryMethod_PushFriendRequests<Service > StreamedService;
+  typedef WithStreamedUnaryMethod_PushFriendRequests<WithStreamedUnaryMethod_PushFriendList<Service > > StreamedService;
 };
 
 }  // namespace message

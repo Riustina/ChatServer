@@ -680,6 +680,51 @@ std::vector<UserInfo> MySqlDao::SearchUsers(const std::string& keyword, std::siz
     }
 }
 
+std::vector<FriendInfo> MySqlDao::GetFriendList(int uid)
+{
+    std::vector<FriendInfo> friends;
+    auto con = pool_->getConnection();
+    if (con == nullptr) {
+        std::cerr << "[MySqlDao.cpp] 函数 [GetFriendList()] 无法获取数据库连接" << std::endl;
+        return friends;
+    }
+
+    Defer defer([this, &con]() {
+        pool_->returnConnection(std::move(con));
+        });
+
+    try {
+        std::unique_ptr<sql::PreparedStatement> pstmt(
+            con->_con->prepareStatement(
+                "SELECT u.uid, u.name, u.email, fr.created_at "
+                "FROM friend_relation fr "
+                "INNER JOIN user u ON u.uid = fr.friend_id "
+                "WHERE fr.user_id = ? AND fr.status = 'accepted' "
+                "ORDER BY fr.created_at DESC, u.uid ASC"));
+        pstmt->setInt(1, uid);
+
+        std::unique_ptr<sql::ResultSet> res(pstmt->executeQuery());
+        while (res->next()) {
+            FriendInfo item;
+            item.uid = res->getInt("uid");
+            item.name = res->getString("name");
+            item.email = res->getString("email");
+            item.created_at = res->getString("created_at");
+            friends.push_back(item);
+        }
+
+        std::cout << "[MySqlDao.cpp] 函数 [GetFriendList()] uid: " << uid
+            << "，好友数: " << friends.size() << std::endl;
+        return friends;
+    }
+    catch (const sql::SQLException& e) {
+        std::cerr << "[MySqlDao.cpp] 函数 [GetFriendList()] SQLException: " << e.what();
+        std::cerr << " (MySQL error code: " << e.getErrorCode();
+        std::cerr << ", SQLState: " << e.getSQLState() << " )" << std::endl;
+        return friends;
+    }
+}
+
 long long MySqlDao::CreateFriendRequest(int from_uid, int to_uid, const std::string& remark)
 {
     if (from_uid <= 0 || to_uid <= 0 || from_uid == to_uid) {

@@ -38,6 +38,11 @@ std::vector<UserInfo> MySqlMgr::SearchUsers(const std::string& keyword, std::siz
     return _dao.SearchUsers(keyword, limit);
 }
 
+std::vector<FriendInfo> MySqlMgr::GetFriendList(int uid)
+{
+    return _dao.GetFriendList(uid);
+}
+
 long long MySqlMgr::CreateFriendRequest(int from_uid, int to_uid, const std::string& remark)
 {
     return _dao.CreateFriendRequest(from_uid, to_uid, remark);

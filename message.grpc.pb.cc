@@ -19,6 +19,7 @@
 #include <grpcpp/server_context.h>
 #include <grpcpp/impl/service_type.h>
 #include <grpcpp/support/sync_stream.h>
+#include <grpcpp/ports_def.inc>
 namespace message {
 
 static const char* VerifyService_method_names[] = {
@@ -397,6 +398,7 @@ StatusService::Service::~Service() {
 
 static const char* ChatService_method_names[] = {
   "/message.ChatService/PushFriendRequests",
+  "/message.ChatService/PushFriendList",
 };
 
 std::unique_ptr< ChatService::Stub> ChatService::NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options) {
@@ -407,6 +409,7 @@ std::unique_ptr< ChatService::Stub> ChatService::NewStub(const std::shared_ptr< 
 
 ChatService::Stub::Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options)
   : channel_(channel), rpcmethod_PushFriendRequests_(ChatService_method_names[0], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_PushFriendList_(ChatService_method_names[1], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   {}
 
 ::grpc::Status ChatService::Stub::PushFriendRequests(::grpc::ClientContext* context, const ::message::PushFriendRequestsReq& request, ::message::PushFriendRequestsRsp* response) {
@@ -432,6 +435,29 @@ void ChatService::Stub::async::PushFriendRequests(::grpc::ClientContext* context
   return result;
 }
 
+::grpc::Status ChatService::Stub::PushFriendList(::grpc::ClientContext* context, const ::message::PushFriendListReq& request, ::message::PushFriendListRsp* response) {
+  return ::grpc::internal::BlockingUnaryCall< ::message::PushFriendListReq, ::message::PushFriendListRsp, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_PushFriendList_, context, request, response);
+}
+
+void ChatService::Stub::async::PushFriendList(::grpc::ClientContext* context, const ::message::PushFriendListReq* request, ::message::PushFriendListRsp* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall< ::message::PushFriendListReq, ::message::PushFriendListRsp, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_PushFriendList_, context, request, response, std::move(f));
+}
+
+void ChatService::Stub::async::PushFriendList(::grpc::ClientContext* context, const ::message::PushFriendListReq* request, ::message::PushFriendListRsp* response, ::grpc::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_PushFriendList_, context, request, response, reactor);
+}
+
+::grpc::ClientAsyncResponseReader< ::message::PushFriendListRsp>* ChatService::Stub::PrepareAsyncPushFriendListRaw(::grpc::ClientContext* context, const ::message::PushFriendListReq& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::message::PushFriendListRsp, ::message::PushFriendListReq, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_PushFriendList_, context, request);
+}
+
+::grpc::ClientAsyncResponseReader< ::message::PushFriendListRsp>* ChatService::Stub::AsyncPushFriendListRaw(::grpc::ClientContext* context, const ::message::PushFriendListReq& request, ::grpc::CompletionQueue* cq) {
+  auto* result =
+    this->PrepareAsyncPushFriendListRaw(context, request, cq);
+  result->StartCall();
+  return result;
+}
+
 ChatService::Service::Service() {
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       ChatService_method_names[0],
@@ -442,6 +468,16 @@ ChatService::Service::Service() {
              const ::message::PushFriendRequestsReq* req,
              ::message::PushFriendRequestsRsp* resp) {
                return service->PushFriendRequests(ctx, req, resp);
+             }, this)));
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
+      ChatService_method_names[1],
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< ChatService::Service, ::message::PushFriendListReq, ::message::PushFriendListRsp, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
+          [](ChatService::Service* service,
+             ::grpc::ServerContext* ctx,
+             const ::message::PushFriendListReq* req,
+             ::message::PushFriendListRsp* resp) {
+               return service->PushFriendList(ctx, req, resp);
              }, this)));
 }
 
@@ -455,6 +491,14 @@ ChatService::Service::~Service() {
   return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
 }
 
+::grpc::Status ChatService::Service::PushFriendList(::grpc::ServerContext* context, const ::message::PushFriendListReq* request, ::message::PushFriendListRsp* response) {
+  (void) context;
+  (void) request;
+  (void) response;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+}
+
 
 }  // namespace message
+#include <grpcpp/ports_undef.inc>
 

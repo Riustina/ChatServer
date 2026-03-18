@@ -20,3 +20,10 @@ struct FriendRequestInfo {
 	std::string created_at;
 	std::string handled_at;
 };
+
+struct FriendInfo {
+	int uid = 0;
+	std::string name;
+	std::string email;
+	std::string created_at;
+};

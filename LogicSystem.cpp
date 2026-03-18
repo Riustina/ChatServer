@@ -15,6 +15,17 @@ std::string BuildChatGrpcAddress(const std::string& host, const std::string& grp
 {
     return host + ":" + grpc_port;
 }
+
+struct RequestLogScope {
+    RequestLogScope()
+    {
+    }
+
+    ~RequestLogScope()
+    {
+        std::cout << "\n";
+    }
+};
 }
 
 LogicSystem::LogicSystem() : _b_stop(false)
@@ -100,6 +111,7 @@ void LogicSystem::DealMsg()
         if (!msg_node) continue;
 
         const short msg_id = msg_node->_recvnode->_msg_id;
+        RequestLogScope log_scope;
         std::cout << "[LogicSystem] DealMsg 处理消息，msg_id: " << msg_id << "\n";
 
         auto it = _fun_callbacks.find(msg_id);
@@ -228,6 +240,7 @@ void LogicSystem::LoginHandler(std::shared_ptr<CSession> session,
     rtvalue["token"] = rsp.token();
     rtvalue["name"] = user_info->name;
     session->Send(rtvalue.toStyledString(), MSG_CHAT_LOGIN_RSP);
+    PushFriendListToUser(uid);
     PushFriendRequestsToUser(uid);
 }
 
@@ -273,6 +286,29 @@ Json::Value LogicSystem::BuildFriendRequestsPayload(int uid)
     return reply;
 }
 
+Json::Value LogicSystem::BuildFriendListPayload(int uid)
+{
+    Json::Value reply;
+    if (uid <= 0) {
+        reply["error"] = ErrorCodes::UidInvalid;
+        return reply;
+    }
+
+    const auto friends = MySqlMgr::getInstance().GetFriendList(uid);
+    reply["error"] = ErrorCodes::Success;
+    Json::Value items(Json::arrayValue);
+    for (const auto& item : friends) {
+        Json::Value node;
+        node["uid"] = item.uid;
+        node["name"] = item.name;
+        node["email"] = item.email;
+        node["created_at"] = item.created_at;
+        items.append(node);
+    }
+    reply["friends"] = items;
+    return reply;
+}
+
 bool LogicSystem::PushFriendRequestsToLocalUser(int uid)
 {
     if (uid <= 0) {
@@ -295,6 +331,31 @@ bool LogicSystem::PushFriendRequestsToLocalUser(int uid)
 
     const Json::Value payload = BuildFriendRequestsPayload(uid);
     session->Send(payload.toStyledString(), MSG_FRIEND_REQUESTS_PUSH);
+    return true;
+}
+
+bool LogicSystem::PushFriendListToLocalUser(int uid)
+{
+    if (uid <= 0) {
+        return false;
+    }
+
+    std::shared_ptr<CSession> session;
+    {
+        std::shared_lock<std::shared_mutex> lock(_online_users_mutex);
+        auto it = _online_users.find(uid);
+        if (it == _online_users.end()) {
+            return false;
+        }
+        session = it->second.lock();
+    }
+
+    if (!session) {
+        return false;
+    }
+
+    const Json::Value payload = BuildFriendListPayload(uid);
+    session->Send(payload.toStyledString(), MSG_FRIEND_LIST_PUSH);
     return true;
 }
 
@@ -328,6 +389,41 @@ void LogicSystem::PushFriendRequestsToUser(int uid)
     grpc::Status status = stub->PushFriendRequests(&context, request, &response);
     if (!status.ok() || response.error() != ErrorCodes::Success) {
         std::cerr << "[LogicSystem] PushFriendRequestsToUser 跨服推送失败，uid: " << uid
+            << "，server_id: " << routeRsp.server_id()
+            << "，error: " << (status.ok() ? response.error() : ErrorCodes::RPC_Failed) << "\n";
+    }
+}
+
+void LogicSystem::PushFriendListToUser(int uid)
+{
+    if (uid <= 0) {
+        return;
+    }
+
+    if (PushFriendListToLocalUser(uid)) {
+        return;
+    }
+
+    const auto routeRsp = StatusGrpcClient::getInstance().QueryUserRoute(uid);
+    if (routeRsp.error() != ErrorCodes::Success || !routeRsp.online()) {
+        return;
+    }
+
+    if (routeRsp.server_id() == StatusGrpcClient::getInstance().ServerId()) {
+        PushFriendListToLocalUser(uid);
+        return;
+    }
+
+    const std::string address = BuildChatGrpcAddress(routeRsp.host(), routeRsp.grpc_port());
+    auto channel = grpc::CreateChannel(address, grpc::InsecureChannelCredentials());
+    auto stub = message::ChatService::NewStub(channel);
+    message::PushFriendListReq request;
+    message::PushFriendListRsp response;
+    request.set_uid(uid);
+    grpc::ClientContext context;
+    grpc::Status status = stub->PushFriendList(&context, request, &response);
+    if (!status.ok() || response.error() != ErrorCodes::Success) {
+        std::cerr << "[LogicSystem] PushFriendListToUser 跨服推送失败，uid: " << uid
             << "，server_id: " << routeRsp.server_id()
             << "，error: " << (status.ok() ? response.error() : ErrorCodes::RPC_Failed) << "\n";
     }
@@ -512,6 +608,10 @@ void LogicSystem::HandleFriendRequestHandler(std::shared_ptr<CSession> session,
       std::cout << "[LogicSystem] HandleFriendRequestHandler 用户 " << to_uid
           << (accept ? " 同意了 " : " 拒绝了 ")
           << "用户 " << from_uid << " 的好友申请，request_id: " << request_id << "\n";
+      if (accept) {
+          PushFriendListToUser(to_uid);
+          PushFriendListToUser(from_uid);
+      }
       PushFriendRequestsToUser(to_uid);
       PushFriendRequestsToUser(from_uid);
 }

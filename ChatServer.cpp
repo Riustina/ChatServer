@@ -33,6 +33,17 @@ public:
         response->set_delivered(delivered);
         return grpc::Status::OK;
     }
+
+    grpc::Status PushFriendList(grpc::ServerContext* context,
+        const message::PushFriendListReq* request,
+        message::PushFriendListRsp* response) override
+    {
+        (void)context;
+        const bool delivered = LogicSystem::getInstance().PushFriendListToLocalUser(request->uid());
+        response->set_error(ErrorCodes::Success);
+        response->set_delivered(delivered);
+        return grpc::Status::OK;
+    }
 };
 }
 
