@@ -399,6 +399,7 @@ StatusService::Service::~Service() {
 static const char* ChatService_method_names[] = {
   "/message.ChatService/PushFriendRequests",
   "/message.ChatService/PushFriendList",
+  "/message.ChatService/PushPrivateMessage",
 };
 
 std::unique_ptr< ChatService::Stub> ChatService::NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options) {
@@ -410,6 +411,7 @@ std::unique_ptr< ChatService::Stub> ChatService::NewStub(const std::shared_ptr< 
 ChatService::Stub::Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options)
   : channel_(channel), rpcmethod_PushFriendRequests_(ChatService_method_names[0], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   , rpcmethod_PushFriendList_(ChatService_method_names[1], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_PushPrivateMessage_(ChatService_method_names[2], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   {}
 
 ::grpc::Status ChatService::Stub::PushFriendRequests(::grpc::ClientContext* context, const ::message::PushFriendRequestsReq& request, ::message::PushFriendRequestsRsp* response) {
@@ -458,6 +460,29 @@ void ChatService::Stub::async::PushFriendList(::grpc::ClientContext* context, co
   return result;
 }
 
+::grpc::Status ChatService::Stub::PushPrivateMessage(::grpc::ClientContext* context, const ::message::PushPrivateMessageReq& request, ::message::PushPrivateMessageRsp* response) {
+  return ::grpc::internal::BlockingUnaryCall< ::message::PushPrivateMessageReq, ::message::PushPrivateMessageRsp, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_PushPrivateMessage_, context, request, response);
+}
+
+void ChatService::Stub::async::PushPrivateMessage(::grpc::ClientContext* context, const ::message::PushPrivateMessageReq* request, ::message::PushPrivateMessageRsp* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall< ::message::PushPrivateMessageReq, ::message::PushPrivateMessageRsp, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_PushPrivateMessage_, context, request, response, std::move(f));
+}
+
+void ChatService::Stub::async::PushPrivateMessage(::grpc::ClientContext* context, const ::message::PushPrivateMessageReq* request, ::message::PushPrivateMessageRsp* response, ::grpc::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_PushPrivateMessage_, context, request, response, reactor);
+}
+
+::grpc::ClientAsyncResponseReader< ::message::PushPrivateMessageRsp>* ChatService::Stub::PrepareAsyncPushPrivateMessageRaw(::grpc::ClientContext* context, const ::message::PushPrivateMessageReq& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::message::PushPrivateMessageRsp, ::message::PushPrivateMessageReq, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_PushPrivateMessage_, context, request);
+}
+
+::grpc::ClientAsyncResponseReader< ::message::PushPrivateMessageRsp>* ChatService::Stub::AsyncPushPrivateMessageRaw(::grpc::ClientContext* context, const ::message::PushPrivateMessageReq& request, ::grpc::CompletionQueue* cq) {
+  auto* result =
+    this->PrepareAsyncPushPrivateMessageRaw(context, request, cq);
+  result->StartCall();
+  return result;
+}
+
 ChatService::Service::Service() {
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       ChatService_method_names[0],
@@ -479,6 +504,16 @@ ChatService::Service::Service() {
              ::message::PushFriendListRsp* resp) {
                return service->PushFriendList(ctx, req, resp);
              }, this)));
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
+      ChatService_method_names[2],
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< ChatService::Service, ::message::PushPrivateMessageReq, ::message::PushPrivateMessageRsp, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
+          [](ChatService::Service* service,
+             ::grpc::ServerContext* ctx,
+             const ::message::PushPrivateMessageReq* req,
+             ::message::PushPrivateMessageRsp* resp) {
+               return service->PushPrivateMessage(ctx, req, resp);
+             }, this)));
 }
 
 ChatService::Service::~Service() {
@@ -492,6 +527,13 @@ ChatService::Service::~Service() {
 }
 
 ::grpc::Status ChatService::Service::PushFriendList(::grpc::ServerContext* context, const ::message::PushFriendListReq* request, ::message::PushFriendListRsp* response) {
+  (void) context;
+  (void) request;
+  (void) response;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+}
+
+::grpc::Status ChatService::Service::PushPrivateMessage(::grpc::ServerContext* context, const ::message::PushPrivateMessageReq* request, ::message::PushPrivateMessageRsp* response) {
   (void) context;
   (void) request;
   (void) response;

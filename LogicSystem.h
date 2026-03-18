@@ -32,6 +32,7 @@ public:
     void OnSessionClosed(std::shared_ptr<CSession> session);
     bool PushFriendRequestsToLocalUser(int uid);
     bool PushFriendListToLocalUser(int uid);
+    bool PushPrivateMessageToLocalUser(const PrivateMessageInfo& message);
 
 private:
     LogicSystem();
@@ -48,6 +49,12 @@ private:
     void AddFriendHandler(std::shared_ptr<CSession> session,
         const short msg_id,
         const std::string& msg_data);
+    void GetPrivateMessagesHandler(std::shared_ptr<CSession> session,
+        const short msg_id,
+        const std::string& msg_data);
+    void SendPrivateMessageHandler(std::shared_ptr<CSession> session,
+        const short msg_id,
+        const std::string& msg_data);
     void GetFriendRequestsHandler(std::shared_ptr<CSession> session,
         const short msg_id,
         const std::string& msg_data);
@@ -56,8 +63,10 @@ private:
         const std::string& msg_data);
     Json::Value BuildFriendRequestsPayload(int uid);
     Json::Value BuildFriendListPayload(int uid);
+    Json::Value BuildPrivateMessagesPayload(int uid, int peer_uid, std::size_t limit = 50);
     void PushFriendRequestsToUser(int uid);
     void PushFriendListToUser(int uid);
+    void PushPrivateMessageToUser(const PrivateMessageInfo& message);
     void BindUserSession(int uid, std::shared_ptr<CSession> session);
     void RemoveUserSession(int uid);
 

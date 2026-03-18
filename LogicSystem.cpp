@@ -4,6 +4,7 @@
 #include "global.h"
 #include "message.grpc.pb.h"
 #include <iostream>
+#include <algorithm>
 #include "Defer.h"
 
 // ──────────────────────────────────────────────────────────────
@@ -14,6 +15,21 @@ namespace {
 std::string BuildChatGrpcAddress(const std::string& host, const std::string& grpc_port)
 {
     return host + ":" + grpc_port;
+}
+
+Json::Value BuildPrivateMessageNode(const PrivateMessageInfo& item, int current_uid)
+{
+    Json::Value node;
+    node["msg_id"] = Json::Int64(item.msg_id);
+    node["from_uid"] = item.from_uid;
+    node["from_name"] = item.from_name;
+    node["to_uid"] = item.to_uid;
+    node["to_name"] = item.to_name;
+    node["contact_id"] = (item.from_uid == current_uid) ? item.to_uid : item.from_uid;
+    node["content_type"] = item.content_type;
+    node["content"] = item.content;
+    node["created_at"] = item.created_at;
+    return node;
 }
 
 struct RequestLogScope {
@@ -146,6 +162,16 @@ void LogicSystem::RegisterCallBacks()
         std::placeholders::_3);
     _fun_callbacks[MSG_ADD_FRIEND_REQ] = std::bind(
         &LogicSystem::AddFriendHandler, this,
+        std::placeholders::_1,
+        std::placeholders::_2,
+        std::placeholders::_3);
+    _fun_callbacks[MSG_GET_PRIVATE_MESSAGES_REQ] = std::bind(
+        &LogicSystem::GetPrivateMessagesHandler, this,
+        std::placeholders::_1,
+        std::placeholders::_2,
+        std::placeholders::_3);
+    _fun_callbacks[MSG_SEND_PRIVATE_MESSAGE_REQ] = std::bind(
+        &LogicSystem::SendPrivateMessageHandler, this,
         std::placeholders::_1,
         std::placeholders::_2,
         std::placeholders::_3);
@@ -303,9 +329,30 @@ Json::Value LogicSystem::BuildFriendListPayload(int uid)
         node["name"] = item.name;
         node["email"] = item.email;
         node["created_at"] = item.created_at;
+        node["last_message"] = item.last_message;
+        node["last_time"] = item.last_time;
         items.append(node);
     }
     reply["friends"] = items;
+    return reply;
+}
+
+Json::Value LogicSystem::BuildPrivateMessagesPayload(int uid, int peer_uid, std::size_t limit)
+{
+    Json::Value reply;
+    if (uid <= 0 || peer_uid <= 0) {
+        reply["error"] = ErrorCodes::UidInvalid;
+        return reply;
+    }
+
+    const auto messages = MySqlMgr::getInstance().GetPrivateMessages(uid, peer_uid, limit);
+    reply["error"] = ErrorCodes::Success;
+    reply["contact_id"] = peer_uid;
+    Json::Value items(Json::arrayValue);
+    for (const auto& item : messages) {
+        items.append(BuildPrivateMessageNode(item, uid));
+    }
+    reply["messages"] = items;
     return reply;
 }
 
@@ -356,6 +403,34 @@ bool LogicSystem::PushFriendListToLocalUser(int uid)
 
     const Json::Value payload = BuildFriendListPayload(uid);
     session->Send(payload.toStyledString(), MSG_FRIEND_LIST_PUSH);
+    return true;
+}
+
+bool LogicSystem::PushPrivateMessageToLocalUser(const PrivateMessageInfo& message)
+{
+    const int uid = message.to_uid;
+    if (uid <= 0) {
+        return false;
+    }
+
+    std::shared_ptr<CSession> session;
+    {
+        std::shared_lock<std::shared_mutex> lock(_online_users_mutex);
+        auto it = _online_users.find(uid);
+        if (it == _online_users.end()) {
+            return false;
+        }
+        session = it->second.lock();
+    }
+
+    if (!session) {
+        return false;
+    }
+
+    Json::Value payload;
+    payload["error"] = ErrorCodes::Success;
+    payload["message"] = BuildPrivateMessageNode(message, uid);
+    session->Send(payload.toStyledString(), MSG_PRIVATE_MESSAGE_PUSH);
     return true;
 }
 
@@ -424,6 +499,48 @@ void LogicSystem::PushFriendListToUser(int uid)
     grpc::Status status = stub->PushFriendList(&context, request, &response);
     if (!status.ok() || response.error() != ErrorCodes::Success) {
         std::cerr << "[LogicSystem] PushFriendListToUser 跨服推送失败，uid: " << uid
+            << "，server_id: " << routeRsp.server_id()
+            << "，error: " << (status.ok() ? response.error() : ErrorCodes::RPC_Failed) << "\n";
+    }
+}
+
+void LogicSystem::PushPrivateMessageToUser(const PrivateMessageInfo& message)
+{
+    if (message.to_uid <= 0) {
+        return;
+    }
+
+    if (PushPrivateMessageToLocalUser(message)) {
+        return;
+    }
+
+    const auto routeRsp = StatusGrpcClient::getInstance().QueryUserRoute(message.to_uid);
+    if (routeRsp.error() != ErrorCodes::Success || !routeRsp.online()) {
+        return;
+    }
+
+    if (routeRsp.server_id() == StatusGrpcClient::getInstance().ServerId()) {
+        PushPrivateMessageToLocalUser(message);
+        return;
+    }
+
+    const std::string address = BuildChatGrpcAddress(routeRsp.host(), routeRsp.grpc_port());
+    auto channel = grpc::CreateChannel(address, grpc::InsecureChannelCredentials());
+    auto stub = message::ChatService::NewStub(channel);
+    message::PushPrivateMessageReq request;
+    message::PushPrivateMessageRsp response;
+    request.set_msg_id(message.msg_id);
+    request.set_from_uid(message.from_uid);
+    request.set_from_name(message.from_name);
+    request.set_to_uid(message.to_uid);
+    request.set_to_name(message.to_name);
+    request.set_content_type(message.content_type);
+    request.set_content(message.content);
+    request.set_created_at(message.created_at);
+    grpc::ClientContext context;
+    grpc::Status status = stub->PushPrivateMessage(&context, request, &response);
+    if (!status.ok() || response.error() != ErrorCodes::Success) {
+        std::cerr << "[LogicSystem] PushPrivateMessageToUser 跨服推送失败，to_uid: " << message.to_uid
             << "，server_id: " << routeRsp.server_id()
             << "，error: " << (status.ok() ? response.error() : ErrorCodes::RPC_Failed) << "\n";
     }
@@ -539,6 +656,115 @@ void LogicSystem::AddFriendHandler(std::shared_ptr<CSession> session,
           << " 向用户 " << to_uid << " 发送了好友申请，request_id: " << request_id << "\n";
       PushFriendRequestsToUser(from_uid);
       PushFriendRequestsToUser(to_uid);
+}
+
+void LogicSystem::GetPrivateMessagesHandler(std::shared_ptr<CSession> session,
+    const short msg_id,
+    const std::string& msg_data)
+{
+    Json::Value root;
+    Json::Reader reader;
+    Json::Value reply;
+    Defer defer([&reply, &session]() {
+        session->Send(reply.toStyledString(), MSG_GET_PRIVATE_MESSAGES_RSP);
+        });
+
+    if (!reader.parse(msg_data, root)) {
+        reply["error"] = ErrorCodes::Error_Json;
+        return;
+    }
+
+    const int uid = session ? session->GetUid() : 0;
+    const int peer_uid = root["contact_id"].asInt();
+    const int limit = root.isMember("limit") ? root["limit"].asInt() : 50;
+    if (uid <= 0 || peer_uid <= 0) {
+        reply["error"] = ErrorCodes::UidInvalid;
+        return;
+    }
+
+    reply = BuildPrivateMessagesPayload(uid, peer_uid, static_cast<std::size_t>(std::max(1, limit)));
+}
+
+void LogicSystem::SendPrivateMessageHandler(std::shared_ptr<CSession> session,
+    const short msg_id,
+    const std::string& msg_data)
+{
+    Json::Value root;
+    Json::Reader reader;
+    Json::Value reply;
+    Defer defer([&reply, &session]() {
+        session->Send(reply.toStyledString(), MSG_SEND_PRIVATE_MESSAGE_RSP);
+        });
+
+    if (!reader.parse(msg_data, root)) {
+        reply["error"] = ErrorCodes::Error_Json;
+        return;
+    }
+
+    const int from_uid = session ? session->GetUid() : 0;
+    const int to_uid = root["to_uid"].asInt();
+    const std::string content_type = root.isMember("content_type") ? root["content_type"].asString() : "text";
+    const std::string content = root.isMember("content") ? root["content"].asString() : "";
+    if (from_uid <= 0 || to_uid <= 0 || content.empty()) {
+        reply["error"] = ErrorCodes::UidInvalid;
+        reply["message"] = "消息参数无效";
+        return;
+    }
+
+    if (!MySqlMgr::getInstance().AreFriends(from_uid, to_uid)) {
+        reply["error"] = ErrorCodes::MySQLFailed;
+        reply["message"] = "对方还不是你的好友";
+        return;
+    }
+
+    const long long msg_id_value = MySqlMgr::getInstance().CreatePrivateMessage(from_uid, to_uid, content_type, content);
+    if (msg_id_value <= 0) {
+        reply["error"] = ErrorCodes::MySQLFailed;
+        reply["message"] = "消息发送失败，请稍后再试";
+        return;
+    }
+
+    std::shared_ptr<UserInfo> from_user;
+    std::shared_ptr<UserInfo> to_user;
+    {
+        std::shared_lock<std::shared_mutex> lock(_users_mutex);
+        auto from_it = _users.find(from_uid);
+        if (from_it != _users.end()) {
+            from_user = from_it->second;
+        }
+        auto to_it = _users.find(to_uid);
+        if (to_it != _users.end()) {
+            to_user = to_it->second;
+        }
+    }
+    if (!from_user) {
+        from_user = MySqlMgr::getInstance().GetUser(from_uid);
+    }
+    if (!to_user) {
+        to_user = MySqlMgr::getInstance().GetUser(to_uid);
+    }
+
+    const auto records = MySqlMgr::getInstance().GetPrivateMessages(from_uid, to_uid, 1);
+    PrivateMessageInfo message;
+    if (!records.empty()) {
+        message = records.back();
+    } else {
+        message.msg_id = msg_id_value;
+        message.from_uid = from_uid;
+        message.from_name = from_user ? from_user->name : "";
+        message.to_uid = to_uid;
+        message.to_name = to_user ? to_user->name : "";
+        message.content_type = content_type;
+        message.content = content;
+    }
+
+    reply["error"] = ErrorCodes::Success;
+    reply["message"] = BuildPrivateMessageNode(message, from_uid);
+    std::cout << "[LogicSystem] SendPrivateMessageHandler 用户 " << from_uid
+        << " 向用户 " << to_uid << " 发送了消息，msg_id: " << msg_id_value << "\n";
+    PushPrivateMessageToUser(message);
+    PushFriendListToUser(from_uid);
+    PushFriendListToUser(to_uid);
 }
 
 void LogicSystem::GetFriendRequestsHandler(std::shared_ptr<CSession> session,

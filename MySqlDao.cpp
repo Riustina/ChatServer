@@ -246,6 +246,18 @@ bool MySqlDao::EnsureFriendTables()
             "KEY idx_from_to_created_at (from_uid, to_uid, created_at)"
             ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 
+        stmt->execute(
+            "CREATE TABLE IF NOT EXISTS private_message ("
+            "msg_id BIGINT PRIMARY KEY AUTO_INCREMENT,"
+            "from_uid INT NOT NULL,"
+            "to_uid INT NOT NULL,"
+            "content_type VARCHAR(16) NOT NULL DEFAULT 'text',"
+            "content TEXT NOT NULL,"
+            "created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,"
+            "KEY idx_pair_time (from_uid, to_uid, created_at),"
+            "KEY idx_to_uid_time (to_uid, created_at)"
+            ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+
         try {
             stmt->execute("ALTER TABLE friend_request DROP INDEX uniq_from_to");
             std::cout << "[MySqlDao.cpp] 函数 [EnsureFriendTables()] 已移除 friend_request 的旧唯一索引 uniq_from_to" << std::endl;
@@ -253,7 +265,7 @@ bool MySqlDao::EnsureFriendTables()
         catch (sql::SQLException&) {
         }
 
-        std::cout << "[MySqlDao.cpp] 函数 [EnsureFriendTables()] 好友相关表检查完成" << std::endl;
+        std::cout << "[MySqlDao.cpp] 函数 [EnsureFriendTables()] 业务相关表检查完成" << std::endl;
         pool_->returnConnection(std::move(con));
         return true;
     }
@@ -696,7 +708,24 @@ std::vector<FriendInfo> MySqlDao::GetFriendList(int uid)
     try {
         std::unique_ptr<sql::PreparedStatement> pstmt(
             con->_con->prepareStatement(
-                "SELECT u.uid, u.name, u.email, fr.created_at "
+                "SELECT u.uid, u.name, u.email, fr.created_at, "
+                "COALESCE(( "
+                "  SELECT CASE "
+                "    WHEN pm.content_type = 'image' THEN '[图片]' "
+                "    ELSE pm.content "
+                "  END "
+                "  FROM private_message pm "
+                "  WHERE ((pm.from_uid = fr.user_id AND pm.to_uid = fr.friend_id) "
+                "     OR (pm.from_uid = fr.friend_id AND pm.to_uid = fr.user_id)) "
+                "  ORDER BY pm.created_at DESC, pm.msg_id DESC LIMIT 1 "
+                "), '') AS last_message, "
+                "COALESCE(( "
+                "  SELECT DATE_FORMAT(pm.created_at, '%H:%i') "
+                "  FROM private_message pm "
+                "  WHERE ((pm.from_uid = fr.user_id AND pm.to_uid = fr.friend_id) "
+                "     OR (pm.from_uid = fr.friend_id AND pm.to_uid = fr.user_id)) "
+                "  ORDER BY pm.created_at DESC, pm.msg_id DESC LIMIT 1 "
+                "), '') AS last_time "
                 "FROM friend_relation fr "
                 "INNER JOIN user u ON u.uid = fr.friend_id "
                 "WHERE fr.user_id = ? AND fr.status = 'accepted' "
@@ -710,6 +739,8 @@ std::vector<FriendInfo> MySqlDao::GetFriendList(int uid)
             item.name = res->getString("name");
             item.email = res->getString("email");
             item.created_at = res->getString("created_at");
+            item.last_message = res->getString("last_message");
+            item.last_time = res->getString("last_time");
             friends.push_back(item);
         }
 
@@ -722,6 +753,133 @@ std::vector<FriendInfo> MySqlDao::GetFriendList(int uid)
         std::cerr << " (MySQL error code: " << e.getErrorCode();
         std::cerr << ", SQLState: " << e.getSQLState() << " )" << std::endl;
         return friends;
+    }
+}
+
+bool MySqlDao::AreFriends(int uid, int peer_uid)
+{
+    auto con = pool_->getConnection();
+    if (con == nullptr) {
+        std::cerr << "[MySqlDao.cpp] 函数 [AreFriends()] 无法获取数据库连接" << std::endl;
+        return false;
+    }
+
+    Defer defer([this, &con]() {
+        pool_->returnConnection(std::move(con));
+        });
+
+    try {
+        std::unique_ptr<sql::PreparedStatement> pstmt(
+            con->_con->prepareStatement(
+                "SELECT 1 FROM friend_relation WHERE user_id = ? AND friend_id = ? AND status = 'accepted' LIMIT 1"));
+        pstmt->setInt(1, uid);
+        pstmt->setInt(2, peer_uid);
+        std::unique_ptr<sql::ResultSet> res(pstmt->executeQuery());
+        return res->next();
+    }
+    catch (const sql::SQLException& e) {
+        std::cerr << "[MySqlDao.cpp] 函数 [AreFriends()] SQLException: " << e.what();
+        std::cerr << " (MySQL error code: " << e.getErrorCode();
+        std::cerr << ", SQLState: " << e.getSQLState() << " )" << std::endl;
+        return false;
+    }
+}
+
+long long MySqlDao::CreatePrivateMessage(int from_uid, int to_uid, const std::string& content_type, const std::string& content)
+{
+    if (from_uid <= 0 || to_uid <= 0 || content.empty()) {
+        return -1;
+    }
+
+    auto con = pool_->getConnection();
+    if (con == nullptr) {
+        std::cerr << "[MySqlDao.cpp] 函数 [CreatePrivateMessage()] 无法获取数据库连接" << std::endl;
+        return -2;
+    }
+
+    Defer defer([this, &con]() {
+        pool_->returnConnection(std::move(con));
+        });
+
+    try {
+        std::unique_ptr<sql::PreparedStatement> pstmt(
+            con->_con->prepareStatement(
+                "INSERT INTO private_message(from_uid, to_uid, content_type, content) VALUES(?, ?, ?, ?)"));
+        pstmt->setInt(1, from_uid);
+        pstmt->setInt(2, to_uid);
+        pstmt->setString(3, content_type);
+        pstmt->setString(4, content);
+        pstmt->executeUpdate();
+
+        std::unique_ptr<sql::Statement> stmt(con->_con->createStatement());
+        std::unique_ptr<sql::ResultSet> res(stmt->executeQuery("SELECT LAST_INSERT_ID() AS msg_id"));
+        if (res->next()) {
+            return res->getInt64("msg_id");
+        }
+        return -3;
+    }
+    catch (const sql::SQLException& e) {
+        std::cerr << "[MySqlDao.cpp] 函数 [CreatePrivateMessage()] SQLException: " << e.what();
+        std::cerr << " (MySQL error code: " << e.getErrorCode();
+        std::cerr << ", SQLState: " << e.getSQLState() << " )" << std::endl;
+        return -4;
+    }
+}
+
+std::vector<PrivateMessageInfo> MySqlDao::GetPrivateMessages(int uid, int peer_uid, std::size_t limit)
+{
+    std::vector<PrivateMessageInfo> messages;
+    auto con = pool_->getConnection();
+    if (con == nullptr) {
+        std::cerr << "[MySqlDao.cpp] 函数 [GetPrivateMessages()] 无法获取数据库连接" << std::endl;
+        return messages;
+    }
+
+    Defer defer([this, &con]() {
+        pool_->returnConnection(std::move(con));
+        });
+
+    try {
+        std::unique_ptr<sql::PreparedStatement> pstmt(
+            con->_con->prepareStatement(
+                "SELECT t.msg_id, t.from_uid, fu.name AS from_name, t.to_uid, tu.name AS to_name, "
+                "t.content_type, t.content, t.created_at "
+                "FROM ("
+                "  SELECT pm.msg_id, pm.from_uid, pm.to_uid, pm.content_type, pm.content, pm.created_at "
+                "  FROM private_message pm "
+                "  WHERE ((pm.from_uid = ? AND pm.to_uid = ?) OR (pm.from_uid = ? AND pm.to_uid = ?)) "
+                "  ORDER BY pm.created_at DESC, pm.msg_id DESC "
+                "  LIMIT ?"
+                ") t "
+                "JOIN user fu ON fu.uid = t.from_uid "
+                "JOIN user tu ON tu.uid = t.to_uid "
+                "ORDER BY t.created_at ASC, t.msg_id ASC"));
+        pstmt->setInt(1, uid);
+        pstmt->setInt(2, peer_uid);
+        pstmt->setInt(3, peer_uid);
+        pstmt->setInt(4, uid);
+        pstmt->setInt(5, static_cast<int>(limit));
+
+        std::unique_ptr<sql::ResultSet> res(pstmt->executeQuery());
+        while (res->next()) {
+            PrivateMessageInfo item;
+            item.msg_id = res->getInt64("msg_id");
+            item.from_uid = res->getInt("from_uid");
+            item.from_name = res->getString("from_name");
+            item.to_uid = res->getInt("to_uid");
+            item.to_name = res->getString("to_name");
+            item.content_type = res->getString("content_type");
+            item.content = res->getString("content");
+            item.created_at = res->getString("created_at");
+            messages.push_back(item);
+        }
+        return messages;
+    }
+    catch (const sql::SQLException& e) {
+        std::cerr << "[MySqlDao.cpp] 函数 [GetPrivateMessages()] SQLException: " << e.what();
+        std::cerr << " (MySQL error code: " << e.getErrorCode();
+        std::cerr << ", SQLState: " << e.getSQLState() << " )" << std::endl;
+        return messages;
     }
 }
 

@@ -44,6 +44,26 @@ public:
         response->set_delivered(delivered);
         return grpc::Status::OK;
     }
+
+    grpc::Status PushPrivateMessage(grpc::ServerContext* context,
+        const message::PushPrivateMessageReq* request,
+        message::PushPrivateMessageRsp* response) override
+    {
+        (void)context;
+        PrivateMessageInfo message;
+        message.msg_id = request->msg_id();
+        message.from_uid = request->from_uid();
+        message.from_name = request->from_name();
+        message.to_uid = request->to_uid();
+        message.to_name = request->to_name();
+        message.content_type = request->content_type();
+        message.content = request->content();
+        message.created_at = request->created_at();
+        const bool delivered = LogicSystem::getInstance().PushPrivateMessageToLocalUser(message);
+        response->set_error(ErrorCodes::Success);
+        response->set_delivered(delivered);
+        return grpc::Status::OK;
+    }
 };
 }
 

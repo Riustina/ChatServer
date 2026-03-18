@@ -43,6 +43,21 @@ std::vector<FriendInfo> MySqlMgr::GetFriendList(int uid)
     return _dao.GetFriendList(uid);
 }
 
+bool MySqlMgr::AreFriends(int uid, int peer_uid)
+{
+    return _dao.AreFriends(uid, peer_uid);
+}
+
+long long MySqlMgr::CreatePrivateMessage(int from_uid, int to_uid, const std::string& content_type, const std::string& content)
+{
+    return _dao.CreatePrivateMessage(from_uid, to_uid, content_type, content);
+}
+
+std::vector<PrivateMessageInfo> MySqlMgr::GetPrivateMessages(int uid, int peer_uid, std::size_t limit)
+{
+    return _dao.GetPrivateMessages(uid, peer_uid, limit);
+}
+
 long long MySqlMgr::CreateFriendRequest(int from_uid, int to_uid, const std::string& remark)
 {
     return _dao.CreateFriendRequest(from_uid, to_uid, remark);
