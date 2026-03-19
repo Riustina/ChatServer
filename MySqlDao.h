@@ -71,6 +71,7 @@ public:
     bool AreFriends(int uid, int peer_uid);
     long long CreatePrivateMessage(int from_uid, int to_uid, const std::string& content_type, const std::string& content);
     std::vector<PrivateMessageInfo> GetPrivateMessages(int uid, int peer_uid, std::size_t limit = 50);
+    int MarkPrivateMessagesRead(int uid, int peer_uid);
     long long CreateFriendRequest(int from_uid, int to_uid, const std::string& remark);
     std::vector<FriendRequestInfo> GetPendingFriendRequests(int to_uid);
     int HandleFriendRequest(long long request_id, int to_uid, bool accept);

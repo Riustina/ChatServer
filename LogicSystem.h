@@ -55,6 +55,9 @@ private:
     void SendPrivateMessageHandler(std::shared_ptr<CSession> session,
         const short msg_id,
         const std::string& msg_data);
+    void MarkPrivateMessagesReadHandler(std::shared_ptr<CSession> session,
+        const short msg_id,
+        const std::string& msg_data);
     void GetFriendRequestsHandler(std::shared_ptr<CSession> session,
         const short msg_id,
         const std::string& msg_data);

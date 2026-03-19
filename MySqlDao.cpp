@@ -254,13 +254,28 @@ bool MySqlDao::EnsureFriendTables()
             "content_type VARCHAR(16) NOT NULL DEFAULT 'text',"
             "content TEXT NOT NULL,"
             "created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,"
+            "read_at TIMESTAMP NULL DEFAULT NULL,"
             "KEY idx_pair_time (from_uid, to_uid, created_at),"
-            "KEY idx_to_uid_time (to_uid, created_at)"
+            "KEY idx_to_uid_time (to_uid, created_at),"
+            "KEY idx_to_uid_read (to_uid, read_at)"
             ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 
         try {
             stmt->execute("ALTER TABLE friend_request DROP INDEX uniq_from_to");
             std::cout << "[MySqlDao.cpp] 函数 [EnsureFriendTables()] 已移除 friend_request 的旧唯一索引 uniq_from_to" << std::endl;
+        }
+        catch (sql::SQLException&) {
+        }
+
+        try {
+            stmt->execute("ALTER TABLE private_message ADD COLUMN read_at TIMESTAMP NULL DEFAULT NULL AFTER created_at");
+            std::cout << "[MySqlDao.cpp] 函数 [EnsureFriendTables()] 已为 private_message 补充 read_at 字段" << std::endl;
+        }
+        catch (sql::SQLException&) {
+        }
+
+        try {
+            stmt->execute("ALTER TABLE private_message ADD KEY idx_to_uid_read (to_uid, read_at)");
         }
         catch (sql::SQLException&) {
         }
@@ -725,7 +740,14 @@ std::vector<FriendInfo> MySqlDao::GetFriendList(int uid)
                 "  WHERE ((pm.from_uid = fr.user_id AND pm.to_uid = fr.friend_id) "
                 "     OR (pm.from_uid = fr.friend_id AND pm.to_uid = fr.user_id)) "
                 "  ORDER BY pm.created_at DESC, pm.msg_id DESC LIMIT 1 "
-                "), '') AS last_time "
+                "), '') AS last_time, "
+                "COALESCE(( "
+                "  SELECT COUNT(*) "
+                "  FROM private_message pm "
+                "  WHERE pm.from_uid = fr.friend_id "
+                "    AND pm.to_uid = fr.user_id "
+                "    AND pm.read_at IS NULL "
+                "), 0) AS unread_count "
                 "FROM friend_relation fr "
                 "INNER JOIN user u ON u.uid = fr.friend_id "
                 "WHERE fr.user_id = ? AND fr.status = 'accepted' "
@@ -741,6 +763,7 @@ std::vector<FriendInfo> MySqlDao::GetFriendList(int uid)
             item.created_at = res->getString("created_at");
             item.last_message = res->getString("last_message");
             item.last_time = res->getString("last_time");
+            item.unread_count = res->getInt("unread_count");
             friends.push_back(item);
         }
 
@@ -880,6 +903,40 @@ std::vector<PrivateMessageInfo> MySqlDao::GetPrivateMessages(int uid, int peer_u
         std::cerr << " (MySQL error code: " << e.getErrorCode();
         std::cerr << ", SQLState: " << e.getSQLState() << " )" << std::endl;
         return messages;
+    }
+}
+
+int MySqlDao::MarkPrivateMessagesRead(int uid, int peer_uid)
+{
+    if (uid <= 0 || peer_uid <= 0) {
+        return -1;
+    }
+
+    auto con = pool_->getConnection();
+    if (con == nullptr) {
+        std::cerr << "[MySqlDao.cpp] 函数 [MarkPrivateMessagesRead()] 无法获取数据库连接" << std::endl;
+        return -2;
+    }
+
+    Defer defer([this, &con]() {
+        pool_->returnConnection(std::move(con));
+        });
+
+    try {
+        std::unique_ptr<sql::PreparedStatement> pstmt(
+            con->_con->prepareStatement(
+                "UPDATE private_message "
+                "SET read_at = CURRENT_TIMESTAMP "
+                "WHERE from_uid = ? AND to_uid = ? AND read_at IS NULL"));
+        pstmt->setInt(1, peer_uid);
+        pstmt->setInt(2, uid);
+        return pstmt->executeUpdate();
+    }
+    catch (const sql::SQLException& e) {
+        std::cerr << "[MySqlDao.cpp] 函数 [MarkPrivateMessagesRead()] SQLException: " << e.what();
+        std::cerr << " (MySQL error code: " << e.getErrorCode();
+        std::cerr << ", SQLState: " << e.getSQLState() << " )" << std::endl;
+        return -3;
     }
 }
 

@@ -28,6 +28,7 @@ struct FriendInfo {
 	std::string created_at;
 	std::string last_message;
 	std::string last_time;
+	int unread_count = 0;
 };
 
 struct PrivateMessageInfo {

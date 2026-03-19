@@ -58,6 +58,11 @@ std::vector<PrivateMessageInfo> MySqlMgr::GetPrivateMessages(int uid, int peer_u
     return _dao.GetPrivateMessages(uid, peer_uid, limit);
 }
 
+int MySqlMgr::MarkPrivateMessagesRead(int uid, int peer_uid)
+{
+    return _dao.MarkPrivateMessagesRead(uid, peer_uid);
+}
+
 long long MySqlMgr::CreateFriendRequest(int from_uid, int to_uid, const std::string& remark)
 {
     return _dao.CreateFriendRequest(from_uid, to_uid, remark);

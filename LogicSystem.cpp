@@ -175,6 +175,11 @@ void LogicSystem::RegisterCallBacks()
         std::placeholders::_1,
         std::placeholders::_2,
         std::placeholders::_3);
+    _fun_callbacks[MSG_MARK_PRIVATE_MESSAGES_READ_REQ] = std::bind(
+        &LogicSystem::MarkPrivateMessagesReadHandler, this,
+        std::placeholders::_1,
+        std::placeholders::_2,
+        std::placeholders::_3);
     _fun_callbacks[MSG_GET_FRIEND_REQUESTS_REQ] = std::bind(
         &LogicSystem::GetFriendRequestsHandler, this,
         std::placeholders::_1,
@@ -331,6 +336,7 @@ Json::Value LogicSystem::BuildFriendListPayload(int uid)
         node["created_at"] = item.created_at;
         node["last_message"] = item.last_message;
         node["last_time"] = item.last_time;
+        node["unread_count"] = item.unread_count;
         items.append(node);
     }
     reply["friends"] = items;
@@ -786,6 +792,44 @@ void LogicSystem::GetFriendRequestsHandler(std::shared_ptr<CSession> session,
     }
 
     reply = BuildFriendRequestsPayload(to_uid);
+}
+
+void LogicSystem::MarkPrivateMessagesReadHandler(std::shared_ptr<CSession> session,
+    const short msg_id,
+    const std::string& msg_data)
+{
+    Json::Value root;
+    Json::Reader reader;
+    Json::Value reply;
+    Defer defer([&reply, &session]() {
+        session->Send(reply.toStyledString(), MSG_MARK_PRIVATE_MESSAGES_READ_RSP);
+        });
+
+    if (!reader.parse(msg_data, root)) {
+        reply["error"] = ErrorCodes::Error_Json;
+        return;
+    }
+
+    const int uid = session ? session->GetUid() : 0;
+    const int peer_uid = root["contact_id"].asInt();
+    if (uid <= 0 || peer_uid <= 0) {
+        reply["error"] = ErrorCodes::UidInvalid;
+        return;
+    }
+
+    const int result = MySqlMgr::getInstance().MarkPrivateMessagesRead(uid, peer_uid);
+    if (result < 0) {
+        reply["error"] = ErrorCodes::MySQLFailed;
+        reply["db_result"] = result;
+        return;
+    }
+
+    reply["error"] = ErrorCodes::Success;
+    reply["contact_id"] = peer_uid;
+    reply["updated"] = result;
+    if (result > 0) {
+        PushFriendListToUser(uid);
+    }
 }
 
 void LogicSystem::HandleFriendRequestHandler(std::shared_ptr<CSession> session,
