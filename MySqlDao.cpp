@@ -849,7 +849,7 @@ long long MySqlDao::CreatePrivateMessage(int from_uid, int to_uid, const std::st
     }
 }
 
-std::vector<PrivateMessageInfo> MySqlDao::GetPrivateMessages(int uid, int peer_uid, std::size_t limit)
+std::vector<PrivateMessageInfo> MySqlDao::GetPrivateMessages(int uid, int peer_uid, std::size_t limit, long long after_msg_id)
 {
     std::vector<PrivateMessageInfo> messages;
     auto con = pool_->getConnection();
@@ -863,8 +863,26 @@ std::vector<PrivateMessageInfo> MySqlDao::GetPrivateMessages(int uid, int peer_u
         });
 
     try {
-        std::unique_ptr<sql::PreparedStatement> pstmt(
-            con->_con->prepareStatement(
+        std::unique_ptr<sql::PreparedStatement> pstmt;
+        if (after_msg_id > 0) {
+            pstmt.reset(con->_con->prepareStatement(
+                "SELECT pm.msg_id, pm.from_uid, fu.name AS from_name, pm.to_uid, tu.name AS to_name, "
+                "pm.content_type, pm.content, pm.created_at "
+                "FROM private_message pm "
+                "JOIN user fu ON fu.uid = pm.from_uid "
+                "JOIN user tu ON tu.uid = pm.to_uid "
+                "WHERE ((pm.from_uid = ? AND pm.to_uid = ?) OR (pm.from_uid = ? AND pm.to_uid = ?)) "
+                "AND pm.msg_id > ? "
+                "ORDER BY pm.created_at ASC, pm.msg_id ASC "
+                "LIMIT ?"));
+            pstmt->setInt(1, uid);
+            pstmt->setInt(2, peer_uid);
+            pstmt->setInt(3, peer_uid);
+            pstmt->setInt(4, uid);
+            pstmt->setInt64(5, after_msg_id);
+            pstmt->setInt(6, static_cast<int>(limit));
+        } else {
+            pstmt.reset(con->_con->prepareStatement(
                 "SELECT t.msg_id, t.from_uid, fu.name AS from_name, t.to_uid, tu.name AS to_name, "
                 "t.content_type, t.content, t.created_at "
                 "FROM ("
@@ -877,11 +895,12 @@ std::vector<PrivateMessageInfo> MySqlDao::GetPrivateMessages(int uid, int peer_u
                 "JOIN user fu ON fu.uid = t.from_uid "
                 "JOIN user tu ON tu.uid = t.to_uid "
                 "ORDER BY t.created_at ASC, t.msg_id ASC"));
-        pstmt->setInt(1, uid);
-        pstmt->setInt(2, peer_uid);
-        pstmt->setInt(3, peer_uid);
-        pstmt->setInt(4, uid);
-        pstmt->setInt(5, static_cast<int>(limit));
+            pstmt->setInt(1, uid);
+            pstmt->setInt(2, peer_uid);
+            pstmt->setInt(3, peer_uid);
+            pstmt->setInt(4, uid);
+            pstmt->setInt(5, static_cast<int>(limit));
+        }
 
         std::unique_ptr<sql::ResultSet> res(pstmt->executeQuery());
         while (res->next()) {

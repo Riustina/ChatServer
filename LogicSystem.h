@@ -66,7 +66,7 @@ private:
         const std::string& msg_data);
     Json::Value BuildFriendRequestsPayload(int uid);
     Json::Value BuildFriendListPayload(int uid);
-    Json::Value BuildPrivateMessagesPayload(int uid, int peer_uid, std::size_t limit = 50);
+    Json::Value BuildPrivateMessagesPayload(int uid, int peer_uid, std::size_t limit = 50, long long after_msg_id = 0);
     void PushFriendRequestsToUser(int uid);
     void PushFriendListToUser(int uid);
     void PushPrivateMessageToUser(const PrivateMessageInfo& message);
