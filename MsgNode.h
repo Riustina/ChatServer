@@ -9,7 +9,7 @@ class LogicSystem;
 class MsgNode
 {
 public:
-	MsgNode(short max_len) :_total_len(max_len), _cur_len(0) {
+	MsgNode(std::size_t max_len) :_total_len(max_len), _cur_len(0) {
 		_data = new char[_total_len + 1]();
 		_data[_total_len] = '\0';
 	}
@@ -24,15 +24,15 @@ public:
 		_cur_len = 0;
 	}
 
-	short _cur_len;
-	short _total_len;
+	std::size_t _cur_len;
+	std::size_t _total_len;
 	char* _data;
 };
 
 class RecvNode :public MsgNode {
 	friend class LogicSystem;
 public:
-	RecvNode(short max_len, short msg_id);
+	RecvNode(std::size_t max_len, short msg_id);
 private:
 	short _msg_id;
 };
@@ -40,7 +40,7 @@ private:
 class SendNode:public MsgNode {
 	friend class LogicSystem;
 public:
-	SendNode(const char* msg,short max_len, short msg_id);
+	SendNode(const char* msg, std::uint16_t max_len, short msg_id);
 private:
 	short _msg_id;
 };

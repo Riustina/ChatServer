@@ -10,6 +10,7 @@
 #include <iostream>
 #include <algorithm>
 #include <sstream>
+#include <zlib.h>
 #include "Defer.h"
 
 // ──────────────────────────────────────────────────────────────
@@ -71,6 +72,61 @@ bool DecodeBase64(const std::string& input, std::string& output)
         }
     }
     return !output.empty();
+}
+
+bool DecodeIncomingImagePayload(const std::string& base64_content,
+    const std::string& content_encoding,
+    std::string& output_bytes,
+    std::string& extension)
+{
+    output_bytes.clear();
+    extension = ".png";
+
+    std::string decoded;
+    if (!DecodeBase64(base64_content, decoded)) {
+        return false;
+    }
+
+    if (content_encoding == "zlib+png") {
+        if (decoded.size() < 4) {
+            return false;
+        }
+
+        const unsigned char* header = reinterpret_cast<const unsigned char*>(decoded.data());
+        const uLongf expected_size =
+            (static_cast<uLongf>(header[0]) << 24) |
+            (static_cast<uLongf>(header[1]) << 16) |
+            (static_cast<uLongf>(header[2]) << 8) |
+            static_cast<uLongf>(header[3]);
+        if (expected_size == 0) {
+            return false;
+        }
+
+        std::string restored(expected_size, '\0');
+        uLongf dest_len = expected_size;
+        const int zlib_result = ::uncompress(
+            reinterpret_cast<Bytef*>(&restored[0]),
+            &dest_len,
+            reinterpret_cast<const Bytef*>(decoded.data() + 4),
+            static_cast<uLong>(decoded.size() - 4));
+        if (zlib_result != Z_OK) {
+            return false;
+        }
+        restored.resize(dest_len);
+        output_bytes = std::move(restored);
+        extension = ".png";
+        return true;
+    }
+
+    output_bytes = std::move(decoded);
+    if (output_bytes.size() >= 8 &&
+        static_cast<unsigned char>(output_bytes[0]) == 0x89 &&
+        output_bytes[1] == 'P' && output_bytes[2] == 'N' && output_bytes[3] == 'G') {
+        extension = ".png";
+    } else {
+        extension = ".jpg";
+    }
+    return true;
 }
 
 struct RequestLogScope {
@@ -426,12 +482,13 @@ bool LogicSystem::SaveIncomingImageContent(int from_uid, const std::string& base
 {
     saved_path.clear();
 
-    std::string bytes;
-    if (!DecodeBase64(base64_content, bytes)) {
-        return false;
-    }
-
     try {
+        std::string bytes;
+        std::string extension;
+        if (!DecodeIncomingImagePayload(base64_content, "zlib+png", bytes, extension)) {
+            return false;
+        }
+
         const boost::filesystem::path upload_root =
             boost::filesystem::absolute(boost::filesystem::current_path() / "uploads" / "chat_images");
         boost::filesystem::create_directories(upload_root);
@@ -439,7 +496,7 @@ bool LogicSystem::SaveIncomingImageContent(int from_uid, const std::string& base
         const auto now_ms = std::chrono::duration_cast<std::chrono::milliseconds>(
             std::chrono::system_clock::now().time_since_epoch()).count();
         std::ostringstream oss;
-        oss << from_uid << "_" << now_ms << ".jpg";
+        oss << from_uid << "_" << now_ms << extension;
         const boost::filesystem::path image_path = upload_root / oss.str();
 
         std::ofstream output(image_path.string(), std::ios::binary);
@@ -837,6 +894,7 @@ void LogicSystem::SendPrivateMessageHandler(std::shared_ptr<CSession> session,
     const int from_uid = session ? session->GetUid() : 0;
     const int to_uid = root["to_uid"].asInt();
     const std::string content_type = root.isMember("content_type") ? root["content_type"].asString() : "text";
+    const std::string content_encoding = root.isMember("content_encoding") ? root["content_encoding"].asString() : "";
     std::string content = root.isMember("content") ? root["content"].asString() : "";
     if (from_uid <= 0 || to_uid <= 0 || content.empty()) {
         reply["error"] = ErrorCodes::UidInvalid;
@@ -851,13 +909,20 @@ void LogicSystem::SendPrivateMessageHandler(std::shared_ptr<CSession> session,
     }
 
     if (content_type == "image") {
-        std::string saved_path;
-        if (!SaveIncomingImageContent(from_uid, content, saved_path)) {
+        if (!content_encoding.empty() && content_encoding != "zlib+png") {
             reply["error"] = ErrorCodes::MySQLFailed;
-            reply["message"] = "图片保存失败，请尝试更小的图片";
+            reply["message"] = "不支持的图片编码格式";
             return;
         }
-        content = saved_path;
+        if (content_encoding == "zlib+png") {
+            std::string saved_path;
+            if (!SaveIncomingImageContent(from_uid, content, saved_path)) {
+                reply["error"] = ErrorCodes::MySQLFailed;
+                reply["message"] = "图片过大或保存失败，请尝试更小的图片";
+                return;
+            }
+            content = saved_path;
+        }
     }
 
     const long long msg_id_value = MySqlMgr::getInstance().CreatePrivateMessage(from_uid, to_uid, content_type, content);

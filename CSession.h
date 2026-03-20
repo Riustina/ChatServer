@@ -29,7 +29,7 @@ public:
 
     void Start();
     void Send(const std::string& msg, short msgid);  // const 引用，避免拷贝
-    void Send(const char* msg, short max_length, short msgid);
+    void Send(const char* msg, std::uint16_t max_length, short msgid);
     void Close();
 
     std::shared_ptr<CSession> SharedSelf();

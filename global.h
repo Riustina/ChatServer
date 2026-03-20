@@ -22,7 +22,7 @@ enum ErrorCodes {
 	MySQLFailed = 9999,
 };
 
-#define MAX_LENGTH  (1024 * 30)
+#define MAX_LENGTH  65535
 //头部总长度
 #define HEAD_TOTAL_LEN 4
 //头部id长度

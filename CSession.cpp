@@ -82,10 +82,10 @@ void CSession::Start()
 
 void CSession::Send(const std::string& msg, short msgid)
 {
-    Send(msg.c_str(), static_cast<short>(msg.length()), msgid);
+    Send(msg.c_str(), static_cast<std::uint16_t>(msg.length()), msgid);
 }
 
-void CSession::Send(const char* msg, short max_length, short msgid)
+void CSession::Send(const char* msg, std::uint16_t max_length, short msgid)
 {
     std::lock_guard<std::mutex> lock(_send_lock);
     int send_que_size = static_cast<int>(_send_que.size());
@@ -180,11 +180,11 @@ void CSession::AsyncReadHead(int total_len)
                     return;
                 }
 
-                short msg_len = 0;
+                std::uint16_t msg_len = 0;
                 memcpy(&msg_len, _recv_head_node->_data + HEAD_ID_LEN, HEAD_DATA_LEN);
                 msg_len = boost::asio::detail::socket_ops::network_to_host_short(msg_len);
                 std::cout << "[CSession] AsyncReadHead msg_len: " << msg_len << "\n";
-                if (msg_len <= 0 || msg_len > MAX_LENGTH) {
+                if (msg_len == 0 || msg_len > MAX_LENGTH) {
                     std::cerr << "[CSession] AsyncReadHead 非法 msg_len: " << msg_len << "\n";
                     Close();
                     _server->ClearSession(_uuid);
