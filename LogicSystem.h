@@ -67,10 +67,11 @@ private:
     void HandleFriendRequestHandler(std::shared_ptr<CSession> session,
         const short msg_id,
         const std::string& msg_data);
-    Json::Value BuildFriendRequestsPayload(int uid, const std::string& updated_after = "");
-    Json::Value BuildFriendListPayload(int uid, const std::string& updated_after = "");
-    Json::Value BuildPrivateMessagesPayload(int uid, int peer_uid, std::size_t limit = 50, long long after_msg_id = 0);
-    void PushFriendRequestsToUser(int uid);
+      Json::Value BuildFriendRequestsPayload(int uid, const std::string& updated_after = "");
+      Json::Value BuildFriendListPayload(int uid, const std::string& updated_after = "");
+      Json::Value BuildPrivateMessagesPayload(int uid, int peer_uid, std::size_t limit = 50, long long after_msg_id = 0);
+      bool SaveIncomingImageContent(int from_uid, const std::string& base64_content, std::string& saved_path);
+      void PushFriendRequestsToUser(int uid);
     void PushFriendListToUser(int uid);
     void PushPrivateMessageToUser(const PrivateMessageInfo& message);
     void BindUserSession(int uid, std::shared_ptr<CSession> session);

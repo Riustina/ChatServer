@@ -3,8 +3,13 @@
 #include "MySqlMgr.h"
 #include "global.h"
 #include "message.grpc.pb.h"
+#include <boost/filesystem.hpp>
+#include <chrono>
+#include <cctype>
+#include <fstream>
 #include <iostream>
 #include <algorithm>
+#include <sstream>
 #include "Defer.h"
 
 // ──────────────────────────────────────────────────────────────
@@ -30,6 +35,42 @@ Json::Value BuildPrivateMessageNode(const PrivateMessageInfo& item, int current_
     node["content"] = item.content;
     node["created_at"] = item.created_at;
     return node;
+}
+
+int DecodeBase64Char(unsigned char c)
+{
+    if (c >= 'A' && c <= 'Z') return c - 'A';
+    if (c >= 'a' && c <= 'z') return c - 'a' + 26;
+    if (c >= '0' && c <= '9') return c - '0' + 52;
+    if (c == '+') return 62;
+    if (c == '/') return 63;
+    return -1;
+}
+
+bool DecodeBase64(const std::string& input, std::string& output)
+{
+    output.clear();
+    int value = 0;
+    int bit_count = -8;
+    for (unsigned char c : input) {
+        if (std::isspace(c)) {
+            continue;
+        }
+        if (c == '=') {
+            break;
+        }
+        const int decoded = DecodeBase64Char(c);
+        if (decoded < 0) {
+            return false;
+        }
+        value = (value << 6) + decoded;
+        bit_count += 6;
+        if (bit_count >= 0) {
+            output.push_back(static_cast<char>((value >> bit_count) & 0xFF));
+            bit_count -= 8;
+        }
+    }
+    return !output.empty();
 }
 
 struct RequestLogScope {
@@ -379,6 +420,46 @@ Json::Value LogicSystem::BuildPrivateMessagesPayload(int uid, int peer_uid, std:
     }
     reply["messages"] = items;
     return reply;
+}
+
+bool LogicSystem::SaveIncomingImageContent(int from_uid, const std::string& base64_content, std::string& saved_path)
+{
+    saved_path.clear();
+
+    std::string bytes;
+    if (!DecodeBase64(base64_content, bytes)) {
+        return false;
+    }
+
+    try {
+        const boost::filesystem::path upload_root =
+            boost::filesystem::absolute(boost::filesystem::current_path() / "uploads" / "chat_images");
+        boost::filesystem::create_directories(upload_root);
+
+        const auto now_ms = std::chrono::duration_cast<std::chrono::milliseconds>(
+            std::chrono::system_clock::now().time_since_epoch()).count();
+        std::ostringstream oss;
+        oss << from_uid << "_" << now_ms << ".jpg";
+        const boost::filesystem::path image_path = upload_root / oss.str();
+
+        std::ofstream output(image_path.string(), std::ios::binary);
+        if (!output.is_open()) {
+            return false;
+        }
+
+        output.write(bytes.data(), static_cast<std::streamsize>(bytes.size()));
+        output.close();
+        if (!output.good()) {
+            return false;
+        }
+
+        saved_path = image_path.string();
+        return true;
+    }
+    catch (const std::exception& e) {
+        std::cerr << "[LogicSystem] SaveIncomingImageContent 异常: " << e.what() << "\n";
+        return false;
+    }
 }
 
 bool LogicSystem::PushFriendRequestsToLocalUser(int uid)
@@ -756,7 +837,7 @@ void LogicSystem::SendPrivateMessageHandler(std::shared_ptr<CSession> session,
     const int from_uid = session ? session->GetUid() : 0;
     const int to_uid = root["to_uid"].asInt();
     const std::string content_type = root.isMember("content_type") ? root["content_type"].asString() : "text";
-    const std::string content = root.isMember("content") ? root["content"].asString() : "";
+    std::string content = root.isMember("content") ? root["content"].asString() : "";
     if (from_uid <= 0 || to_uid <= 0 || content.empty()) {
         reply["error"] = ErrorCodes::UidInvalid;
         reply["message"] = "消息参数无效";
@@ -767,6 +848,16 @@ void LogicSystem::SendPrivateMessageHandler(std::shared_ptr<CSession> session,
         reply["error"] = ErrorCodes::MySQLFailed;
         reply["message"] = "对方还不是你的好友";
         return;
+    }
+
+    if (content_type == "image") {
+        std::string saved_path;
+        if (!SaveIncomingImageContent(from_uid, content, saved_path)) {
+            reply["error"] = ErrorCodes::MySQLFailed;
+            reply["message"] = "图片保存失败，请尝试更小的图片";
+            return;
+        }
+        content = saved_path;
     }
 
     const long long msg_id_value = MySqlMgr::getInstance().CreatePrivateMessage(from_uid, to_uid, content_type, content);
