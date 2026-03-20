@@ -165,6 +165,11 @@ void LogicSystem::RegisterCallBacks()
         std::placeholders::_1,
         std::placeholders::_2,
         std::placeholders::_3);
+    _fun_callbacks[MSG_GET_FRIEND_LIST_REQ] = std::bind(
+        &LogicSystem::GetFriendListHandler, this,
+        std::placeholders::_1,
+        std::placeholders::_2,
+        std::placeholders::_3);
     _fun_callbacks[MSG_GET_PRIVATE_MESSAGES_REQ] = std::bind(
         &LogicSystem::GetPrivateMessagesHandler, this,
         std::placeholders::_1,
@@ -271,8 +276,6 @@ void LogicSystem::LoginHandler(std::shared_ptr<CSession> session,
     rtvalue["token"] = rsp.token();
     rtvalue["name"] = user_info->name;
     session->Send(rtvalue.toStyledString(), MSG_CHAT_LOGIN_RSP);
-    PushFriendListToUser(uid);
-    PushFriendRequestsToUser(uid);
 }
 
 void LogicSystem::BindUserSession(int uid, std::shared_ptr<CSession> session)
@@ -289,7 +292,7 @@ void LogicSystem::RemoveUserSession(int uid)
     std::cout << "[LogicSystem] RemoveUserSession 移除本机在线用户，uid: " << uid << "\n";
 }
 
-Json::Value LogicSystem::BuildFriendRequestsPayload(int uid)
+Json::Value LogicSystem::BuildFriendRequestsPayload(int uid, const std::string& updated_after)
 {
     Json::Value reply;
     if (uid <= 0) {
@@ -297,8 +300,10 @@ Json::Value LogicSystem::BuildFriendRequestsPayload(int uid)
         return reply;
     }
 
-    const auto requests = MySqlMgr::getInstance().GetPendingFriendRequests(uid);
+    const auto requests = MySqlMgr::getInstance().GetPendingFriendRequests(uid, updated_after);
     reply["error"] = ErrorCodes::Success;
+    reply["incremental"] = !updated_after.empty();
+    std::string cursor = updated_after;
     Json::Value items(Json::arrayValue);
     for (const auto& item : requests) {
         Json::Value node;
@@ -311,13 +316,18 @@ Json::Value LogicSystem::BuildFriendRequestsPayload(int uid)
         node["status"] = item.status;
         node["created_at"] = item.created_at;
         node["handled_at"] = item.handled_at;
+        node["updated_at"] = item.updated_at;
         items.append(node);
+        if (item.updated_at > cursor) {
+            cursor = item.updated_at;
+        }
     }
     reply["requests"] = items;
+    reply["cursor"] = cursor;
     return reply;
 }
 
-Json::Value LogicSystem::BuildFriendListPayload(int uid)
+Json::Value LogicSystem::BuildFriendListPayload(int uid, const std::string& updated_after)
 {
     Json::Value reply;
     if (uid <= 0) {
@@ -325,8 +335,10 @@ Json::Value LogicSystem::BuildFriendListPayload(int uid)
         return reply;
     }
 
-    const auto friends = MySqlMgr::getInstance().GetFriendList(uid);
+    const auto friends = MySqlMgr::getInstance().GetFriendList(uid, updated_after);
     reply["error"] = ErrorCodes::Success;
+    reply["incremental"] = !updated_after.empty();
+    std::string cursor = updated_after;
     Json::Value items(Json::arrayValue);
     for (const auto& item : friends) {
         Json::Value node;
@@ -334,12 +346,17 @@ Json::Value LogicSystem::BuildFriendListPayload(int uid)
         node["name"] = item.name;
         node["email"] = item.email;
         node["created_at"] = item.created_at;
+        node["updated_at"] = item.updated_at;
         node["last_message"] = item.last_message;
         node["last_time"] = item.last_time;
         node["unread_count"] = item.unread_count;
         items.append(node);
+        if (item.updated_at > cursor) {
+            cursor = item.updated_at;
+        }
     }
     reply["friends"] = items;
+    reply["cursor"] = cursor;
     return reply;
 }
 
@@ -666,6 +683,32 @@ void LogicSystem::AddFriendHandler(std::shared_ptr<CSession> session,
       PushFriendRequestsToUser(to_uid);
 }
 
+void LogicSystem::GetFriendListHandler(std::shared_ptr<CSession> session,
+    const short msg_id,
+    const std::string& msg_data)
+{
+    Json::Value root;
+    Json::Reader reader;
+    Json::Value reply;
+    Defer defer([&reply, &session]() {
+        session->Send(reply.toStyledString(), MSG_GET_FRIEND_LIST_RSP);
+        });
+
+    if (!reader.parse(msg_data, root)) {
+        reply["error"] = ErrorCodes::Error_Json;
+        return;
+    }
+
+    const int uid = session ? session->GetUid() : 0;
+    if (uid <= 0) {
+        reply["error"] = ErrorCodes::UidInvalid;
+        return;
+    }
+
+    const std::string updated_after = root.isMember("updated_after") ? root["updated_after"].asString() : "";
+    reply = BuildFriendListPayload(uid, updated_after);
+}
+
 void LogicSystem::GetPrivateMessagesHandler(std::shared_ptr<CSession> session,
     const short msg_id,
     const std::string& msg_data)
@@ -788,13 +831,21 @@ void LogicSystem::GetFriendRequestsHandler(std::shared_ptr<CSession> session,
         session->Send(reply.toStyledString(), MSG_GET_FRIEND_REQUESTS_RSP);
         });
 
+    Json::Value root;
+    Json::Reader reader;
+    if (!reader.parse(msg_data, root)) {
+        reply["error"] = ErrorCodes::Error_Json;
+        return;
+    }
+
     const int to_uid = session ? session->GetUid() : 0;
     if (to_uid <= 0) {
         reply["error"] = ErrorCodes::UidInvalid;
         return;
     }
 
-    reply = BuildFriendRequestsPayload(to_uid);
+    const std::string updated_after = root.isMember("updated_after") ? root["updated_after"].asString() : "";
+    reply = BuildFriendRequestsPayload(to_uid, updated_after);
 }
 
 void LogicSystem::MarkPrivateMessagesReadHandler(std::shared_ptr<CSession> session,

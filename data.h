@@ -19,6 +19,7 @@ struct FriendRequestInfo {
 	std::string status;
 	std::string created_at;
 	std::string handled_at;
+	std::string updated_at;
 };
 
 struct FriendInfo {
@@ -26,6 +27,7 @@ struct FriendInfo {
 	std::string name;
 	std::string email;
 	std::string created_at;
+	std::string updated_at;
 	std::string last_message;
 	std::string last_time;
 	int unread_count = 0;

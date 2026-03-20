@@ -707,7 +707,7 @@ std::vector<UserInfo> MySqlDao::SearchUsers(const std::string& keyword, std::siz
     }
 }
 
-std::vector<FriendInfo> MySqlDao::GetFriendList(int uid)
+std::vector<FriendInfo> MySqlDao::GetFriendList(int uid, const std::string& updated_after)
 {
     std::vector<FriendInfo> friends;
     auto con = pool_->getConnection();
@@ -721,9 +721,55 @@ std::vector<FriendInfo> MySqlDao::GetFriendList(int uid)
         });
 
     try {
-        std::unique_ptr<sql::PreparedStatement> pstmt(
-            con->_con->prepareStatement(
+        std::unique_ptr<sql::PreparedStatement> pstmt;
+        if (!updated_after.empty()) {
+            pstmt.reset(con->_con->prepareStatement(
                 "SELECT u.uid, u.name, u.email, fr.created_at, "
+                "GREATEST(fr.updated_at, "
+                "COALESCE((SELECT MAX(pm.created_at) FROM private_message pm "
+                " WHERE ((pm.from_uid = fr.user_id AND pm.to_uid = fr.friend_id) "
+                "    OR (pm.from_uid = fr.friend_id AND pm.to_uid = fr.user_id))), fr.updated_at), "
+                "COALESCE((SELECT MAX(pm.read_at) FROM private_message pm "
+                " WHERE pm.from_uid = fr.friend_id AND pm.to_uid = fr.user_id), fr.updated_at)) AS updated_at, "
+                "COALESCE(( "
+                "  SELECT CASE WHEN pm.content_type = 'image' THEN '[图片]' ELSE pm.content END "
+                "  FROM private_message pm "
+                "  WHERE ((pm.from_uid = fr.user_id AND pm.to_uid = fr.friend_id) "
+                "     OR (pm.from_uid = fr.friend_id AND pm.to_uid = fr.user_id)) "
+                "  ORDER BY pm.created_at DESC, pm.msg_id DESC LIMIT 1 "
+                "), '') AS last_message, "
+                "COALESCE(( "
+                "  SELECT DATE_FORMAT(pm.created_at, '%H:%i') "
+                "  FROM private_message pm "
+                "  WHERE ((pm.from_uid = fr.user_id AND pm.to_uid = fr.friend_id) "
+                "     OR (pm.from_uid = fr.friend_id AND pm.to_uid = fr.user_id)) "
+                "  ORDER BY pm.created_at DESC, pm.msg_id DESC LIMIT 1 "
+                "), '') AS last_time, "
+                "COALESCE(( "
+                "  SELECT COUNT(*) FROM private_message pm "
+                "  WHERE pm.from_uid = fr.friend_id AND pm.to_uid = fr.user_id AND pm.read_at IS NULL "
+                "), 0) AS unread_count "
+                "FROM friend_relation fr "
+                "INNER JOIN user u ON u.uid = fr.friend_id "
+                "WHERE fr.user_id = ? AND fr.status = 'accepted' "
+                "AND GREATEST(fr.updated_at, "
+                "COALESCE((SELECT MAX(pm.created_at) FROM private_message pm "
+                " WHERE ((pm.from_uid = fr.user_id AND pm.to_uid = fr.friend_id) "
+                "    OR (pm.from_uid = fr.friend_id AND pm.to_uid = fr.user_id))), fr.updated_at), "
+                "COALESCE((SELECT MAX(pm.read_at) FROM private_message pm "
+                " WHERE pm.from_uid = fr.friend_id AND pm.to_uid = fr.user_id), fr.updated_at)) >= ? "
+                "ORDER BY updated_at ASC, u.uid ASC"));
+            pstmt->setInt(1, uid);
+            pstmt->setString(2, updated_after);
+        } else {
+            pstmt.reset(con->_con->prepareStatement(
+                "SELECT u.uid, u.name, u.email, fr.created_at, "
+                "GREATEST(fr.updated_at, "
+                "COALESCE((SELECT MAX(pm.created_at) FROM private_message pm "
+                " WHERE ((pm.from_uid = fr.user_id AND pm.to_uid = fr.friend_id) "
+                "    OR (pm.from_uid = fr.friend_id AND pm.to_uid = fr.user_id))), fr.updated_at), "
+                "COALESCE((SELECT MAX(pm.read_at) FROM private_message pm "
+                " WHERE pm.from_uid = fr.friend_id AND pm.to_uid = fr.user_id), fr.updated_at)) AS updated_at, "
                 "COALESCE(( "
                 "  SELECT CASE "
                 "    WHEN pm.content_type = 'image' THEN '[图片]' "
@@ -752,7 +798,8 @@ std::vector<FriendInfo> MySqlDao::GetFriendList(int uid)
                 "INNER JOIN user u ON u.uid = fr.friend_id "
                 "WHERE fr.user_id = ? AND fr.status = 'accepted' "
                 "ORDER BY fr.created_at DESC, u.uid ASC"));
-        pstmt->setInt(1, uid);
+            pstmt->setInt(1, uid);
+        }
 
         std::unique_ptr<sql::ResultSet> res(pstmt->executeQuery());
         while (res->next()) {
@@ -761,6 +808,7 @@ std::vector<FriendInfo> MySqlDao::GetFriendList(int uid)
             item.name = res->getString("name");
             item.email = res->getString("email");
             item.created_at = res->getString("created_at");
+            item.updated_at = res->getString("updated_at");
             item.last_message = res->getString("last_message");
             item.last_time = res->getString("last_time");
             item.unread_count = res->getInt("unread_count");
@@ -1027,7 +1075,7 @@ long long MySqlDao::CreateFriendRequest(int from_uid, int to_uid, const std::str
     }
 }
 
-std::vector<FriendRequestInfo> MySqlDao::GetPendingFriendRequests(int to_uid)
+std::vector<FriendRequestInfo> MySqlDao::GetPendingFriendRequests(int to_uid, const std::string& updated_after)
 {
     std::vector<FriendRequestInfo> requests;
     auto con = pool_->getConnection();
@@ -1041,17 +1089,34 @@ std::vector<FriendRequestInfo> MySqlDao::GetPendingFriendRequests(int to_uid)
         });
 
     try {
-        std::unique_ptr<sql::PreparedStatement> pstmt(
-            con->_con->prepareStatement(
+        std::unique_ptr<sql::PreparedStatement> pstmt;
+        if (!updated_after.empty()) {
+            pstmt.reset(con->_con->prepareStatement(
                 "SELECT fr.request_id, fr.from_uid, fu.name AS from_name, fr.to_uid, tu.name AS to_name, "
-                "fr.remark, fr.status, fr.created_at, fr.handled_at "
+                "fr.remark, fr.status, fr.created_at, fr.handled_at, "
+                "COALESCE(fr.handled_at, fr.created_at) AS updated_at "
+                "FROM friend_request fr "
+                "JOIN user fu ON fu.uid = fr.from_uid "
+                "JOIN user tu ON tu.uid = fr.to_uid "
+                "WHERE (fr.to_uid = ? OR fr.from_uid = ?) "
+                "AND COALESCE(fr.handled_at, fr.created_at) >= ? "
+                "ORDER BY updated_at ASC, fr.request_id ASC"));
+            pstmt->setInt(1, to_uid);
+            pstmt->setInt(2, to_uid);
+            pstmt->setString(3, updated_after);
+        } else {
+            pstmt.reset(con->_con->prepareStatement(
+                "SELECT fr.request_id, fr.from_uid, fu.name AS from_name, fr.to_uid, tu.name AS to_name, "
+                "fr.remark, fr.status, fr.created_at, fr.handled_at, "
+                "COALESCE(fr.handled_at, fr.created_at) AS updated_at "
                 "FROM friend_request fr "
                 "JOIN user fu ON fu.uid = fr.from_uid "
                 "JOIN user tu ON tu.uid = fr.to_uid "
                 "WHERE fr.to_uid = ? OR fr.from_uid = ? "
                 "ORDER BY fr.request_id DESC"));
-        pstmt->setInt(1, to_uid);
-        pstmt->setInt(2, to_uid);
+            pstmt->setInt(1, to_uid);
+            pstmt->setInt(2, to_uid);
+        }
         std::unique_ptr<sql::ResultSet> res(pstmt->executeQuery());
 
         while (res->next()) {
@@ -1065,6 +1130,7 @@ std::vector<FriendRequestInfo> MySqlDao::GetPendingFriendRequests(int to_uid)
             item.status = res->getString("status");
             item.created_at = res->getString("created_at");
             item.handled_at = res->isNull("handled_at") ? "" : res->getString("handled_at");
+            item.updated_at = res->getString("updated_at");
             requests.push_back(item);
         }
         return requests;

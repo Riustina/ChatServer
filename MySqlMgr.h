@@ -16,13 +16,13 @@ public:
     int CheckLogin(const std::string& email, const std::string& pwd, UserInfo& userInfo);
     std::shared_ptr<UserInfo> GetUser(int uid);
     std::vector<UserInfo> SearchUsers(const std::string& keyword, std::size_t limit = 20);
-    std::vector<FriendInfo> GetFriendList(int uid);
+    std::vector<FriendInfo> GetFriendList(int uid, const std::string& updated_after = "");
     bool AreFriends(int uid, int peer_uid);
     long long CreatePrivateMessage(int from_uid, int to_uid, const std::string& content_type, const std::string& content);
     std::vector<PrivateMessageInfo> GetPrivateMessages(int uid, int peer_uid, std::size_t limit = 50, long long after_msg_id = 0);
     int MarkPrivateMessagesRead(int uid, int peer_uid);
     long long CreateFriendRequest(int from_uid, int to_uid, const std::string& remark);
-    std::vector<FriendRequestInfo> GetPendingFriendRequests(int to_uid);
+    std::vector<FriendRequestInfo> GetPendingFriendRequests(int to_uid, const std::string& updated_after = "");
     int HandleFriendRequest(long long request_id, int to_uid, bool accept);
 private:
     MySqlMgr();

@@ -38,9 +38,9 @@ std::vector<UserInfo> MySqlMgr::SearchUsers(const std::string& keyword, std::siz
     return _dao.SearchUsers(keyword, limit);
 }
 
-std::vector<FriendInfo> MySqlMgr::GetFriendList(int uid)
+std::vector<FriendInfo> MySqlMgr::GetFriendList(int uid, const std::string& updated_after)
 {
-    return _dao.GetFriendList(uid);
+    return _dao.GetFriendList(uid, updated_after);
 }
 
 bool MySqlMgr::AreFriends(int uid, int peer_uid)
@@ -68,9 +68,9 @@ long long MySqlMgr::CreateFriendRequest(int from_uid, int to_uid, const std::str
     return _dao.CreateFriendRequest(from_uid, to_uid, remark);
 }
 
-std::vector<FriendRequestInfo> MySqlMgr::GetPendingFriendRequests(int to_uid)
+std::vector<FriendRequestInfo> MySqlMgr::GetPendingFriendRequests(int to_uid, const std::string& updated_after)
 {
-    return _dao.GetPendingFriendRequests(to_uid);
+    return _dao.GetPendingFriendRequests(to_uid, updated_after);
 }
 
 int MySqlMgr::HandleFriendRequest(long long request_id, int to_uid, bool accept)
