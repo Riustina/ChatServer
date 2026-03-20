@@ -893,9 +893,11 @@ void LogicSystem::SendPrivateMessageHandler(std::shared_ptr<CSession> session,
 
     const int from_uid = session ? session->GetUid() : 0;
     const int to_uid = root["to_uid"].asInt();
+    const std::string client_msg_id = root.isMember("client_msg_id") ? root["client_msg_id"].asString() : "";
     const std::string content_type = root.isMember("content_type") ? root["content_type"].asString() : "text";
     const std::string content_encoding = root.isMember("content_encoding") ? root["content_encoding"].asString() : "";
     std::string content = root.isMember("content") ? root["content"].asString() : "";
+    reply["client_msg_id"] = client_msg_id;
     if (from_uid <= 0 || to_uid <= 0 || content.empty()) {
         reply["error"] = ErrorCodes::UidInvalid;
         reply["message"] = "消息参数无效";
@@ -967,6 +969,7 @@ void LogicSystem::SendPrivateMessageHandler(std::shared_ptr<CSession> session,
     }
 
     reply["error"] = ErrorCodes::Success;
+    reply["client_msg_id"] = client_msg_id;
     reply["message"] = BuildPrivateMessageNode(message, from_uid);
     std::cout << "[LogicSystem] SendPrivateMessageHandler 用户 " << from_uid
         << " 向用户 " << to_uid << " 发送了消息，msg_id: " << msg_id_value << "\n";
