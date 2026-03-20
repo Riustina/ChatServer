@@ -69,7 +69,7 @@ private:
         const std::string& msg_data);
       Json::Value BuildFriendRequestsPayload(int uid, const std::string& updated_after = "");
       Json::Value BuildFriendListPayload(int uid, const std::string& updated_after = "");
-      Json::Value BuildPrivateMessagesPayload(int uid, int peer_uid, std::size_t limit = 50, long long after_msg_id = 0);
+      Json::Value BuildPrivateMessagesPayload(int uid, int peer_uid, std::size_t limit = 50, long long after_msg_id = 0, long long before_msg_id = 0);
       bool SaveIncomingImageContent(int from_uid, const std::string& base64_content, std::string& saved_path);
       void PushFriendRequestsToUser(int uid);
     void PushFriendListToUser(int uid);

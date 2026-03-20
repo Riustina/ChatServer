@@ -70,7 +70,7 @@ public:
     std::vector<FriendInfo> GetFriendList(int uid, const std::string& updated_after = "");
     bool AreFriends(int uid, int peer_uid);
     long long CreatePrivateMessage(int from_uid, int to_uid, const std::string& content_type, const std::string& content);
-    std::vector<PrivateMessageInfo> GetPrivateMessages(int uid, int peer_uid, std::size_t limit = 50, long long after_msg_id = 0);
+    std::vector<PrivateMessageInfo> GetPrivateMessages(int uid, int peer_uid, std::size_t limit = 50, long long after_msg_id = 0, long long before_msg_id = 0);
     int MarkPrivateMessagesRead(int uid, int peer_uid);
     long long CreateFriendRequest(int from_uid, int to_uid, const std::string& remark);
     std::vector<FriendRequestInfo> GetPendingFriendRequests(int to_uid, const std::string& updated_after = "");

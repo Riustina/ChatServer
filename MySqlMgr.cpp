@@ -53,9 +53,9 @@ long long MySqlMgr::CreatePrivateMessage(int from_uid, int to_uid, const std::st
     return _dao.CreatePrivateMessage(from_uid, to_uid, content_type, content);
 }
 
-std::vector<PrivateMessageInfo> MySqlMgr::GetPrivateMessages(int uid, int peer_uid, std::size_t limit, long long after_msg_id)
+std::vector<PrivateMessageInfo> MySqlMgr::GetPrivateMessages(int uid, int peer_uid, std::size_t limit, long long after_msg_id, long long before_msg_id)
 {
-    return _dao.GetPrivateMessages(uid, peer_uid, limit, after_msg_id);
+    return _dao.GetPrivateMessages(uid, peer_uid, limit, after_msg_id, before_msg_id);
 }
 
 int MySqlMgr::MarkPrivateMessagesRead(int uid, int peer_uid)

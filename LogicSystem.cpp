@@ -457,7 +457,7 @@ Json::Value LogicSystem::BuildFriendListPayload(int uid, const std::string& upda
     return reply;
 }
 
-Json::Value LogicSystem::BuildPrivateMessagesPayload(int uid, int peer_uid, std::size_t limit, long long after_msg_id)
+Json::Value LogicSystem::BuildPrivateMessagesPayload(int uid, int peer_uid, std::size_t limit, long long after_msg_id, long long before_msg_id)
 {
     Json::Value reply;
     if (uid <= 0 || peer_uid <= 0) {
@@ -465,11 +465,13 @@ Json::Value LogicSystem::BuildPrivateMessagesPayload(int uid, int peer_uid, std:
         return reply;
     }
 
-    const auto messages = MySqlMgr::getInstance().GetPrivateMessages(uid, peer_uid, limit, after_msg_id);
+    const auto messages = MySqlMgr::getInstance().GetPrivateMessages(uid, peer_uid, limit, after_msg_id, before_msg_id);
     reply["error"] = ErrorCodes::Success;
     reply["contact_id"] = peer_uid;
     reply["after_msg_id"] = Json::Int64(after_msg_id);
+    reply["before_msg_id"] = Json::Int64(before_msg_id);
     reply["incremental"] = after_msg_id > 0;
+    reply["history"] = before_msg_id > 0;
     Json::Value items(Json::arrayValue);
     for (const auto& item : messages) {
         items.append(BuildPrivateMessageNode(item, uid));
@@ -867,12 +869,13 @@ void LogicSystem::GetPrivateMessagesHandler(std::shared_ptr<CSession> session,
     const int peer_uid = root["contact_id"].asInt();
     const int limit = root.isMember("limit") ? root["limit"].asInt() : 50;
     const long long after_msg_id = root.isMember("after_msg_id") ? root["after_msg_id"].asInt64() : 0;
+    const long long before_msg_id = root.isMember("before_msg_id") ? root["before_msg_id"].asInt64() : 0;
     if (uid <= 0 || peer_uid <= 0) {
         reply["error"] = ErrorCodes::UidInvalid;
         return;
     }
 
-    reply = BuildPrivateMessagesPayload(uid, peer_uid, static_cast<std::size_t>(std::max(1, limit)), after_msg_id);
+    reply = BuildPrivateMessagesPayload(uid, peer_uid, static_cast<std::size_t>(std::max(1, limit)), after_msg_id, before_msg_id);
 }
 
 void LogicSystem::SendPrivateMessageHandler(std::shared_ptr<CSession> session,
