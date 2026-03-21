@@ -3,12 +3,12 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
-    <IncludePath>D:\MySQL Server 8.4\mysql_connector_debug\include;D:\jsoncpp-0.y.z\include;$(IncludePath)</IncludePath>
-    <LibraryPath>D:\MySQL Server 8.4\mysql_connector_debug\lib64\debug\vs14;D:\jsoncpp-0.y.z\makefiles\vs71\x64\libjson;$(LibraryPath)</LibraryPath>
+    <IncludePath>D:\MySQL Server 8.4\mysql_connector_debug\include;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\MySQL Server 8.4\mysql_connector_debug\lib64\debug\vs14;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <Link>
-      <AdditionalDependencies>json_vc71_libmtd.lib;mysqlcppconn.lib;mysqlcppconnx.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>mysqlcppconn.lib;mysqlcppconnx.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ClCompile>
       <LanguageStandard>stdcpp17</LanguageStandard>
