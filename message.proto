@@ -45,6 +45,7 @@ message RegisterChatServerReq {
   string host = 2;
   string port = 3;
   string grpc_port = 4;
+  string grpc_host = 5;
 }
 
 message RegisterChatServerRsp {
@@ -57,6 +58,7 @@ message HeartbeatReq {
   string port = 3;
   int64 timestamp = 4;
   string grpc_port = 5;
+  string grpc_host = 6;
 }
 
 message HeartbeatRsp {
@@ -96,6 +98,7 @@ message QueryUserRouteRsp {
   string host = 4;
   string port = 5;
   string grpc_port = 6;
+  string grpc_host = 7;
 }
 
 message PushFriendRequestsReq {

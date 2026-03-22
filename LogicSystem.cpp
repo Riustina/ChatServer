@@ -619,7 +619,8 @@ void LogicSystem::PushFriendRequestsToUser(int uid)
         return;
     }
 
-    const std::string address = BuildChatGrpcAddress(routeRsp.host(), routeRsp.grpc_port());
+      const std::string grpc_host = routeRsp.grpc_host().empty() ? routeRsp.host() : routeRsp.grpc_host();
+      const std::string address = BuildChatGrpcAddress(grpc_host, routeRsp.grpc_port());
     auto channel = grpc::CreateChannel(address, grpc::InsecureChannelCredentials());
     auto stub = message::ChatService::NewStub(channel);
     message::PushFriendRequestsReq request;
@@ -654,7 +655,8 @@ void LogicSystem::PushFriendListToUser(int uid)
         return;
     }
 
-    const std::string address = BuildChatGrpcAddress(routeRsp.host(), routeRsp.grpc_port());
+      const std::string grpc_host = routeRsp.grpc_host().empty() ? routeRsp.host() : routeRsp.grpc_host();
+      const std::string address = BuildChatGrpcAddress(grpc_host, routeRsp.grpc_port());
     auto channel = grpc::CreateChannel(address, grpc::InsecureChannelCredentials());
     auto stub = message::ChatService::NewStub(channel);
     message::PushFriendListReq request;
@@ -689,7 +691,8 @@ void LogicSystem::PushPrivateMessageToUser(const PrivateMessageInfo& message)
         return;
     }
 
-    const std::string address = BuildChatGrpcAddress(routeRsp.host(), routeRsp.grpc_port());
+      const std::string grpc_host = routeRsp.grpc_host().empty() ? routeRsp.host() : routeRsp.grpc_host();
+      const std::string address = BuildChatGrpcAddress(grpc_host, routeRsp.grpc_port());
     auto channel = grpc::CreateChannel(address, grpc::InsecureChannelCredentials());
     auto stub = message::ChatService::NewStub(channel);
     message::PushPrivateMessageReq request;

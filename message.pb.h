@@ -1335,6 +1335,7 @@ class RegisterChatServerReq final : public ::google::protobuf::Message
     kHostFieldNumber = 2,
     kPortFieldNumber = 3,
     kGrpcPortFieldNumber = 4,
+    kGrpcHostFieldNumber = 5,
   };
   // string server_id = 1;
   void clear_server_id() ;
@@ -1396,12 +1397,27 @@ class RegisterChatServerReq final : public ::google::protobuf::Message
   ::std::string* PROTOBUF_NONNULL _internal_mutable_grpc_port();
 
   public:
+  // string grpc_host = 5;
+  void clear_grpc_host() ;
+  const ::std::string& grpc_host() const;
+  template <typename Arg_ = const ::std::string&, typename... Args_>
+  void set_grpc_host(Arg_&& arg, Args_... args);
+  ::std::string* PROTOBUF_NONNULL mutable_grpc_host();
+  [[nodiscard]] ::std::string* PROTOBUF_NULLABLE release_grpc_host();
+  void set_allocated_grpc_host(::std::string* PROTOBUF_NULLABLE value);
+
+  private:
+  const ::std::string& _internal_grpc_host() const;
+  PROTOBUF_ALWAYS_INLINE void _internal_set_grpc_host(const ::std::string& value);
+  ::std::string* PROTOBUF_NONNULL _internal_mutable_grpc_host();
+
+  public:
   // @@protoc_insertion_point(class_scope:message.RegisterChatServerReq)
  private:
   class _Internal;
   friend class ::google::protobuf::internal::TcParser;
-  static const ::google::protobuf::internal::TcParseTable<2, 4,
-                                   0, 64,
+  static const ::google::protobuf::internal::TcParseTable<3, 5,
+                                   0, 73,
                                    2>
       _table_;
 
@@ -1426,6 +1442,7 @@ class RegisterChatServerReq final : public ::google::protobuf::Message
     ::google::protobuf::internal::ArenaStringPtr host_;
     ::google::protobuf::internal::ArenaStringPtr port_;
     ::google::protobuf::internal::ArenaStringPtr grpc_port_;
+    ::google::protobuf::internal::ArenaStringPtr grpc_host_;
     PROTOBUF_TSAN_DECLARE_MEMBER
   };
   union { Impl_ _impl_; };
@@ -1581,6 +1598,7 @@ class QueryUserRouteRsp final : public ::google::protobuf::Message
     kHostFieldNumber = 4,
     kPortFieldNumber = 5,
     kGrpcPortFieldNumber = 6,
+    kGrpcHostFieldNumber = 7,
     kErrorFieldNumber = 1,
     kOnlineFieldNumber = 2,
   };
@@ -1644,6 +1662,21 @@ class QueryUserRouteRsp final : public ::google::protobuf::Message
   ::std::string* PROTOBUF_NONNULL _internal_mutable_grpc_port();
 
   public:
+  // string grpc_host = 7;
+  void clear_grpc_host() ;
+  const ::std::string& grpc_host() const;
+  template <typename Arg_ = const ::std::string&, typename... Args_>
+  void set_grpc_host(Arg_&& arg, Args_... args);
+  ::std::string* PROTOBUF_NONNULL mutable_grpc_host();
+  [[nodiscard]] ::std::string* PROTOBUF_NULLABLE release_grpc_host();
+  void set_allocated_grpc_host(::std::string* PROTOBUF_NULLABLE value);
+
+  private:
+  const ::std::string& _internal_grpc_host() const;
+  PROTOBUF_ALWAYS_INLINE void _internal_set_grpc_host(const ::std::string& value);
+  ::std::string* PROTOBUF_NONNULL _internal_mutable_grpc_host();
+
+  public:
   // int32 error = 1;
   void clear_error() ;
   ::int32_t error() const;
@@ -1668,8 +1701,8 @@ class QueryUserRouteRsp final : public ::google::protobuf::Message
  private:
   class _Internal;
   friend class ::google::protobuf::internal::TcParser;
-  static const ::google::protobuf::internal::TcParseTable<3, 6,
-                                   0, 60,
+  static const ::google::protobuf::internal::TcParseTable<3, 7,
+                                   0, 69,
                                    2>
       _table_;
 
@@ -1694,6 +1727,7 @@ class QueryUserRouteRsp final : public ::google::protobuf::Message
     ::google::protobuf::internal::ArenaStringPtr host_;
     ::google::protobuf::internal::ArenaStringPtr port_;
     ::google::protobuf::internal::ArenaStringPtr grpc_port_;
+    ::google::protobuf::internal::ArenaStringPtr grpc_host_;
     ::int32_t error_;
     bool online_;
     PROTOBUF_TSAN_DECLARE_MEMBER
@@ -3954,6 +3988,7 @@ class HeartbeatReq final : public ::google::protobuf::Message
     kHostFieldNumber = 2,
     kPortFieldNumber = 3,
     kGrpcPortFieldNumber = 5,
+    kGrpcHostFieldNumber = 6,
     kTimestampFieldNumber = 4,
   };
   // string server_id = 1;
@@ -4016,6 +4051,21 @@ class HeartbeatReq final : public ::google::protobuf::Message
   ::std::string* PROTOBUF_NONNULL _internal_mutable_grpc_port();
 
   public:
+  // string grpc_host = 6;
+  void clear_grpc_host() ;
+  const ::std::string& grpc_host() const;
+  template <typename Arg_ = const ::std::string&, typename... Args_>
+  void set_grpc_host(Arg_&& arg, Args_... args);
+  ::std::string* PROTOBUF_NONNULL mutable_grpc_host();
+  [[nodiscard]] ::std::string* PROTOBUF_NULLABLE release_grpc_host();
+  void set_allocated_grpc_host(::std::string* PROTOBUF_NULLABLE value);
+
+  private:
+  const ::std::string& _internal_grpc_host() const;
+  PROTOBUF_ALWAYS_INLINE void _internal_set_grpc_host(const ::std::string& value);
+  ::std::string* PROTOBUF_NONNULL _internal_mutable_grpc_host();
+
+  public:
   // int64 timestamp = 4;
   void clear_timestamp() ;
   ::int64_t timestamp() const;
@@ -4030,8 +4080,8 @@ class HeartbeatReq final : public ::google::protobuf::Message
  private:
   class _Internal;
   friend class ::google::protobuf::internal::TcParser;
-  static const ::google::protobuf::internal::TcParseTable<3, 5,
-                                   0, 55,
+  static const ::google::protobuf::internal::TcParseTable<3, 6,
+                                   0, 64,
                                    2>
       _table_;
 
@@ -4056,6 +4106,7 @@ class HeartbeatReq final : public ::google::protobuf::Message
     ::google::protobuf::internal::ArenaStringPtr host_;
     ::google::protobuf::internal::ArenaStringPtr port_;
     ::google::protobuf::internal::ArenaStringPtr grpc_port_;
+    ::google::protobuf::internal::ArenaStringPtr grpc_host_;
     ::int64_t timestamp_;
     PROTOBUF_TSAN_DECLARE_MEMBER
   };
@@ -6049,6 +6100,71 @@ inline void RegisterChatServerReq::set_allocated_grpc_port(::std::string* PROTOB
   // @@protoc_insertion_point(field_set_allocated:message.RegisterChatServerReq.grpc_port)
 }
 
+// string grpc_host = 5;
+inline void RegisterChatServerReq::clear_grpc_host() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.grpc_host_.ClearToEmpty();
+  ClearHasBit(_impl_._has_bits_[0],
+                  0x00000010U);
+}
+inline const ::std::string& RegisterChatServerReq::grpc_host() const
+    ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  // @@protoc_insertion_point(field_get:message.RegisterChatServerReq.grpc_host)
+  return _internal_grpc_host();
+}
+template <typename Arg_, typename... Args_>
+PROTOBUF_ALWAYS_INLINE void RegisterChatServerReq::set_grpc_host(Arg_&& arg, Args_... args) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  SetHasBit(_impl_._has_bits_[0], 0x00000010U);
+  _impl_.grpc_host_.Set(static_cast<Arg_&&>(arg), args..., GetArena());
+  // @@protoc_insertion_point(field_set:message.RegisterChatServerReq.grpc_host)
+}
+inline ::std::string* PROTOBUF_NONNULL RegisterChatServerReq::mutable_grpc_host()
+    ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  SetHasBit(_impl_._has_bits_[0], 0x00000010U);
+  ::std::string* _s = _internal_mutable_grpc_host();
+  // @@protoc_insertion_point(field_mutable:message.RegisterChatServerReq.grpc_host)
+  return _s;
+}
+inline const ::std::string& RegisterChatServerReq::_internal_grpc_host() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.grpc_host_.Get();
+}
+inline void RegisterChatServerReq::_internal_set_grpc_host(const ::std::string& value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.grpc_host_.Set(value, GetArena());
+}
+inline ::std::string* PROTOBUF_NONNULL RegisterChatServerReq::_internal_mutable_grpc_host() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  return _impl_.grpc_host_.Mutable( GetArena());
+}
+inline ::std::string* PROTOBUF_NULLABLE RegisterChatServerReq::release_grpc_host() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  // @@protoc_insertion_point(field_release:message.RegisterChatServerReq.grpc_host)
+  if (!CheckHasBit(_impl_._has_bits_[0], 0x00000010U)) {
+    return nullptr;
+  }
+  ClearHasBit(_impl_._has_bits_[0], 0x00000010U);
+  auto* released = _impl_.grpc_host_.Release();
+  if (::google::protobuf::internal::DebugHardenForceCopyDefaultString()) {
+    _impl_.grpc_host_.Set("", GetArena());
+  }
+  return released;
+}
+inline void RegisterChatServerReq::set_allocated_grpc_host(::std::string* PROTOBUF_NULLABLE value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  if (value != nullptr) {
+    SetHasBit(_impl_._has_bits_[0], 0x00000010U);
+  } else {
+    ClearHasBit(_impl_._has_bits_[0], 0x00000010U);
+  }
+  _impl_.grpc_host_.SetAllocated(value, GetArena());
+  if (::google::protobuf::internal::DebugHardenForceCopyDefaultString() && _impl_.grpc_host_.IsDefault()) {
+    _impl_.grpc_host_.Set("", GetArena());
+  }
+  // @@protoc_insertion_point(field_set_allocated:message.RegisterChatServerReq.grpc_host)
+}
+
 // -------------------------------------------------------------------
 
 // RegisterChatServerRsp
@@ -6282,7 +6398,7 @@ inline void HeartbeatReq::clear_timestamp() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.timestamp_ = ::int64_t{0};
   ClearHasBit(_impl_._has_bits_[0],
-                  0x00000010U);
+                  0x00000020U);
 }
 inline ::int64_t HeartbeatReq::timestamp() const {
   // @@protoc_insertion_point(field_get:message.HeartbeatReq.timestamp)
@@ -6290,7 +6406,7 @@ inline ::int64_t HeartbeatReq::timestamp() const {
 }
 inline void HeartbeatReq::set_timestamp(::int64_t value) {
   _internal_set_timestamp(value);
-  SetHasBit(_impl_._has_bits_[0], 0x00000010U);
+  SetHasBit(_impl_._has_bits_[0], 0x00000020U);
   // @@protoc_insertion_point(field_set:message.HeartbeatReq.timestamp)
 }
 inline ::int64_t HeartbeatReq::_internal_timestamp() const {
@@ -6365,6 +6481,71 @@ inline void HeartbeatReq::set_allocated_grpc_port(::std::string* PROTOBUF_NULLAB
     _impl_.grpc_port_.Set("", GetArena());
   }
   // @@protoc_insertion_point(field_set_allocated:message.HeartbeatReq.grpc_port)
+}
+
+// string grpc_host = 6;
+inline void HeartbeatReq::clear_grpc_host() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.grpc_host_.ClearToEmpty();
+  ClearHasBit(_impl_._has_bits_[0],
+                  0x00000010U);
+}
+inline const ::std::string& HeartbeatReq::grpc_host() const
+    ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  // @@protoc_insertion_point(field_get:message.HeartbeatReq.grpc_host)
+  return _internal_grpc_host();
+}
+template <typename Arg_, typename... Args_>
+PROTOBUF_ALWAYS_INLINE void HeartbeatReq::set_grpc_host(Arg_&& arg, Args_... args) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  SetHasBit(_impl_._has_bits_[0], 0x00000010U);
+  _impl_.grpc_host_.Set(static_cast<Arg_&&>(arg), args..., GetArena());
+  // @@protoc_insertion_point(field_set:message.HeartbeatReq.grpc_host)
+}
+inline ::std::string* PROTOBUF_NONNULL HeartbeatReq::mutable_grpc_host()
+    ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  SetHasBit(_impl_._has_bits_[0], 0x00000010U);
+  ::std::string* _s = _internal_mutable_grpc_host();
+  // @@protoc_insertion_point(field_mutable:message.HeartbeatReq.grpc_host)
+  return _s;
+}
+inline const ::std::string& HeartbeatReq::_internal_grpc_host() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.grpc_host_.Get();
+}
+inline void HeartbeatReq::_internal_set_grpc_host(const ::std::string& value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.grpc_host_.Set(value, GetArena());
+}
+inline ::std::string* PROTOBUF_NONNULL HeartbeatReq::_internal_mutable_grpc_host() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  return _impl_.grpc_host_.Mutable( GetArena());
+}
+inline ::std::string* PROTOBUF_NULLABLE HeartbeatReq::release_grpc_host() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  // @@protoc_insertion_point(field_release:message.HeartbeatReq.grpc_host)
+  if (!CheckHasBit(_impl_._has_bits_[0], 0x00000010U)) {
+    return nullptr;
+  }
+  ClearHasBit(_impl_._has_bits_[0], 0x00000010U);
+  auto* released = _impl_.grpc_host_.Release();
+  if (::google::protobuf::internal::DebugHardenForceCopyDefaultString()) {
+    _impl_.grpc_host_.Set("", GetArena());
+  }
+  return released;
+}
+inline void HeartbeatReq::set_allocated_grpc_host(::std::string* PROTOBUF_NULLABLE value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  if (value != nullptr) {
+    SetHasBit(_impl_._has_bits_[0], 0x00000010U);
+  } else {
+    ClearHasBit(_impl_._has_bits_[0], 0x00000010U);
+  }
+  _impl_.grpc_host_.SetAllocated(value, GetArena());
+  if (::google::protobuf::internal::DebugHardenForceCopyDefaultString() && _impl_.grpc_host_.IsDefault()) {
+    _impl_.grpc_host_.Set("", GetArena());
+  }
+  // @@protoc_insertion_point(field_set_allocated:message.HeartbeatReq.grpc_host)
 }
 
 // -------------------------------------------------------------------
@@ -6900,7 +7081,7 @@ inline void QueryUserRouteRsp::clear_error() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.error_ = 0;
   ClearHasBit(_impl_._has_bits_[0],
-                  0x00000010U);
+                  0x00000020U);
 }
 inline ::int32_t QueryUserRouteRsp::error() const {
   // @@protoc_insertion_point(field_get:message.QueryUserRouteRsp.error)
@@ -6908,7 +7089,7 @@ inline ::int32_t QueryUserRouteRsp::error() const {
 }
 inline void QueryUserRouteRsp::set_error(::int32_t value) {
   _internal_set_error(value);
-  SetHasBit(_impl_._has_bits_[0], 0x00000010U);
+  SetHasBit(_impl_._has_bits_[0], 0x00000020U);
   // @@protoc_insertion_point(field_set:message.QueryUserRouteRsp.error)
 }
 inline ::int32_t QueryUserRouteRsp::_internal_error() const {
@@ -6925,7 +7106,7 @@ inline void QueryUserRouteRsp::clear_online() {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.online_ = false;
   ClearHasBit(_impl_._has_bits_[0],
-                  0x00000020U);
+                  0x00000040U);
 }
 inline bool QueryUserRouteRsp::online() const {
   // @@protoc_insertion_point(field_get:message.QueryUserRouteRsp.online)
@@ -6933,7 +7114,7 @@ inline bool QueryUserRouteRsp::online() const {
 }
 inline void QueryUserRouteRsp::set_online(bool value) {
   _internal_set_online(value);
-  SetHasBit(_impl_._has_bits_[0], 0x00000020U);
+  SetHasBit(_impl_._has_bits_[0], 0x00000040U);
   // @@protoc_insertion_point(field_set:message.QueryUserRouteRsp.online)
 }
 inline bool QueryUserRouteRsp::_internal_online() const {
@@ -7203,6 +7384,71 @@ inline void QueryUserRouteRsp::set_allocated_grpc_port(::std::string* PROTOBUF_N
     _impl_.grpc_port_.Set("", GetArena());
   }
   // @@protoc_insertion_point(field_set_allocated:message.QueryUserRouteRsp.grpc_port)
+}
+
+// string grpc_host = 7;
+inline void QueryUserRouteRsp::clear_grpc_host() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.grpc_host_.ClearToEmpty();
+  ClearHasBit(_impl_._has_bits_[0],
+                  0x00000010U);
+}
+inline const ::std::string& QueryUserRouteRsp::grpc_host() const
+    ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  // @@protoc_insertion_point(field_get:message.QueryUserRouteRsp.grpc_host)
+  return _internal_grpc_host();
+}
+template <typename Arg_, typename... Args_>
+PROTOBUF_ALWAYS_INLINE void QueryUserRouteRsp::set_grpc_host(Arg_&& arg, Args_... args) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  SetHasBit(_impl_._has_bits_[0], 0x00000010U);
+  _impl_.grpc_host_.Set(static_cast<Arg_&&>(arg), args..., GetArena());
+  // @@protoc_insertion_point(field_set:message.QueryUserRouteRsp.grpc_host)
+}
+inline ::std::string* PROTOBUF_NONNULL QueryUserRouteRsp::mutable_grpc_host()
+    ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  SetHasBit(_impl_._has_bits_[0], 0x00000010U);
+  ::std::string* _s = _internal_mutable_grpc_host();
+  // @@protoc_insertion_point(field_mutable:message.QueryUserRouteRsp.grpc_host)
+  return _s;
+}
+inline const ::std::string& QueryUserRouteRsp::_internal_grpc_host() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.grpc_host_.Get();
+}
+inline void QueryUserRouteRsp::_internal_set_grpc_host(const ::std::string& value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.grpc_host_.Set(value, GetArena());
+}
+inline ::std::string* PROTOBUF_NONNULL QueryUserRouteRsp::_internal_mutable_grpc_host() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  return _impl_.grpc_host_.Mutable( GetArena());
+}
+inline ::std::string* PROTOBUF_NULLABLE QueryUserRouteRsp::release_grpc_host() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  // @@protoc_insertion_point(field_release:message.QueryUserRouteRsp.grpc_host)
+  if (!CheckHasBit(_impl_._has_bits_[0], 0x00000010U)) {
+    return nullptr;
+  }
+  ClearHasBit(_impl_._has_bits_[0], 0x00000010U);
+  auto* released = _impl_.grpc_host_.Release();
+  if (::google::protobuf::internal::DebugHardenForceCopyDefaultString()) {
+    _impl_.grpc_host_.Set("", GetArena());
+  }
+  return released;
+}
+inline void QueryUserRouteRsp::set_allocated_grpc_host(::std::string* PROTOBUF_NULLABLE value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  if (value != nullptr) {
+    SetHasBit(_impl_._has_bits_[0], 0x00000010U);
+  } else {
+    ClearHasBit(_impl_._has_bits_[0], 0x00000010U);
+  }
+  _impl_.grpc_host_.SetAllocated(value, GetArena());
+  if (::google::protobuf::internal::DebugHardenForceCopyDefaultString() && _impl_.grpc_host_.IsDefault()) {
+    _impl_.grpc_host_.Set("", GetArena());
+  }
+  // @@protoc_insertion_point(field_set_allocated:message.QueryUserRouteRsp.grpc_host)
 }
 
 // -------------------------------------------------------------------

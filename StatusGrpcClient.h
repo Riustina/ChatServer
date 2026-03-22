@@ -71,6 +71,7 @@ private:
 
     std::unique_ptr<StatusConPool> pool_;
     std::string self_host_;
+    std::string self_grpc_host_;
     std::string self_port_;
     std::string self_grpc_port_;
     std::string self_server_id_;

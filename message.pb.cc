@@ -180,6 +180,9 @@ inline constexpr RegisterChatServerReq::Impl_::Impl_(
             ::_pbi::ConstantInitialized()),
         grpc_port_(
             &::google::protobuf::internal::fixed_address_empty_string,
+            ::_pbi::ConstantInitialized()),
+        grpc_host_(
+            &::google::protobuf::internal::fixed_address_empty_string,
             ::_pbi::ConstantInitialized()) {}
 
 template <typename>
@@ -215,6 +218,9 @@ inline constexpr QueryUserRouteRsp::Impl_::Impl_(
             &::google::protobuf::internal::fixed_address_empty_string,
             ::_pbi::ConstantInitialized()),
         grpc_port_(
+            &::google::protobuf::internal::fixed_address_empty_string,
+            ::_pbi::ConstantInitialized()),
+        grpc_host_(
             &::google::protobuf::internal::fixed_address_empty_string,
             ::_pbi::ConstantInitialized()),
         error_{0},
@@ -533,6 +539,9 @@ inline constexpr HeartbeatReq::Impl_::Impl_(
         grpc_port_(
             &::google::protobuf::internal::fixed_address_empty_string,
             ::_pbi::ConstantInitialized()),
+        grpc_host_(
+            &::google::protobuf::internal::fixed_address_empty_string,
+            ::_pbi::ConstantInitialized()),
         timestamp_{::int64_t{0}} {}
 
 template <typename>
@@ -737,15 +746,17 @@ const ::uint32_t
         0,
         0x081, // bitmap
         PROTOBUF_FIELD_OFFSET(::message::RegisterChatServerReq, _impl_._has_bits_),
-        7, // hasbit index offset
+        8, // hasbit index offset
         PROTOBUF_FIELD_OFFSET(::message::RegisterChatServerReq, _impl_.server_id_),
         PROTOBUF_FIELD_OFFSET(::message::RegisterChatServerReq, _impl_.host_),
         PROTOBUF_FIELD_OFFSET(::message::RegisterChatServerReq, _impl_.port_),
         PROTOBUF_FIELD_OFFSET(::message::RegisterChatServerReq, _impl_.grpc_port_),
+        PROTOBUF_FIELD_OFFSET(::message::RegisterChatServerReq, _impl_.grpc_host_),
         0,
         1,
         2,
         3,
+        4,
         0x081, // bitmap
         PROTOBUF_FIELD_OFFSET(::message::RegisterChatServerRsp, _impl_._has_bits_),
         4, // hasbit index offset
@@ -753,17 +764,19 @@ const ::uint32_t
         0,
         0x081, // bitmap
         PROTOBUF_FIELD_OFFSET(::message::HeartbeatReq, _impl_._has_bits_),
-        8, // hasbit index offset
+        9, // hasbit index offset
         PROTOBUF_FIELD_OFFSET(::message::HeartbeatReq, _impl_.server_id_),
         PROTOBUF_FIELD_OFFSET(::message::HeartbeatReq, _impl_.host_),
         PROTOBUF_FIELD_OFFSET(::message::HeartbeatReq, _impl_.port_),
         PROTOBUF_FIELD_OFFSET(::message::HeartbeatReq, _impl_.timestamp_),
         PROTOBUF_FIELD_OFFSET(::message::HeartbeatReq, _impl_.grpc_port_),
+        PROTOBUF_FIELD_OFFSET(::message::HeartbeatReq, _impl_.grpc_host_),
         0,
         1,
         2,
-        4,
+        5,
         3,
+        4,
         0x081, // bitmap
         PROTOBUF_FIELD_OFFSET(::message::HeartbeatRsp, _impl_._has_bits_),
         5, // hasbit index offset
@@ -808,19 +821,21 @@ const ::uint32_t
         0,
         0x081, // bitmap
         PROTOBUF_FIELD_OFFSET(::message::QueryUserRouteRsp, _impl_._has_bits_),
-        9, // hasbit index offset
+        10, // hasbit index offset
         PROTOBUF_FIELD_OFFSET(::message::QueryUserRouteRsp, _impl_.error_),
         PROTOBUF_FIELD_OFFSET(::message::QueryUserRouteRsp, _impl_.online_),
         PROTOBUF_FIELD_OFFSET(::message::QueryUserRouteRsp, _impl_.server_id_),
         PROTOBUF_FIELD_OFFSET(::message::QueryUserRouteRsp, _impl_.host_),
         PROTOBUF_FIELD_OFFSET(::message::QueryUserRouteRsp, _impl_.port_),
         PROTOBUF_FIELD_OFFSET(::message::QueryUserRouteRsp, _impl_.grpc_port_),
-        4,
+        PROTOBUF_FIELD_OFFSET(::message::QueryUserRouteRsp, _impl_.grpc_host_),
         5,
+        6,
         0,
         1,
         2,
         3,
+        4,
         0x081, // bitmap
         PROTOBUF_FIELD_OFFSET(::message::PushFriendRequestsReq, _impl_._has_bits_),
         4, // hasbit index offset
@@ -882,21 +897,21 @@ static const ::_pbi::MigrationSchema
         {34, sizeof(::message::LoginReq)},
         {41, sizeof(::message::LoginRsp)},
         {50, sizeof(::message::RegisterChatServerReq)},
-        {61, sizeof(::message::RegisterChatServerRsp)},
-        {66, sizeof(::message::HeartbeatReq)},
-        {79, sizeof(::message::HeartbeatRsp)},
-        {86, sizeof(::message::ReportUserOnlineReq)},
-        {99, sizeof(::message::ReportUserOnlineRsp)},
-        {104, sizeof(::message::ReportUserOfflineReq)},
-        {111, sizeof(::message::ReportUserOfflineRsp)},
-        {116, sizeof(::message::QueryUserRouteReq)},
-        {121, sizeof(::message::QueryUserRouteRsp)},
-        {136, sizeof(::message::PushFriendRequestsReq)},
-        {141, sizeof(::message::PushFriendRequestsRsp)},
-        {148, sizeof(::message::PushFriendListReq)},
-        {153, sizeof(::message::PushFriendListRsp)},
-        {160, sizeof(::message::PushPrivateMessageReq)},
-        {179, sizeof(::message::PushPrivateMessageRsp)},
+        {63, sizeof(::message::RegisterChatServerRsp)},
+        {68, sizeof(::message::HeartbeatReq)},
+        {83, sizeof(::message::HeartbeatRsp)},
+        {90, sizeof(::message::ReportUserOnlineReq)},
+        {103, sizeof(::message::ReportUserOnlineRsp)},
+        {108, sizeof(::message::ReportUserOfflineReq)},
+        {115, sizeof(::message::ReportUserOfflineRsp)},
+        {120, sizeof(::message::QueryUserRouteReq)},
+        {125, sizeof(::message::QueryUserRouteRsp)},
+        {142, sizeof(::message::PushFriendRequestsReq)},
+        {147, sizeof(::message::PushFriendRequestsRsp)},
+        {154, sizeof(::message::PushFriendListReq)},
+        {159, sizeof(::message::PushFriendListRsp)},
+        {166, sizeof(::message::PushPrivateMessageReq)},
+        {185, sizeof(::message::PushPrivateMessageRsp)},
 };
 static const ::_pb::Message* PROTOBUF_NONNULL const file_default_instances[] = {
     &::message::_GetVerifyReq_default_instance_._instance,
@@ -933,62 +948,63 @@ const char descriptor_table_protodef_message_2eproto[] ABSL_ATTRIBUTE_SECTION_VA
     "\005 \001(\t\022\021\n\tgrpc_port\030\006 \001(\t\"&\n\010LoginReq\022\013\n\003"
     "uid\030\001 \001(\005\022\r\n\005token\030\002 \001(\t\"5\n\010LoginRsp\022\r\n\005"
     "error\030\001 \001(\005\022\013\n\003uid\030\002 \001(\005\022\r\n\005token\030\003 \001(\t\""
-    "Y\n\025RegisterChatServerReq\022\021\n\tserver_id\030\001 "
+    "l\n\025RegisterChatServerReq\022\021\n\tserver_id\030\001 "
     "\001(\t\022\014\n\004host\030\002 \001(\t\022\014\n\004port\030\003 \001(\t\022\021\n\tgrpc_"
-    "port\030\004 \001(\t\"&\n\025RegisterChatServerRsp\022\r\n\005e"
-    "rror\030\001 \001(\005\"c\n\014HeartbeatReq\022\021\n\tserver_id\030"
-    "\001 \001(\t\022\014\n\004host\030\002 \001(\t\022\014\n\004port\030\003 \001(\t\022\021\n\ttim"
-    "estamp\030\004 \001(\003\022\021\n\tgrpc_port\030\005 \001(\t\"-\n\014Heart"
-    "beatRsp\022\r\n\005error\030\001 \001(\005\022\016\n\006online\030\002 \001(\010\"`"
-    "\n\023ReportUserOnlineReq\022\013\n\003uid\030\001 \001(\005\022\r\n\005to"
-    "ken\030\002 \001(\t\022\021\n\tserver_id\030\003 \001(\t\022\014\n\004host\030\004 \001"
-    "(\t\022\014\n\004port\030\005 \001(\t\"$\n\023ReportUserOnlineRsp\022"
-    "\r\n\005error\030\001 \001(\005\"6\n\024ReportUserOfflineReq\022\013"
-    "\n\003uid\030\001 \001(\005\022\021\n\tserver_id\030\002 \001(\t\"%\n\024Report"
-    "UserOfflineRsp\022\r\n\005error\030\001 \001(\005\" \n\021QueryUs"
-    "erRouteReq\022\013\n\003uid\030\001 \001(\005\"t\n\021QueryUserRout"
-    "eRsp\022\r\n\005error\030\001 \001(\005\022\016\n\006online\030\002 \001(\010\022\021\n\ts"
-    "erver_id\030\003 \001(\t\022\014\n\004host\030\004 \001(\t\022\014\n\004port\030\005 \001"
-    "(\t\022\021\n\tgrpc_port\030\006 \001(\t\"$\n\025PushFriendReque"
-    "stsReq\022\013\n\003uid\030\001 \001(\005\"9\n\025PushFriendRequest"
-    "sRsp\022\r\n\005error\030\001 \001(\005\022\021\n\tdelivered\030\002 \001(\010\" "
-    "\n\021PushFriendListReq\022\013\n\003uid\030\001 \001(\005\"5\n\021Push"
-    "FriendListRsp\022\r\n\005error\030\001 \001(\005\022\021\n\tdelivere"
-    "d\030\002 \001(\010\"\250\001\n\025PushPrivateMessageReq\022\016\n\006msg"
-    "_id\030\001 \001(\003\022\020\n\010from_uid\030\002 \001(\005\022\021\n\tfrom_name"
-    "\030\003 \001(\t\022\016\n\006to_uid\030\004 \001(\005\022\017\n\007to_name\030\005 \001(\t\022"
-    "\024\n\014content_type\030\006 \001(\t\022\017\n\007content\030\007 \001(\t\022\022"
-    "\n\ncreated_at\030\010 \001(\t\"9\n\025PushPrivateMessage"
-    "Rsp\022\r\n\005error\030\001 \001(\005\022\021\n\tdelivered\030\002 \001(\0102P\n"
-    "\rVerifyService\022\?\n\rGetVerifyCode\022\025.messag"
-    "e.GetVerifyReq\032\025.message.GetVerifyRsp\"\0002"
-    "\221\004\n\rStatusService\022G\n\rGetChatServer\022\031.mes"
-    "sage.GetChatServerReq\032\031.message.GetChatS"
-    "erverRsp\"\000\022/\n\005Login\022\021.message.LoginReq\032\021"
-    ".message.LoginRsp\"\000\022V\n\022RegisterChatServe"
-    "r\022\036.message.RegisterChatServerReq\032\036.mess"
-    "age.RegisterChatServerRsp\"\000\022;\n\tHeartbeat"
-    "\022\025.message.HeartbeatReq\032\025.message.Heartb"
-    "eatRsp\"\000\022P\n\020ReportUserOnline\022\034.message.R"
-    "eportUserOnlineReq\032\034.message.ReportUserO"
-    "nlineRsp\"\000\022S\n\021ReportUserOffline\022\035.messag"
-    "e.ReportUserOfflineReq\032\035.message.ReportU"
-    "serOfflineRsp\"\000\022J\n\016QueryUserRoute\022\032.mess"
-    "age.QueryUserRouteReq\032\032.message.QueryUse"
-    "rRouteRsp\"\0002\211\002\n\013ChatService\022V\n\022PushFrien"
-    "dRequests\022\036.message.PushFriendRequestsRe"
-    "q\032\036.message.PushFriendRequestsRsp\"\000\022J\n\016P"
-    "ushFriendList\022\032.message.PushFriendListRe"
-    "q\032\032.message.PushFriendListRsp\"\000\022V\n\022PushP"
-    "rivateMessage\022\036.message.PushPrivateMessa"
-    "geReq\032\036.message.PushPrivateMessageRsp\"\000b"
-    "\006proto3"
+    "port\030\004 \001(\t\022\021\n\tgrpc_host\030\005 \001(\t\"&\n\025Registe"
+    "rChatServerRsp\022\r\n\005error\030\001 \001(\005\"v\n\014Heartbe"
+    "atReq\022\021\n\tserver_id\030\001 \001(\t\022\014\n\004host\030\002 \001(\t\022\014"
+    "\n\004port\030\003 \001(\t\022\021\n\ttimestamp\030\004 \001(\003\022\021\n\tgrpc_"
+    "port\030\005 \001(\t\022\021\n\tgrpc_host\030\006 \001(\t\"-\n\014Heartbe"
+    "atRsp\022\r\n\005error\030\001 \001(\005\022\016\n\006online\030\002 \001(\010\"`\n\023"
+    "ReportUserOnlineReq\022\013\n\003uid\030\001 \001(\005\022\r\n\005toke"
+    "n\030\002 \001(\t\022\021\n\tserver_id\030\003 \001(\t\022\014\n\004host\030\004 \001(\t"
+    "\022\014\n\004port\030\005 \001(\t\"$\n\023ReportUserOnlineRsp\022\r\n"
+    "\005error\030\001 \001(\005\"6\n\024ReportUserOfflineReq\022\013\n\003"
+    "uid\030\001 \001(\005\022\021\n\tserver_id\030\002 \001(\t\"%\n\024ReportUs"
+    "erOfflineRsp\022\r\n\005error\030\001 \001(\005\" \n\021QueryUser"
+    "RouteReq\022\013\n\003uid\030\001 \001(\005\"\207\001\n\021QueryUserRoute"
+    "Rsp\022\r\n\005error\030\001 \001(\005\022\016\n\006online\030\002 \001(\010\022\021\n\tse"
+    "rver_id\030\003 \001(\t\022\014\n\004host\030\004 \001(\t\022\014\n\004port\030\005 \001("
+    "\t\022\021\n\tgrpc_port\030\006 \001(\t\022\021\n\tgrpc_host\030\007 \001(\t\""
+    "$\n\025PushFriendRequestsReq\022\013\n\003uid\030\001 \001(\005\"9\n"
+    "\025PushFriendRequestsRsp\022\r\n\005error\030\001 \001(\005\022\021\n"
+    "\tdelivered\030\002 \001(\010\" \n\021PushFriendListReq\022\013\n"
+    "\003uid\030\001 \001(\005\"5\n\021PushFriendListRsp\022\r\n\005error"
+    "\030\001 \001(\005\022\021\n\tdelivered\030\002 \001(\010\"\250\001\n\025PushPrivat"
+    "eMessageReq\022\016\n\006msg_id\030\001 \001(\003\022\020\n\010from_uid\030"
+    "\002 \001(\005\022\021\n\tfrom_name\030\003 \001(\t\022\016\n\006to_uid\030\004 \001(\005"
+    "\022\017\n\007to_name\030\005 \001(\t\022\024\n\014content_type\030\006 \001(\t\022"
+    "\017\n\007content\030\007 \001(\t\022\022\n\ncreated_at\030\010 \001(\t\"9\n\025"
+    "PushPrivateMessageRsp\022\r\n\005error\030\001 \001(\005\022\021\n\t"
+    "delivered\030\002 \001(\0102P\n\rVerifyService\022\?\n\rGetV"
+    "erifyCode\022\025.message.GetVerifyReq\032\025.messa"
+    "ge.GetVerifyRsp\"\0002\221\004\n\rStatusService\022G\n\rG"
+    "etChatServer\022\031.message.GetChatServerReq\032"
+    "\031.message.GetChatServerRsp\"\000\022/\n\005Login\022\021."
+    "message.LoginReq\032\021.message.LoginRsp\"\000\022V\n"
+    "\022RegisterChatServer\022\036.message.RegisterCh"
+    "atServerReq\032\036.message.RegisterChatServer"
+    "Rsp\"\000\022;\n\tHeartbeat\022\025.message.HeartbeatRe"
+    "q\032\025.message.HeartbeatRsp\"\000\022P\n\020ReportUser"
+    "Online\022\034.message.ReportUserOnlineReq\032\034.m"
+    "essage.ReportUserOnlineRsp\"\000\022S\n\021ReportUs"
+    "erOffline\022\035.message.ReportUserOfflineReq"
+    "\032\035.message.ReportUserOfflineRsp\"\000\022J\n\016Que"
+    "ryUserRoute\022\032.message.QueryUserRouteReq\032"
+    "\032.message.QueryUserRouteRsp\"\0002\211\002\n\013ChatSe"
+    "rvice\022V\n\022PushFriendRequests\022\036.message.Pu"
+    "shFriendRequestsReq\032\036.message.PushFriend"
+    "RequestsRsp\"\000\022J\n\016PushFriendList\022\032.messag"
+    "e.PushFriendListReq\032\032.message.PushFriend"
+    "ListRsp\"\000\022V\n\022PushPrivateMessage\022\036.messag"
+    "e.PushPrivateMessageReq\032\036.message.PushPr"
+    "ivateMessageRsp\"\000b\006proto3"
 };
 static ::absl::once_flag descriptor_table_message_2eproto_once;
 PROTOBUF_CONSTINIT const ::_pbi::DescriptorTable descriptor_table_message_2eproto = {
     false,
     false,
-    2327,
+    2385,
     descriptor_table_protodef_message_2eproto,
     "message.proto",
     &descriptor_table_message_2eproto_once,
@@ -3044,7 +3060,8 @@ PROTOBUF_NDEBUG_INLINE RegisterChatServerReq::Impl_::Impl_(
         server_id_(arena, from.server_id_),
         host_(arena, from.host_),
         port_(arena, from.port_),
-        grpc_port_(arena, from.grpc_port_) {}
+        grpc_port_(arena, from.grpc_port_),
+        grpc_host_(arena, from.grpc_host_) {}
 
 RegisterChatServerReq::RegisterChatServerReq(
     ::google::protobuf::Arena* PROTOBUF_NULLABLE arena,
@@ -3069,7 +3086,8 @@ PROTOBUF_NDEBUG_INLINE RegisterChatServerReq::Impl_::Impl_(
         server_id_(arena),
         host_(arena),
         port_(arena),
-        grpc_port_(arena) {}
+        grpc_port_(arena),
+        grpc_host_(arena) {}
 
 inline void RegisterChatServerReq::SharedCtor(::_pb::Arena* PROTOBUF_NULLABLE arena) {
   new (&_impl_) Impl_(internal_visibility(), arena);
@@ -3089,6 +3107,7 @@ inline void RegisterChatServerReq::SharedDtor(MessageLite& self) {
   this_._impl_.host_.Destroy();
   this_._impl_.port_.Destroy();
   this_._impl_.grpc_port_.Destroy();
+  this_._impl_.grpc_host_.Destroy();
   this_._impl_.~Impl_();
 }
 
@@ -3135,16 +3154,16 @@ RegisterChatServerReq::GetClassData() const {
   return RegisterChatServerReq_class_data_.base();
 }
 PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
-const ::_pbi::TcParseTable<2, 4, 0, 64, 2>
+const ::_pbi::TcParseTable<3, 5, 0, 73, 2>
 RegisterChatServerReq::_table_ = {
   {
     PROTOBUF_FIELD_OFFSET(RegisterChatServerReq, _impl_._has_bits_),
     0, // no _extensions_
-    4, 24,  // max_field_number, fast_idx_mask
+    5, 56,  // max_field_number, fast_idx_mask
     offsetof(decltype(_table_), field_lookup_table),
-    4294967280,  // skipmap
+    4294967264,  // skipmap
     offsetof(decltype(_table_), field_entries),
-    4,  // num_field_entries
+    5,  // num_field_entries
     0,  // num_aux_entries
     offsetof(decltype(_table_), field_names),  // no aux_entries
     RegisterChatServerReq_class_data_.base(),
@@ -3154,10 +3173,7 @@ RegisterChatServerReq::_table_ = {
     ::_pbi::TcParser::GetTable<::message::RegisterChatServerReq>(),  // to_prefetch
     #endif  // PROTOBUF_PREFETCH_PARSE_TABLE
   }, {{
-    // string grpc_port = 4;
-    {::_pbi::TcParser::FastUS1,
-     {34, 3, 0,
-      PROTOBUF_FIELD_OFFSET(RegisterChatServerReq, _impl_.grpc_port_)}},
+    {::_pbi::TcParser::MiniParse, {}},
     // string server_id = 1;
     {::_pbi::TcParser::FastUS1,
      {10, 0, 0,
@@ -3170,6 +3186,16 @@ RegisterChatServerReq::_table_ = {
     {::_pbi::TcParser::FastUS1,
      {26, 2, 0,
       PROTOBUF_FIELD_OFFSET(RegisterChatServerReq, _impl_.port_)}},
+    // string grpc_port = 4;
+    {::_pbi::TcParser::FastUS1,
+     {34, 3, 0,
+      PROTOBUF_FIELD_OFFSET(RegisterChatServerReq, _impl_.grpc_port_)}},
+    // string grpc_host = 5;
+    {::_pbi::TcParser::FastUS1,
+     {42, 4, 0,
+      PROTOBUF_FIELD_OFFSET(RegisterChatServerReq, _impl_.grpc_host_)}},
+    {::_pbi::TcParser::MiniParse, {}},
+    {::_pbi::TcParser::MiniParse, {}},
   }}, {{
     65535, 65535
   }}, {{
@@ -3181,15 +3207,18 @@ RegisterChatServerReq::_table_ = {
     {PROTOBUF_FIELD_OFFSET(RegisterChatServerReq, _impl_.port_), _Internal::kHasBitsOffset + 2, 0, (0 | ::_fl::kFcOptional | ::_fl::kUtf8String | ::_fl::kRepAString)},
     // string grpc_port = 4;
     {PROTOBUF_FIELD_OFFSET(RegisterChatServerReq, _impl_.grpc_port_), _Internal::kHasBitsOffset + 3, 0, (0 | ::_fl::kFcOptional | ::_fl::kUtf8String | ::_fl::kRepAString)},
+    // string grpc_host = 5;
+    {PROTOBUF_FIELD_OFFSET(RegisterChatServerReq, _impl_.grpc_host_), _Internal::kHasBitsOffset + 4, 0, (0 | ::_fl::kFcOptional | ::_fl::kUtf8String | ::_fl::kRepAString)},
   }},
   // no aux_entries
   {{
-    "\35\11\4\4\11\0\0\0"
+    "\35\11\4\4\11\11\0\0"
     "message.RegisterChatServerReq"
     "server_id"
     "host"
     "port"
     "grpc_port"
+    "grpc_host"
   }},
 };
 PROTOBUF_NOINLINE void RegisterChatServerReq::Clear() {
@@ -3200,7 +3229,7 @@ PROTOBUF_NOINLINE void RegisterChatServerReq::Clear() {
   (void) cached_has_bits;
 
   cached_has_bits = _impl_._has_bits_[0];
-  if (BatchCheckHasBit(cached_has_bits, 0x0000000fU)) {
+  if (BatchCheckHasBit(cached_has_bits, 0x0000001fU)) {
     if (CheckHasBit(cached_has_bits, 0x00000001U)) {
       _impl_.server_id_.ClearNonDefaultToEmpty();
     }
@@ -3212,6 +3241,9 @@ PROTOBUF_NOINLINE void RegisterChatServerReq::Clear() {
     }
     if (CheckHasBit(cached_has_bits, 0x00000008U)) {
       _impl_.grpc_port_.ClearNonDefaultToEmpty();
+    }
+    if (CheckHasBit(cached_has_bits, 0x00000010U)) {
+      _impl_.grpc_host_.ClearNonDefaultToEmpty();
     }
   }
   _impl_._has_bits_.Clear();
@@ -3277,6 +3309,16 @@ PROTOBUF_NOINLINE void RegisterChatServerReq::Clear() {
     }
   }
 
+  // string grpc_host = 5;
+  if (CheckHasBit(cached_has_bits, 0x00000010U)) {
+    if (!this_._internal_grpc_host().empty()) {
+      const ::std::string& _s = this_._internal_grpc_host();
+      ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+          _s.data(), static_cast<int>(_s.length()), ::google::protobuf::internal::WireFormatLite::SERIALIZE, "message.RegisterChatServerReq.grpc_host");
+      target = stream->WriteStringMaybeAliased(5, _s, target);
+    }
+  }
+
   if (ABSL_PREDICT_FALSE(this_._internal_metadata_.have_unknown_fields())) {
     target =
         ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
@@ -3302,7 +3344,7 @@ PROTOBUF_NOINLINE void RegisterChatServerReq::Clear() {
 
   ::_pbi::Prefetch5LinesFrom7Lines(&this_);
   cached_has_bits = this_._impl_._has_bits_[0];
-  if (BatchCheckHasBit(cached_has_bits, 0x0000000fU)) {
+  if (BatchCheckHasBit(cached_has_bits, 0x0000001fU)) {
     // string server_id = 1;
     if (CheckHasBit(cached_has_bits, 0x00000001U)) {
       if (!this_._internal_server_id().empty()) {
@@ -3331,6 +3373,13 @@ PROTOBUF_NOINLINE void RegisterChatServerReq::Clear() {
                                         this_._internal_grpc_port());
       }
     }
+    // string grpc_host = 5;
+    if (CheckHasBit(cached_has_bits, 0x00000010U)) {
+      if (!this_._internal_grpc_host().empty()) {
+        total_size += 1 + ::google::protobuf::internal::WireFormatLite::StringSize(
+                                        this_._internal_grpc_host());
+      }
+    }
   }
   return this_.MaybeComputeUnknownFieldsSize(total_size,
                                              &this_._impl_._cached_size_);
@@ -3350,7 +3399,7 @@ void RegisterChatServerReq::MergeImpl(::google::protobuf::MessageLite& to_msg,
   (void)cached_has_bits;
 
   cached_has_bits = from._impl_._has_bits_[0];
-  if (BatchCheckHasBit(cached_has_bits, 0x0000000fU)) {
+  if (BatchCheckHasBit(cached_has_bits, 0x0000001fU)) {
     if (CheckHasBit(cached_has_bits, 0x00000001U)) {
       if (!from._internal_server_id().empty()) {
         _this->_internal_set_server_id(from._internal_server_id());
@@ -3387,6 +3436,15 @@ void RegisterChatServerReq::MergeImpl(::google::protobuf::MessageLite& to_msg,
         }
       }
     }
+    if (CheckHasBit(cached_has_bits, 0x00000010U)) {
+      if (!from._internal_grpc_host().empty()) {
+        _this->_internal_set_grpc_host(from._internal_grpc_host());
+      } else {
+        if (_this->_impl_.grpc_host_.IsDefault()) {
+          _this->_internal_set_grpc_host("");
+        }
+      }
+    }
   }
   _this->_impl_._has_bits_[0] |= cached_has_bits;
   _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(
@@ -3411,6 +3469,7 @@ void RegisterChatServerReq::InternalSwap(RegisterChatServerReq* PROTOBUF_RESTRIC
   ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.host_, &other->_impl_.host_, arena);
   ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.port_, &other->_impl_.port_, arena);
   ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.grpc_port_, &other->_impl_.grpc_port_, arena);
+  ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.grpc_host_, &other->_impl_.grpc_host_, arena);
 }
 
 ::google::protobuf::Metadata RegisterChatServerReq::GetMetadata() const {
@@ -3692,7 +3751,8 @@ PROTOBUF_NDEBUG_INLINE HeartbeatReq::Impl_::Impl_(
         server_id_(arena, from.server_id_),
         host_(arena, from.host_),
         port_(arena, from.port_),
-        grpc_port_(arena, from.grpc_port_) {}
+        grpc_port_(arena, from.grpc_port_),
+        grpc_host_(arena, from.grpc_host_) {}
 
 HeartbeatReq::HeartbeatReq(
     ::google::protobuf::Arena* PROTOBUF_NULLABLE arena,
@@ -3718,7 +3778,8 @@ PROTOBUF_NDEBUG_INLINE HeartbeatReq::Impl_::Impl_(
         server_id_(arena),
         host_(arena),
         port_(arena),
-        grpc_port_(arena) {}
+        grpc_port_(arena),
+        grpc_host_(arena) {}
 
 inline void HeartbeatReq::SharedCtor(::_pb::Arena* PROTOBUF_NULLABLE arena) {
   new (&_impl_) Impl_(internal_visibility(), arena);
@@ -3739,6 +3800,7 @@ inline void HeartbeatReq::SharedDtor(MessageLite& self) {
   this_._impl_.host_.Destroy();
   this_._impl_.port_.Destroy();
   this_._impl_.grpc_port_.Destroy();
+  this_._impl_.grpc_host_.Destroy();
   this_._impl_.~Impl_();
 }
 
@@ -3785,16 +3847,16 @@ HeartbeatReq::GetClassData() const {
   return HeartbeatReq_class_data_.base();
 }
 PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
-const ::_pbi::TcParseTable<3, 5, 0, 55, 2>
+const ::_pbi::TcParseTable<3, 6, 0, 64, 2>
 HeartbeatReq::_table_ = {
   {
     PROTOBUF_FIELD_OFFSET(HeartbeatReq, _impl_._has_bits_),
     0, // no _extensions_
-    5, 56,  // max_field_number, fast_idx_mask
+    6, 56,  // max_field_number, fast_idx_mask
     offsetof(decltype(_table_), field_lookup_table),
-    4294967264,  // skipmap
+    4294967232,  // skipmap
     offsetof(decltype(_table_), field_entries),
-    5,  // num_field_entries
+    6,  // num_field_entries
     0,  // num_aux_entries
     offsetof(decltype(_table_), field_names),  // no aux_entries
     HeartbeatReq_class_data_.base(),
@@ -3818,14 +3880,17 @@ HeartbeatReq::_table_ = {
      {26, 2, 0,
       PROTOBUF_FIELD_OFFSET(HeartbeatReq, _impl_.port_)}},
     // int64 timestamp = 4;
-    {::_pbi::TcParser::SingularVarintNoZag1<::uint64_t, offsetof(HeartbeatReq, _impl_.timestamp_), 4>(),
-     {32, 4, 0,
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint64_t, offsetof(HeartbeatReq, _impl_.timestamp_), 5>(),
+     {32, 5, 0,
       PROTOBUF_FIELD_OFFSET(HeartbeatReq, _impl_.timestamp_)}},
     // string grpc_port = 5;
     {::_pbi::TcParser::FastUS1,
      {42, 3, 0,
       PROTOBUF_FIELD_OFFSET(HeartbeatReq, _impl_.grpc_port_)}},
-    {::_pbi::TcParser::MiniParse, {}},
+    // string grpc_host = 6;
+    {::_pbi::TcParser::FastUS1,
+     {50, 4, 0,
+      PROTOBUF_FIELD_OFFSET(HeartbeatReq, _impl_.grpc_host_)}},
     {::_pbi::TcParser::MiniParse, {}},
   }}, {{
     65535, 65535
@@ -3837,18 +3902,21 @@ HeartbeatReq::_table_ = {
     // string port = 3;
     {PROTOBUF_FIELD_OFFSET(HeartbeatReq, _impl_.port_), _Internal::kHasBitsOffset + 2, 0, (0 | ::_fl::kFcOptional | ::_fl::kUtf8String | ::_fl::kRepAString)},
     // int64 timestamp = 4;
-    {PROTOBUF_FIELD_OFFSET(HeartbeatReq, _impl_.timestamp_), _Internal::kHasBitsOffset + 4, 0, (0 | ::_fl::kFcOptional | ::_fl::kInt64)},
+    {PROTOBUF_FIELD_OFFSET(HeartbeatReq, _impl_.timestamp_), _Internal::kHasBitsOffset + 5, 0, (0 | ::_fl::kFcOptional | ::_fl::kInt64)},
     // string grpc_port = 5;
     {PROTOBUF_FIELD_OFFSET(HeartbeatReq, _impl_.grpc_port_), _Internal::kHasBitsOffset + 3, 0, (0 | ::_fl::kFcOptional | ::_fl::kUtf8String | ::_fl::kRepAString)},
+    // string grpc_host = 6;
+    {PROTOBUF_FIELD_OFFSET(HeartbeatReq, _impl_.grpc_host_), _Internal::kHasBitsOffset + 4, 0, (0 | ::_fl::kFcOptional | ::_fl::kUtf8String | ::_fl::kRepAString)},
   }},
   // no aux_entries
   {{
-    "\24\11\4\4\0\11\0\0"
+    "\24\11\4\4\0\11\11\0"
     "message.HeartbeatReq"
     "server_id"
     "host"
     "port"
     "grpc_port"
+    "grpc_host"
   }},
 };
 PROTOBUF_NOINLINE void HeartbeatReq::Clear() {
@@ -3859,7 +3927,7 @@ PROTOBUF_NOINLINE void HeartbeatReq::Clear() {
   (void) cached_has_bits;
 
   cached_has_bits = _impl_._has_bits_[0];
-  if (BatchCheckHasBit(cached_has_bits, 0x0000000fU)) {
+  if (BatchCheckHasBit(cached_has_bits, 0x0000001fU)) {
     if (CheckHasBit(cached_has_bits, 0x00000001U)) {
       _impl_.server_id_.ClearNonDefaultToEmpty();
     }
@@ -3871,6 +3939,9 @@ PROTOBUF_NOINLINE void HeartbeatReq::Clear() {
     }
     if (CheckHasBit(cached_has_bits, 0x00000008U)) {
       _impl_.grpc_port_.ClearNonDefaultToEmpty();
+    }
+    if (CheckHasBit(cached_has_bits, 0x00000010U)) {
+      _impl_.grpc_host_.ClearNonDefaultToEmpty();
     }
   }
   _impl_.timestamp_ = ::int64_t{0};
@@ -3928,7 +3999,7 @@ PROTOBUF_NOINLINE void HeartbeatReq::Clear() {
   }
 
   // int64 timestamp = 4;
-  if (CheckHasBit(cached_has_bits, 0x00000010U)) {
+  if (CheckHasBit(cached_has_bits, 0x00000020U)) {
     if (this_._internal_timestamp() != 0) {
       target =
           ::google::protobuf::internal::WireFormatLite::WriteInt64ToArrayWithField<4>(
@@ -3943,6 +4014,16 @@ PROTOBUF_NOINLINE void HeartbeatReq::Clear() {
       ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
           _s.data(), static_cast<int>(_s.length()), ::google::protobuf::internal::WireFormatLite::SERIALIZE, "message.HeartbeatReq.grpc_port");
       target = stream->WriteStringMaybeAliased(5, _s, target);
+    }
+  }
+
+  // string grpc_host = 6;
+  if (CheckHasBit(cached_has_bits, 0x00000010U)) {
+    if (!this_._internal_grpc_host().empty()) {
+      const ::std::string& _s = this_._internal_grpc_host();
+      ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+          _s.data(), static_cast<int>(_s.length()), ::google::protobuf::internal::WireFormatLite::SERIALIZE, "message.HeartbeatReq.grpc_host");
+      target = stream->WriteStringMaybeAliased(6, _s, target);
     }
   }
 
@@ -3971,7 +4052,7 @@ PROTOBUF_NOINLINE void HeartbeatReq::Clear() {
 
   ::_pbi::Prefetch5LinesFrom7Lines(&this_);
   cached_has_bits = this_._impl_._has_bits_[0];
-  if (BatchCheckHasBit(cached_has_bits, 0x0000001fU)) {
+  if (BatchCheckHasBit(cached_has_bits, 0x0000003fU)) {
     // string server_id = 1;
     if (CheckHasBit(cached_has_bits, 0x00000001U)) {
       if (!this_._internal_server_id().empty()) {
@@ -4000,8 +4081,15 @@ PROTOBUF_NOINLINE void HeartbeatReq::Clear() {
                                         this_._internal_grpc_port());
       }
     }
-    // int64 timestamp = 4;
+    // string grpc_host = 6;
     if (CheckHasBit(cached_has_bits, 0x00000010U)) {
+      if (!this_._internal_grpc_host().empty()) {
+        total_size += 1 + ::google::protobuf::internal::WireFormatLite::StringSize(
+                                        this_._internal_grpc_host());
+      }
+    }
+    // int64 timestamp = 4;
+    if (CheckHasBit(cached_has_bits, 0x00000020U)) {
       if (this_._internal_timestamp() != 0) {
         total_size += ::_pbi::WireFormatLite::Int64SizePlusOne(
             this_._internal_timestamp());
@@ -4026,7 +4114,7 @@ void HeartbeatReq::MergeImpl(::google::protobuf::MessageLite& to_msg,
   (void)cached_has_bits;
 
   cached_has_bits = from._impl_._has_bits_[0];
-  if (BatchCheckHasBit(cached_has_bits, 0x0000001fU)) {
+  if (BatchCheckHasBit(cached_has_bits, 0x0000003fU)) {
     if (CheckHasBit(cached_has_bits, 0x00000001U)) {
       if (!from._internal_server_id().empty()) {
         _this->_internal_set_server_id(from._internal_server_id());
@@ -4064,6 +4152,15 @@ void HeartbeatReq::MergeImpl(::google::protobuf::MessageLite& to_msg,
       }
     }
     if (CheckHasBit(cached_has_bits, 0x00000010U)) {
+      if (!from._internal_grpc_host().empty()) {
+        _this->_internal_set_grpc_host(from._internal_grpc_host());
+      } else {
+        if (_this->_impl_.grpc_host_.IsDefault()) {
+          _this->_internal_set_grpc_host("");
+        }
+      }
+    }
+    if (CheckHasBit(cached_has_bits, 0x00000020U)) {
       if (from._internal_timestamp() != 0) {
         _this->_impl_.timestamp_ = from._impl_.timestamp_;
       }
@@ -4092,6 +4189,7 @@ void HeartbeatReq::InternalSwap(HeartbeatReq* PROTOBUF_RESTRICT PROTOBUF_NONNULL
   ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.host_, &other->_impl_.host_, arena);
   ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.port_, &other->_impl_.port_, arena);
   ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.grpc_port_, &other->_impl_.grpc_port_, arena);
+  ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.grpc_host_, &other->_impl_.grpc_host_, arena);
   swap(_impl_.timestamp_, other->_impl_.timestamp_);
 }
 
@@ -5905,7 +6003,8 @@ PROTOBUF_NDEBUG_INLINE QueryUserRouteRsp::Impl_::Impl_(
         server_id_(arena, from.server_id_),
         host_(arena, from.host_),
         port_(arena, from.port_),
-        grpc_port_(arena, from.grpc_port_) {}
+        grpc_port_(arena, from.grpc_port_),
+        grpc_host_(arena, from.grpc_host_) {}
 
 QueryUserRouteRsp::QueryUserRouteRsp(
     ::google::protobuf::Arena* PROTOBUF_NULLABLE arena,
@@ -5937,7 +6036,8 @@ PROTOBUF_NDEBUG_INLINE QueryUserRouteRsp::Impl_::Impl_(
         server_id_(arena),
         host_(arena),
         port_(arena),
-        grpc_port_(arena) {}
+        grpc_port_(arena),
+        grpc_host_(arena) {}
 
 inline void QueryUserRouteRsp::SharedCtor(::_pb::Arena* PROTOBUF_NULLABLE arena) {
   new (&_impl_) Impl_(internal_visibility(), arena);
@@ -5963,6 +6063,7 @@ inline void QueryUserRouteRsp::SharedDtor(MessageLite& self) {
   this_._impl_.host_.Destroy();
   this_._impl_.port_.Destroy();
   this_._impl_.grpc_port_.Destroy();
+  this_._impl_.grpc_host_.Destroy();
   this_._impl_.~Impl_();
 }
 
@@ -6009,16 +6110,16 @@ QueryUserRouteRsp::GetClassData() const {
   return QueryUserRouteRsp_class_data_.base();
 }
 PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
-const ::_pbi::TcParseTable<3, 6, 0, 60, 2>
+const ::_pbi::TcParseTable<3, 7, 0, 69, 2>
 QueryUserRouteRsp::_table_ = {
   {
     PROTOBUF_FIELD_OFFSET(QueryUserRouteRsp, _impl_._has_bits_),
     0, // no _extensions_
-    6, 56,  // max_field_number, fast_idx_mask
+    7, 56,  // max_field_number, fast_idx_mask
     offsetof(decltype(_table_), field_lookup_table),
-    4294967232,  // skipmap
+    4294967168,  // skipmap
     offsetof(decltype(_table_), field_entries),
-    6,  // num_field_entries
+    7,  // num_field_entries
     0,  // num_aux_entries
     offsetof(decltype(_table_), field_names),  // no aux_entries
     QueryUserRouteRsp_class_data_.base(),
@@ -6030,12 +6131,12 @@ QueryUserRouteRsp::_table_ = {
   }, {{
     {::_pbi::TcParser::MiniParse, {}},
     // int32 error = 1;
-    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(QueryUserRouteRsp, _impl_.error_), 4>(),
-     {8, 4, 0,
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(QueryUserRouteRsp, _impl_.error_), 5>(),
+     {8, 5, 0,
       PROTOBUF_FIELD_OFFSET(QueryUserRouteRsp, _impl_.error_)}},
     // bool online = 2;
-    {::_pbi::TcParser::SingularVarintNoZag1<bool, offsetof(QueryUserRouteRsp, _impl_.online_), 5>(),
-     {16, 5, 0,
+    {::_pbi::TcParser::SingularVarintNoZag1<bool, offsetof(QueryUserRouteRsp, _impl_.online_), 6>(),
+     {16, 6, 0,
       PROTOBUF_FIELD_OFFSET(QueryUserRouteRsp, _impl_.online_)}},
     // string server_id = 3;
     {::_pbi::TcParser::FastUS1,
@@ -6053,14 +6154,17 @@ QueryUserRouteRsp::_table_ = {
     {::_pbi::TcParser::FastUS1,
      {50, 3, 0,
       PROTOBUF_FIELD_OFFSET(QueryUserRouteRsp, _impl_.grpc_port_)}},
-    {::_pbi::TcParser::MiniParse, {}},
+    // string grpc_host = 7;
+    {::_pbi::TcParser::FastUS1,
+     {58, 4, 0,
+      PROTOBUF_FIELD_OFFSET(QueryUserRouteRsp, _impl_.grpc_host_)}},
   }}, {{
     65535, 65535
   }}, {{
     // int32 error = 1;
-    {PROTOBUF_FIELD_OFFSET(QueryUserRouteRsp, _impl_.error_), _Internal::kHasBitsOffset + 4, 0, (0 | ::_fl::kFcOptional | ::_fl::kInt32)},
+    {PROTOBUF_FIELD_OFFSET(QueryUserRouteRsp, _impl_.error_), _Internal::kHasBitsOffset + 5, 0, (0 | ::_fl::kFcOptional | ::_fl::kInt32)},
     // bool online = 2;
-    {PROTOBUF_FIELD_OFFSET(QueryUserRouteRsp, _impl_.online_), _Internal::kHasBitsOffset + 5, 0, (0 | ::_fl::kFcOptional | ::_fl::kBool)},
+    {PROTOBUF_FIELD_OFFSET(QueryUserRouteRsp, _impl_.online_), _Internal::kHasBitsOffset + 6, 0, (0 | ::_fl::kFcOptional | ::_fl::kBool)},
     // string server_id = 3;
     {PROTOBUF_FIELD_OFFSET(QueryUserRouteRsp, _impl_.server_id_), _Internal::kHasBitsOffset + 0, 0, (0 | ::_fl::kFcOptional | ::_fl::kUtf8String | ::_fl::kRepAString)},
     // string host = 4;
@@ -6069,15 +6173,18 @@ QueryUserRouteRsp::_table_ = {
     {PROTOBUF_FIELD_OFFSET(QueryUserRouteRsp, _impl_.port_), _Internal::kHasBitsOffset + 2, 0, (0 | ::_fl::kFcOptional | ::_fl::kUtf8String | ::_fl::kRepAString)},
     // string grpc_port = 6;
     {PROTOBUF_FIELD_OFFSET(QueryUserRouteRsp, _impl_.grpc_port_), _Internal::kHasBitsOffset + 3, 0, (0 | ::_fl::kFcOptional | ::_fl::kUtf8String | ::_fl::kRepAString)},
+    // string grpc_host = 7;
+    {PROTOBUF_FIELD_OFFSET(QueryUserRouteRsp, _impl_.grpc_host_), _Internal::kHasBitsOffset + 4, 0, (0 | ::_fl::kFcOptional | ::_fl::kUtf8String | ::_fl::kRepAString)},
   }},
   // no aux_entries
   {{
-    "\31\0\0\11\4\4\11\0"
+    "\31\0\0\11\4\4\11\11"
     "message.QueryUserRouteRsp"
     "server_id"
     "host"
     "port"
     "grpc_port"
+    "grpc_host"
   }},
 };
 PROTOBUF_NOINLINE void QueryUserRouteRsp::Clear() {
@@ -6088,7 +6195,7 @@ PROTOBUF_NOINLINE void QueryUserRouteRsp::Clear() {
   (void) cached_has_bits;
 
   cached_has_bits = _impl_._has_bits_[0];
-  if (BatchCheckHasBit(cached_has_bits, 0x0000000fU)) {
+  if (BatchCheckHasBit(cached_has_bits, 0x0000001fU)) {
     if (CheckHasBit(cached_has_bits, 0x00000001U)) {
       _impl_.server_id_.ClearNonDefaultToEmpty();
     }
@@ -6101,8 +6208,11 @@ PROTOBUF_NOINLINE void QueryUserRouteRsp::Clear() {
     if (CheckHasBit(cached_has_bits, 0x00000008U)) {
       _impl_.grpc_port_.ClearNonDefaultToEmpty();
     }
+    if (CheckHasBit(cached_has_bits, 0x00000010U)) {
+      _impl_.grpc_host_.ClearNonDefaultToEmpty();
+    }
   }
-  if (BatchCheckHasBit(cached_has_bits, 0x00000030U)) {
+  if (BatchCheckHasBit(cached_has_bits, 0x00000060U)) {
     ::memset(&_impl_.error_, 0, static_cast<::size_t>(
         reinterpret_cast<char*>(&_impl_.online_) -
         reinterpret_cast<char*>(&_impl_.error_)) + sizeof(_impl_.online_));
@@ -6131,7 +6241,7 @@ PROTOBUF_NOINLINE void QueryUserRouteRsp::Clear() {
 
   cached_has_bits = this_._impl_._has_bits_[0];
   // int32 error = 1;
-  if (CheckHasBit(cached_has_bits, 0x00000010U)) {
+  if (CheckHasBit(cached_has_bits, 0x00000020U)) {
     if (this_._internal_error() != 0) {
       target =
           ::google::protobuf::internal::WireFormatLite::WriteInt32ToArrayWithField<1>(
@@ -6140,7 +6250,7 @@ PROTOBUF_NOINLINE void QueryUserRouteRsp::Clear() {
   }
 
   // bool online = 2;
-  if (CheckHasBit(cached_has_bits, 0x00000020U)) {
+  if (CheckHasBit(cached_has_bits, 0x00000040U)) {
     if (this_._internal_online() != 0) {
       target = stream->EnsureSpace(target);
       target = ::_pbi::WireFormatLite::WriteBoolToArray(
@@ -6188,6 +6298,16 @@ PROTOBUF_NOINLINE void QueryUserRouteRsp::Clear() {
     }
   }
 
+  // string grpc_host = 7;
+  if (CheckHasBit(cached_has_bits, 0x00000010U)) {
+    if (!this_._internal_grpc_host().empty()) {
+      const ::std::string& _s = this_._internal_grpc_host();
+      ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+          _s.data(), static_cast<int>(_s.length()), ::google::protobuf::internal::WireFormatLite::SERIALIZE, "message.QueryUserRouteRsp.grpc_host");
+      target = stream->WriteStringMaybeAliased(7, _s, target);
+    }
+  }
+
   if (ABSL_PREDICT_FALSE(this_._internal_metadata_.have_unknown_fields())) {
     target =
         ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
@@ -6213,7 +6333,7 @@ PROTOBUF_NOINLINE void QueryUserRouteRsp::Clear() {
 
   ::_pbi::Prefetch5LinesFrom7Lines(&this_);
   cached_has_bits = this_._impl_._has_bits_[0];
-  if (BatchCheckHasBit(cached_has_bits, 0x0000003fU)) {
+  if (BatchCheckHasBit(cached_has_bits, 0x0000007fU)) {
     // string server_id = 3;
     if (CheckHasBit(cached_has_bits, 0x00000001U)) {
       if (!this_._internal_server_id().empty()) {
@@ -6242,15 +6362,22 @@ PROTOBUF_NOINLINE void QueryUserRouteRsp::Clear() {
                                         this_._internal_grpc_port());
       }
     }
-    // int32 error = 1;
+    // string grpc_host = 7;
     if (CheckHasBit(cached_has_bits, 0x00000010U)) {
+      if (!this_._internal_grpc_host().empty()) {
+        total_size += 1 + ::google::protobuf::internal::WireFormatLite::StringSize(
+                                        this_._internal_grpc_host());
+      }
+    }
+    // int32 error = 1;
+    if (CheckHasBit(cached_has_bits, 0x00000020U)) {
       if (this_._internal_error() != 0) {
         total_size += ::_pbi::WireFormatLite::Int32SizePlusOne(
             this_._internal_error());
       }
     }
     // bool online = 2;
-    if (CheckHasBit(cached_has_bits, 0x00000020U)) {
+    if (CheckHasBit(cached_has_bits, 0x00000040U)) {
       if (this_._internal_online() != 0) {
         total_size += 2;
       }
@@ -6274,7 +6401,7 @@ void QueryUserRouteRsp::MergeImpl(::google::protobuf::MessageLite& to_msg,
   (void)cached_has_bits;
 
   cached_has_bits = from._impl_._has_bits_[0];
-  if (BatchCheckHasBit(cached_has_bits, 0x0000003fU)) {
+  if (BatchCheckHasBit(cached_has_bits, 0x0000007fU)) {
     if (CheckHasBit(cached_has_bits, 0x00000001U)) {
       if (!from._internal_server_id().empty()) {
         _this->_internal_set_server_id(from._internal_server_id());
@@ -6312,11 +6439,20 @@ void QueryUserRouteRsp::MergeImpl(::google::protobuf::MessageLite& to_msg,
       }
     }
     if (CheckHasBit(cached_has_bits, 0x00000010U)) {
+      if (!from._internal_grpc_host().empty()) {
+        _this->_internal_set_grpc_host(from._internal_grpc_host());
+      } else {
+        if (_this->_impl_.grpc_host_.IsDefault()) {
+          _this->_internal_set_grpc_host("");
+        }
+      }
+    }
+    if (CheckHasBit(cached_has_bits, 0x00000020U)) {
       if (from._internal_error() != 0) {
         _this->_impl_.error_ = from._impl_.error_;
       }
     }
-    if (CheckHasBit(cached_has_bits, 0x00000020U)) {
+    if (CheckHasBit(cached_has_bits, 0x00000040U)) {
       if (from._internal_online() != 0) {
         _this->_impl_.online_ = from._impl_.online_;
       }
@@ -6345,6 +6481,7 @@ void QueryUserRouteRsp::InternalSwap(QueryUserRouteRsp* PROTOBUF_RESTRICT PROTOB
   ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.host_, &other->_impl_.host_, arena);
   ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.port_, &other->_impl_.port_, arena);
   ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.grpc_port_, &other->_impl_.grpc_port_, arena);
+  ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.grpc_host_, &other->_impl_.grpc_host_, arena);
   ::google::protobuf::internal::memswap<
       PROTOBUF_FIELD_OFFSET(QueryUserRouteRsp, _impl_.online_)
       + sizeof(QueryUserRouteRsp::_impl_.online_)

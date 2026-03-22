@@ -86,8 +86,12 @@ StatusGrpcClient::StatusGrpcClient()
     const std::string host = cfg["StatusServer"]["host"];
     const std::string port = cfg["StatusServer"]["port"];
     self_host_ = cfg["SelfServer"]["Host"];
+    self_grpc_host_ = cfg["SelfServer"]["GrpcHost"];
     self_port_ = cfg["SelfServer"]["Port"];
     self_grpc_port_ = cfg["SelfServer"]["GrpcPort"];
+    if (self_grpc_host_.empty()) {
+        self_grpc_host_ = self_host_;
+    }
     self_server_id_ = buildServerId(self_host_, self_port_);
     pool_ = std::make_unique<StatusConPool>(5, host, port);
 }
@@ -174,6 +178,7 @@ RegisterChatServerRsp StatusGrpcClient::RegisterChatServer()
     request.set_server_id(self_server_id_);
     request.set_host(self_host_);
     request.set_port(self_port_);
+    request.set_grpc_host(self_grpc_host_);
     request.set_grpc_port(self_grpc_port_);
     ClientContext context;
 
@@ -206,6 +211,7 @@ HeartbeatRsp StatusGrpcClient::Heartbeat()
     request.set_server_id(self_server_id_);
     request.set_host(self_host_);
     request.set_port(self_port_);
+    request.set_grpc_host(self_grpc_host_);
     request.set_grpc_port(self_grpc_port_);
     request.set_timestamp(static_cast<long long>(std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::system_clock::now().time_since_epoch()).count()));

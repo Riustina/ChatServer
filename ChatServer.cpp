@@ -95,13 +95,14 @@ int main(int argc, char* argv[])
             throw std::runtime_error("[main] 配置文件中 SelfServer.GrpcPort 为空");
         }
         const std::string host_str = cfg["SelfServer"]["Host"].empty() ? "0.0.0.0" : cfg["SelfServer"]["Host"];
+        const std::string grpc_host_str = cfg["SelfServer"]["GrpcHost"].empty() ? "0.0.0.0" : cfg["SelfServer"]["GrpcHost"];
 
         const int port = std::stoi(port_str); // 比 atoi 更安全，失败时抛异常
         CServer server(io_context, static_cast<short>(port));
 
         ChatGrpcServiceImpl chat_grpc_service;
         grpc::ServerBuilder grpc_builder;
-        const std::string grpc_address = BuildChatGrpcAddress(host_str, grpc_port_str);
+        const std::string grpc_address = BuildChatGrpcAddress(grpc_host_str, grpc_port_str);
         grpc_builder.AddListeningPort(grpc_address, grpc::InsecureServerCredentials());
         grpc_builder.RegisterService(&chat_grpc_service);
         auto grpc_server = grpc_builder.BuildAndStart();
@@ -131,8 +132,8 @@ int main(int argc, char* argv[])
                 pool.Stop();
             });
 
-        std::cout << "[main] ChatServer 启动，TCP端口: " << port
-            << "，gRPC地址: " << grpc_address << "\n";
+        std::cout << "[main] ChatServer 启动，TCP监听地址: " << host_str << ":" << port
+            << "，gRPC监听地址: " << grpc_address << "\n";
         io_context.run();
         grpc_server->Shutdown();
         if (grpc_thread.joinable()) {
