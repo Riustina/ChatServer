@@ -363,3 +363,6 @@ MigrationBackup/
 FodyWeavers.xsd
 *.dll
 build-cmake/
+config.ini.donotdistribute
+config_8090.ini.donotdistribute
+config_8091.ini.donotdistribute
