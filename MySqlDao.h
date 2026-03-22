@@ -6,6 +6,7 @@
 #include <cstdint>
 #include <cstdlib>
 #include <mutex>
+#include <condition_variable>
 #include <atomic>
 #include <thread>
 #include <queue>
